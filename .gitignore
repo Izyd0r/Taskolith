@@ -353,7 +353,6 @@ node_modules/
 **/*.DesktopClient/ModelManifest.xml
 **/*.Server/GeneratedArtifacts
 **/*.Server/ModelManifest.xml
-_Pvt_Extensions
 
 # Paket dependency manager
 .paket/paket.exe
@@ -798,6 +797,7 @@ obj/
 
 # Paket dependency manager
 
+_Pvt_Extensions
 # FAKE - F# Make
 
 # CodeRush personal settings
@@ -848,5 +848,30 @@ obj/
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/csharp,react,android,androidstudio,rider,visualstudio,kotlin
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 docs/
