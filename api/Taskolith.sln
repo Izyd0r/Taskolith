@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taskolith.API", "Taskolith.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taskolith.API.UnitTests", "Taskolith.API.UnitTests\Taskolith.API.UnitTests.csproj", "{0DE81F4B-181A-4933-A297-184F74312BF4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taskolith.API.IntegrationTests", "Taskolith.API.IntegrationTests\Taskolith.API.IntegrationTests.csproj", "{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,18 @@ Global
 		{0DE81F4B-181A-4933-A297-184F74312BF4}.Release|x64.Build.0 = Release|Any CPU
 		{0DE81F4B-181A-4933-A297-184F74312BF4}.Release|x86.ActiveCfg = Release|Any CPU
 		{0DE81F4B-181A-4933-A297-184F74312BF4}.Release|x86.Build.0 = Release|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Debug|x64.Build.0 = Debug|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Debug|x86.Build.0 = Debug|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Release|x64.ActiveCfg = Release|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Release|x64.Build.0 = Release|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Release|x86.ActiveCfg = Release|Any CPU
+		{751B8E50-BA6E-4EB6-8665-D656E2EB85FB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
