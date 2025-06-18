@@ -1,4 +1,5 @@
 using Taskolith.API.Auth;
+using Taskolith.API.Auth.Login;
 using Taskolith.API.Auth.SignUp;
 using Taskolith.API.Common;
 
@@ -21,7 +22,8 @@ public static class Endpoints
             .WithTags("Authentication");
 
         endpoints.MapPublicGroup()
-            .MapEndpoint<SignUpUser>();
+            .MapEndpoint<SignUpUser>()
+            .MapEndpoint<LoginUser>();
     }
     
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)
