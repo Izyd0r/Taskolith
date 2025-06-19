@@ -31,6 +31,27 @@ builder.Services.AddSwaggerGen(options =>
             Url = new Uri("https://example.com/license"),
         }
     });
+
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "JWT Authorization header using the Bearer scheme.",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer",
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+    
+    options.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { securityScheme, new List<string>() }
+    });
 });
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -41,7 +62,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new()
         {
             ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidateAudience = true,
+            ValidAudiences = [
+                builder.Configuration["Jwt:Audiences:0"]
+            ],
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
 

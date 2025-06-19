@@ -15,4 +15,6 @@ public class User
     public required string FirstName { get; init; } = null!;
     [MaxLength(20)]
     public required string LastName { get; init; } = null!;
+    
+    public ICollection<ToDoTask> Tasks { get; init; } = new List<ToDoTask>();
 }
