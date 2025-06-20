@@ -17,6 +17,7 @@ public class CreateTask : IEndPoint
     {
         var value = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if (value == null) return Results.BadRequest();
+        var taskCreationTime = DateTime.UtcNow;
         var task = new ToDoTask()
         {
             Title = request.Title,
@@ -25,12 +26,13 @@ public class CreateTask : IEndPoint
             UserId = Guid.Parse(value),
             IsCompleted = false,
             Id = Guid.NewGuid(),
+            CreatedDate = taskCreationTime,
         };
             
         await context.ToDoTasks.AddAsync(task, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
             
-        var response = new CreateTaskResponse(task.UserId, task.Id, task.Title, task.Description, task.DueDate, task.IsCompleted, DateTime.UtcNow);
+        var response = new CreateTaskResponse(task.UserId, task.Id, task.Title, task.Description, task.DueDate, taskCreationTime, task.IsCompleted);
         return Results.Created($"/api/tasks/{task.Id}",response);
     }
 }

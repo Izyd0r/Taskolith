@@ -28,10 +28,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         builder.Property(u => u.LastName).IsRequired().HasMaxLength(100);
         builder.Property(u => u.Username).IsRequired().HasMaxLength(20);
         builder.HasIndex(u => u.Username).IsUnique();
-        builder.HasMany(u => u.Tasks)
-            .WithOne(t => t.User)
-            .HasForeignKey(t => t.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private static void ConfigureTasksTable(ModelBuilder modelBuilder)
@@ -43,10 +39,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         builder.Property(t => t.Title).IsRequired().HasMaxLength(256);
         builder.Property(t => t.Description).IsRequired().HasMaxLength(1024);
         builder.Property(t => t.DueDate).IsRequired();
-        builder.HasIndex(t => t.Title).IsUnique();
-        builder.HasOne(t => t.User)
+        builder.Property(t => t.CreatedDate).IsRequired();
+        builder.HasOne<User>()
             .WithMany(u => u.Tasks)
             .HasForeignKey(t => t.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
