@@ -4,6 +4,7 @@ using Taskolith.API.Auth.SignUp;
 using Taskolith.API.Common;
 using Taskolith.API.Tasks.CreateTask;
 using Taskolith.API.Tasks.GetTasks;
+using Taskolith.API.Tasks.UpdateTask;
 
 namespace Taskolith.API;
 
@@ -36,7 +37,8 @@ public static class Endpoints
 
         endpoints.MapPrivateGroup()
             .MapEndpoint<CreateTask>()
-            .MapEndpoint<GetTasks>();
+            .MapEndpoint<GetTasks>()
+            .MapEndpoint<UpdateTask>();
     }
     
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)
