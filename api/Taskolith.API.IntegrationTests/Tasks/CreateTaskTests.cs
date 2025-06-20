@@ -36,7 +36,7 @@ public class CreateTaskTests(IntegrationTestWebAppFactory factory, ITestOutputHe
         
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
 
-        var createTaskRequest = new CreateTaskRequest("Title", "Description", DateTime.UtcNow);
+        var createTaskRequest = new CreateTaskRequest("Title", "Description", DateTime.UtcNow.AddDays(1));
         var responseFromCreateTask = await client.PostAsJsonAsync("/api/tasks/createtask", createTaskRequest);
         responseFromCreateTask.StatusCode.Should().Be(HttpStatusCode.Created);
         

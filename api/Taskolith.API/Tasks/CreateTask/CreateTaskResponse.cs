@@ -6,6 +6,6 @@ public record CreateTaskResponse(
     string Title,
     string Description,
     DateTime DueDate,
-    bool Completed,
-    DateTime Created
+    DateTime Created,
+    bool Completed
 );
