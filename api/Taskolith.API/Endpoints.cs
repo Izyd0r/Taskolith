@@ -3,6 +3,7 @@ using Taskolith.API.Auth.Login;
 using Taskolith.API.Auth.SignUp;
 using Taskolith.API.Common;
 using Taskolith.API.Tasks.CreateTask;
+using Taskolith.API.Tasks.DeleteTask;
 using Taskolith.API.Tasks.GetTasks;
 using Taskolith.API.Tasks.UpdateTask;
 
@@ -14,7 +15,7 @@ public static class Endpoints
     {
         var endpoints = app.MapGroup("/api")
             .WithOpenApi();
-       
+
         // Here we map groups of endpoints
         endpoints.MapAuthEndpoints();
         endpoints.MapTasksEndpoints();
@@ -38,22 +39,24 @@ public static class Endpoints
         endpoints.MapPrivateGroup()
             .MapEndpoint<CreateTask>()
             .MapEndpoint<GetTasks>()
-            .MapEndpoint<UpdateTask>();
+            .MapEndpoint<UpdateTask>()
+            .MapEndpoint<DeleteTask>();
     }
-    
+
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)
     {
         return app.MapGroup(prefix ?? string.Empty)
             .AllowAnonymous();
     }
-    
+
     private static RouteGroupBuilder MapPrivateGroup(this IEndpointRouteBuilder app, string? prefix = null)
     {
         return app.MapGroup(prefix ?? string.Empty)
             .RequireAuthorization();
     }
-    
-    private static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app) where TEndpoint : IEndPoint
+
+    private static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app)
+        where TEndpoint : IEndPoint
     {
         TEndpoint.Map(app);
         return app;
