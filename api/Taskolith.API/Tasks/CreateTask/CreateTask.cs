@@ -9,7 +9,7 @@ namespace Taskolith.API.Tasks.CreateTask;
 public class CreateTask : IEndPoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/createtask", Handle)
+        .MapPost("/create-task", Handle)
         .WithSummary("Creates a new task")
         .WithRequestValidation<CreateTaskRequest>();
 
