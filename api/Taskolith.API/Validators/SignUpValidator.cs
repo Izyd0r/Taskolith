@@ -23,7 +23,7 @@ public class SignUpValidator : AbstractValidator<SignUpRequest>
 
         RuleFor(request => request.Username)
             .NotEmpty().WithMessage("Username is required")
-            .MaximumLength(20).WithMessage("Username must not exceed 100 characters long");
+            .MaximumLength(20).WithMessage("Username must not exceed 20 characters long");
         
         RuleFor(request => request.FirstName)
             .NotEmpty().WithMessage("First name is required")
