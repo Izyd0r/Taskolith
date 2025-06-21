@@ -13,7 +13,7 @@ public abstract class SignUpUser : IEndPoint
         .WithRequestValidation<SignUpRequest>()
         .WithDisplayName("Register User");
     
-    static async Task<IResult> Handle(SignUpRequest request, AppDbContext dbContext)
+    static async Task<IResult> Handle(SignUpRequest request, AppDbContext dbContext, JwtTokenGenerator jwtTokenGenerator)
     {
         if (await dbContext.Users.AnyAsync(u => u.Email == request.Email))
         {
@@ -36,13 +36,14 @@ public abstract class SignUpUser : IEndPoint
         
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
-
+        
         var signUpResponse = new SignUpResponse(
             user.Id,
             user.Username,
             user.FirstName,
             user.LastName,
-            user.Email
+            user.Email,
+            jwtTokenGenerator.GenerateToken(user)
         );
         
         return Results.Created($"/api/users/{signUpResponse.Id}", signUpResponse);
