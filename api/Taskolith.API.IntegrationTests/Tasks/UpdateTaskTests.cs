@@ -38,14 +38,14 @@ public class UpdateTaskTests(IntegrationTestWebAppFactory factory) : BaseIntegra
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
 
         var createTaskRequest = new CreateTaskRequest("Title", "Description", DateTime.UtcNow.AddDays(1));
-        var responseFromCreateTask = await client.PostAsJsonAsync("/api/tasks/create-task", createTaskRequest);
+        var responseFromCreateTask = await client.PostAsJsonAsync("/api/tasks/", createTaskRequest);
         responseFromCreateTask.StatusCode.Should().Be(HttpStatusCode.Created);
         
         var createTaskResponse = await responseFromCreateTask.Content.ReadFromJsonAsync<CreateTaskResponse>();
         responseFromCreateTask.Headers.Location?.OriginalString.Should().Be($"/api/tasks/{createTaskResponse!.TaskId}");
         
         var updateTaskRequest = new UpdateTaskRequest(createTaskResponse!.TaskId, "New title", "New description", DateTime.UtcNow.AddDays(1), createTaskResponse.Completed);
-        var responseFromUpdateTask = await client.PutAsJsonAsync("/api/tasks/update-task", updateTaskRequest);
+        var responseFromUpdateTask = await client.PutAsJsonAsync("/api/tasks/", updateTaskRequest);
         responseFromUpdateTask.StatusCode.Should().Be(HttpStatusCode.OK);
         
         var updatedTask = await DbContext.ToDoTasks.SingleAsync(x => x.Id == updateTaskRequest.TaskId);
@@ -78,7 +78,7 @@ public class UpdateTaskTests(IntegrationTestWebAppFactory factory) : BaseIntegra
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
 
         var updateTaskRequest = new UpdateTaskRequest(Guid.NewGuid(), "New title", "New description", DateTime.UtcNow.AddDays(1), true);
-        var responseFromUpdateTask = await client.PutAsJsonAsync("/api/tasks/update-task", updateTaskRequest);
+        var responseFromUpdateTask = await client.PutAsJsonAsync("/api/tasks/", updateTaskRequest);
         responseFromUpdateTask.StatusCode.Should().Be(HttpStatusCode.BadRequest, "No task found");
     }
 }

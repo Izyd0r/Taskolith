@@ -8,7 +8,7 @@ namespace Taskolith.API.Tasks.GetTasks;
 public class GetTasks : IEndPoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/get-tasks", Handle)
+        .MapGet("/", Handle)
         .WithSummary("Get all user tasks");
 
     static async Task<IResult> Handle(AppDbContext dbContext, ClaimsPrincipal user, CancellationToken cancellationToken)

@@ -37,7 +37,7 @@ public class DeleteTaskTests(IntegrationTestWebAppFactory factory, ITestOutputHe
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
         
         var createTaskRequest = new CreateTaskRequest("Title", "Description", DateTime.UtcNow.AddDays(1));
-        var createResponse = await client.PostAsJsonAsync("/api/tasks/create-task", createTaskRequest);
+        var createResponse = await client.PostAsJsonAsync("/api/tasks/", createTaskRequest);
         createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
         
         var created = await createResponse.Content.ReadFromJsonAsync<CreateTaskResponse>();
