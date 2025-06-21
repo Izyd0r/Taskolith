@@ -9,7 +9,7 @@ namespace Taskolith.API.Tasks.UpdateTask;
 public class UpdateTask : IEndPoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPut("/update-task", Handle)
+        .MapPut("/", Handle)
         .WithSummary("Updates task")
         .WithRequestValidation<UpdateTaskRequest>();
 

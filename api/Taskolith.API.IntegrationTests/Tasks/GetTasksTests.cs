@@ -94,7 +94,7 @@ public class GetTasksTests(IntegrationTestWebAppFactory factory) : BaseIntegrati
         
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
         
-        var getTasksResponse = await client.GetAsync("/api/tasks/get-tasks");
+        var getTasksResponse = await client.GetAsync("/api/tasks/");
         getTasksResponse.EnsureSuccessStatusCode();
         var tasks = await getTasksResponse.Content.ReadFromJsonAsync<GetTasksResponse>();
         Assert.NotNull(tasks);
