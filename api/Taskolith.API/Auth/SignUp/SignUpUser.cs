@@ -36,7 +36,7 @@ public abstract class SignUpUser : IEndPoint
         
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();
-        
+
         var signUpResponse = new SignUpResponse(
             user.Id,
             user.Username,
