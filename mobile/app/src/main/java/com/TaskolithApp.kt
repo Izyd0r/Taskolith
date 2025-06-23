@@ -5,23 +5,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.ui.navigation.NavGraph
 import com.ui.screens.SplashScreen
 import com.ui.theme.TaskolithTheme
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
 
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    device = "spec:width=411dp,height=891dp,dpi=420"
-)
 @Composable
 fun TaskolithApp() {
+    val navController = rememberNavController()
     TaskolithTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            SplashScreen()
+            NavGraph(navController = navController)
         }
     }
 }

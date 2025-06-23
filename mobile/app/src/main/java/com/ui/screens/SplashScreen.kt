@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -18,35 +19,37 @@ import com.ui.theme.Satoshi
 import com.ui.viewmodels.SplashScreenViewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.ui.navigation.Screen
 
 
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    device = "spec:width=411dp,height=891dp,dpi=420"
-)
 @Composable
-fun SplashScreen(splashViewModel: SplashScreenViewModel = viewModel()) {
+fun SplashScreen(
+    navController: NavController,
+    splashViewModel: SplashScreenViewModel = viewModel()
+) {
     val isDone by splashViewModel.isSplashDone.collectAsState()
 
-    if (isDone) {
-        // TODO: navigate to login/register panel
-    } else {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        )
-        {
-            Text(
-                text = "Taskolith",
-                modifier = Modifier
-                    .testTag("appName")
-                    .offset(y = (-100).dp),
-                style = MaterialTheme.typography.displayLarge,
-                fontFamily = Satoshi,
-                fontWeight = FontWeight.Black,
-                fontSize = 86.sp
-            )
+    LaunchedEffect(isDone) {
+        if(isDone) {
+            navController.navigate(Screen.Auth.route)
         }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    )
+    {
+        Text(
+            text = "Taskolith",
+            modifier = Modifier
+                .testTag("appName")
+                .offset(y = (-100).dp),
+            style = MaterialTheme.typography.displayLarge,
+            fontFamily = Satoshi,
+            fontWeight = FontWeight.Black,
+            fontSize = 86.sp
+        )
     }
 }
