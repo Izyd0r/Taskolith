@@ -4,10 +4,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -24,19 +22,33 @@ import com.ui.theme.Satoshi
 fun AppButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
+    val disabledContainerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+    val disabledContentColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.5f)
+    val disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+
     Button(
         onClick = onClick,
+        enabled = enabled,
         shape = MaterialTheme.shapes.medium,
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isPressed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-            contentColor = if (isPressed) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSecondary
+            contentColor = if (isPressed) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSecondary,
+            disabledContainerColor = disabledContainerColor,
+            disabledContentColor = disabledContentColor
         ),
-        border = BorderStroke(2.dp, if (isPressed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface),
+        border = BorderStroke(2.dp,
+            if (enabled) {
+                if (isPressed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+            } else {
+                disabledBorderColor
+            }
+        ),
         interactionSource = interactionSource,
         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 32.dp),
         modifier = Modifier
