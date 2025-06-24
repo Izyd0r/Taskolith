@@ -17,7 +17,7 @@ class SplashScreenViewModel(
     val isSplashDone: StateFlow<Boolean> = _isSplashDone
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
             delay(2000)
             _isSplashDone.value = true
         }
