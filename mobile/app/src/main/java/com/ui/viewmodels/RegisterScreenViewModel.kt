@@ -1,11 +1,9 @@
+package com.ui.viewmodels
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ui.state.TextFieldState
 import kotlinx.coroutines.flow.*
-
-data class TextFieldState(
-    val text: String = "",
-    val error: String? = null
-)
 
 class RegisterScreenViewModel : ViewModel() {
 

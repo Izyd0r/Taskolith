@@ -1,6 +1,6 @@
 package com.taskolithmobile.viewmodel
 
-import RegisterScreenViewModel
+import com.ui.viewmodels.RegisterScreenViewModel
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
