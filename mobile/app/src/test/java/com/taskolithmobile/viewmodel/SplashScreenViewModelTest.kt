@@ -32,7 +32,7 @@ class SplashScreenViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `splash screen completes after delay`(): Unit = runTest {
-        val viewModel = SplashScreenViewModel()
+        val viewModel = SplashScreenViewModel(testDispatcher)
         assertFalse(viewModel.isSplashDone.value)
         advanceTimeBy(2000)
         testDispatcher.scheduler.advanceUntilIdle()

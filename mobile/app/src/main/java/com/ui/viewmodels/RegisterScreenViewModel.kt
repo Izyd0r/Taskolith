@@ -1,11 +1,23 @@
 package com.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.data.remote.dto.RegisterRequest
+import com.di.MainDispatcher
+import com.domain.repository.AuthRepository
 import com.ui.state.TextFieldState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
-class RegisterScreenViewModel : ViewModel() {
+@HiltViewModel
+class RegisterScreenViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
+    @MainDispatcher private val dispatcher: CoroutineDispatcher
+) : ViewModel() {
 
     private val _firstNameState = MutableStateFlow(TextFieldState())
     val firstNameState: StateFlow<TextFieldState> = _firstNameState.asStateFlow()
@@ -34,14 +46,14 @@ class RegisterScreenViewModel : ViewModel() {
     val isRegisterEnabled: StateFlow<Boolean> = combine(
         firstFiveFieldsFlow, _confirmPasswordState
     ) { firstFiveStates, confirmPassState ->
-
         val firstFiveAreValid = firstFiveStates.all { it.text.isNotBlank() && it.error == null }
-
         val confirmPassIsValid = confirmPassState.text.isNotBlank() && confirmPassState.error == null
-
         firstFiveAreValid && confirmPassIsValid
-
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = false
+    )
 
     fun onFirstNameChange(text: String) {
         val error = if (text.isEmpty()) "First name is required"
@@ -101,6 +113,21 @@ class RegisterScreenViewModel : ViewModel() {
     }
 
     fun onRegisterClick() {
-        // Registration logic goes here
+        val request = RegisterRequest(
+            firstName = _firstNameState.value.text,
+            lastName = _lastNameState.value.text,
+            username = _usernameState.value.text,
+            email = _emailState.value.text,
+            password = _passwordState.value.text
+        )
+
+        viewModelScope.launch(dispatcher) {
+            try {
+                val response = authRepository.registerUser(request)
+                Log.d("Register", "Success your JWT is: ${response.token}")
+            } catch (e: Exception) {
+                Log.e("Register", "Error: ${e.message}")
+            }
+        }
     }
 }

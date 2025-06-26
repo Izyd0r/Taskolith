@@ -1,7 +1,11 @@
 package com.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.di.MainDispatcher
+import com.domain.repository.AuthRepository
 import com.ui.state.TextFieldState
+import jakarta.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -10,7 +14,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 
-class LoginScreenViewModel : ViewModel() {
+class LoginScreenViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
+    @MainDispatcher private val dispatcher: CoroutineDispatcher
+) : ViewModel() {
 
     private val _usernameState = MutableStateFlow(TextFieldState())
     val usernameState: StateFlow<TextFieldState> = _usernameState.asStateFlow()

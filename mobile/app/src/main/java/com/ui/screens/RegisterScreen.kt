@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.ui.components.AppButton
 import com.ui.components.AppTextField
@@ -35,7 +36,7 @@ import com.ui.theme.TaskolithTheme
 @Composable
 fun RegisterScreen(
     navController: NavController,
-    viewModel: RegisterScreenViewModel = viewModel()
+    viewModel: RegisterScreenViewModel = hiltViewModel()
 ) {
     val firstNameState by viewModel.firstNameState.collectAsState()
     val lastNameState by viewModel.lastNameState.collectAsState()

@@ -17,10 +17,16 @@ class LoginScreenViewModelTests {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: LoginScreenViewModel
+    private lateinit var fakeAuthRepository: FakeAuthRepository
 
     @Before
     fun setup() {
-        viewModel = LoginScreenViewModel()
+        fakeAuthRepository = FakeAuthRepository()
+
+        viewModel = LoginScreenViewModel(
+            authRepository = fakeAuthRepository,
+            dispatcher = mainDispatcherRule.testDispatcher
+        )
     }
 
     @Test
@@ -66,7 +72,7 @@ class LoginScreenViewModelTests {
 
     @Test
     fun `isLoginEnabled - when all fields are valid - becomes true`() = runTest {
-        val viewModel = LoginScreenViewModel()
+        val viewModel = LoginScreenViewModel(fakeAuthRepository,mainDispatcherRule.testDispatcher)
 
         viewModel.isLoginEnabled.test {
             assertEquals("Initial state should be false", false, awaitItem())
@@ -82,7 +88,7 @@ class LoginScreenViewModelTests {
 
     @Test
     fun `isLoginEnabled - when one field becomes invalid - becomes false`() = runTest {
-        val viewModel = LoginScreenViewModel()
+        val viewModel = LoginScreenViewModel(fakeAuthRepository,mainDispatcherRule.testDispatcher)
 
         viewModel.isLoginEnabled.test {
             assertEquals("Initial state should be false", false, awaitItem())
@@ -102,7 +108,7 @@ class LoginScreenViewModelTests {
 
     @Test
     fun `isLoginEnabled - remains false if only username is valid`() = runTest {
-        val viewModel = LoginScreenViewModel()
+        val viewModel = LoginScreenViewModel(fakeAuthRepository,mainDispatcherRule.testDispatcher)
 
         viewModel.isLoginEnabled.test {
             assertEquals("Initial state should be false", false, awaitItem())

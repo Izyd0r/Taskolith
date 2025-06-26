@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -15,7 +17,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.taskolithmobile.integration.HiltTestRunner"
     }
 
     buildTypes {
@@ -37,6 +39,11 @@ android {
     buildFeatures {
         compose = true
     }
+    packaging {
+        resources {
+            excludes += "META-INF/gradle/incremental.annotation.processors"
+        }
+    }
 }
 
 dependencies {
@@ -52,9 +59,13 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation("androidx.navigation:navigation-compose:2.5.3")
     implementation(libs.androidx.navigation.testing.android)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation(libs.hilt.android)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
+    testImplementation(libs.okhttp3.mockwebserver)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -62,7 +73,16 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.runner)
     androidTestImplementation(libs.androidx.rules)
+    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.mockwebserver.v4120)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(kotlin("test"))
+    kapt(libs.hilt.android.compiler)
+    kaptAndroidTest(libs.hilt.android.compiler)
+    implementation(libs.hilt.navigation.compose)
+
+    implementation(platform(libs.okhttp.bom))
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+
 }

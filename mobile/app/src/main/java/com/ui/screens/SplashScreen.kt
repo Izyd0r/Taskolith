@@ -19,6 +19,7 @@ import com.ui.theme.Satoshi
 import com.ui.viewmodels.SplashScreenViewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ui.navigation.Screen
 
@@ -26,7 +27,7 @@ import com.ui.navigation.Screen
 @Composable
 fun SplashScreen(
     navController: NavController,
-    splashViewModel: SplashScreenViewModel = viewModel()
+    splashViewModel: SplashScreenViewModel = hiltViewModel()
 ) {
     val isDone by splashViewModel.isSplashDone.collectAsState()
 
