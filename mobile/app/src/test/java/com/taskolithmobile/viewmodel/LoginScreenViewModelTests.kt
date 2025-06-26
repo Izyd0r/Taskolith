@@ -1,6 +1,8 @@
 package com.taskolithmobile.viewmodel
 
 import app.cash.turbine.test
+import com.data.repository.SessionHandler
+import com.domain.repository.SessionRepository
 import com.ui.viewmodels.LoginScreenViewModel
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -18,6 +20,7 @@ class LoginScreenViewModelTests {
 
     private lateinit var viewModel: LoginScreenViewModel
     private lateinit var fakeAuthRepository: FakeAuthRepository
+    private lateinit var fakeSessionHandler: SessionHandler
 
     @Before
     fun setup() {
@@ -25,7 +28,8 @@ class LoginScreenViewModelTests {
 
         viewModel = LoginScreenViewModel(
             authRepository = fakeAuthRepository,
-            dispatcher = mainDispatcherRule.testDispatcher
+            dispatcher = mainDispatcherRule.testDispatcher,
+            sessionHandler = fakeSessionHandler
         )
     }
 
@@ -72,7 +76,7 @@ class LoginScreenViewModelTests {
 
     @Test
     fun `isLoginEnabled - when all fields are valid - becomes true`() = runTest {
-        val viewModel = LoginScreenViewModel(fakeAuthRepository,mainDispatcherRule.testDispatcher)
+        val viewModel = LoginScreenViewModel(fakeAuthRepository, fakeSessionHandler,mainDispatcherRule.testDispatcher)
 
         viewModel.isLoginEnabled.test {
             assertEquals("Initial state should be false", false, awaitItem())
@@ -88,7 +92,7 @@ class LoginScreenViewModelTests {
 
     @Test
     fun `isLoginEnabled - when one field becomes invalid - becomes false`() = runTest {
-        val viewModel = LoginScreenViewModel(fakeAuthRepository,mainDispatcherRule.testDispatcher)
+        val viewModel = LoginScreenViewModel(fakeAuthRepository, fakeSessionHandler,mainDispatcherRule.testDispatcher)
 
         viewModel.isLoginEnabled.test {
             assertEquals("Initial state should be false", false, awaitItem())
@@ -108,7 +112,7 @@ class LoginScreenViewModelTests {
 
     @Test
     fun `isLoginEnabled - remains false if only username is valid`() = runTest {
-        val viewModel = LoginScreenViewModel(fakeAuthRepository,mainDispatcherRule.testDispatcher)
+        val viewModel = LoginScreenViewModel(fakeAuthRepository, fakeSessionHandler,mainDispatcherRule.testDispatcher)
 
         viewModel.isLoginEnabled.test {
             assertEquals("Initial state should be false", false, awaitItem())

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.data.remote.dto.LoginRequest
 import com.data.remote.dto.RegisterRequest
+import com.data.repository.SessionHandler
 import com.di.MainDispatcher
 import com.domain.repository.AuthRepository
 import com.domain.repository.SessionRepository
@@ -23,7 +24,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val sessionRepository: SessionRepository,
+    private val sessionHandler: SessionHandler,
     @MainDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -68,8 +69,9 @@ class LoginScreenViewModel @Inject constructor(
             _loginUiState.value = LoginUiState.Loading
 
             try {
+                sessionHandler.logoutOrSwitchUser()
                 val response = authRepository.loginUser(request)
-                sessionRepository.saveToken(response.token)
+                sessionHandler.sessionRepository.saveToken(response.token)
                 _loginUiState.value = LoginUiState.Success
                 Log.d("Register", "Success your JWT is: ${response.token}")
             } catch (e: Exception) {

@@ -7,7 +7,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import app.cash.turbine.test
-import com.ui.viewmodels.LoginScreenViewModel
+import com.data.repository.SessionHandler
 
 class RegisterScreenViewModelTests {
 
@@ -16,6 +16,7 @@ class RegisterScreenViewModelTests {
 
     private lateinit var viewModel: RegisterScreenViewModel
     private lateinit var fakeAuthRepository: FakeAuthRepository
+    private lateinit var fakeSessionHandler: SessionHandler
 
     @Before
     fun setup() {
@@ -23,6 +24,7 @@ class RegisterScreenViewModelTests {
 
         viewModel = RegisterScreenViewModel(
             authRepository = fakeAuthRepository,
+            sessionHandler = fakeSessionHandler,
             dispatcher = mainDispatcherRule.testDispatcher
         )
     }
@@ -113,7 +115,7 @@ class RegisterScreenViewModelTests {
 
     @Test
     fun `isRegisterEnabled - when all fields are valid - becomes true`() = runTest {
-        val viewModel = RegisterScreenViewModel(fakeAuthRepository,mainDispatcherRule.testDispatcher)
+        val viewModel = RegisterScreenViewModel(fakeAuthRepository, fakeSessionHandler ,mainDispatcherRule.testDispatcher)
 
         viewModel.isRegisterEnabled.test {
             assertEquals("Initial state should be false", false, awaitItem())
@@ -130,7 +132,7 @@ class RegisterScreenViewModelTests {
 
     @Test
     fun `isRegisterEnabled - when one field becomes invalid - becomes false`() = runTest {
-        val viewModel = RegisterScreenViewModel(fakeAuthRepository,mainDispatcherRule.testDispatcher)
+        val viewModel = RegisterScreenViewModel(fakeAuthRepository, fakeSessionHandler ,mainDispatcherRule.testDispatcher)
         viewModel.isRegisterEnabled.test {
             assertEquals("Initial state should be false", false, awaitItem())
             viewModel.onFirstNameChange("John")

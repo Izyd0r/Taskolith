@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.data.remote.dto.RegisterRequest
+import com.data.repository.SessionHandler
 import com.di.MainDispatcher
 import com.domain.repository.AuthRepository
 import com.domain.repository.SessionRepository
@@ -18,7 +19,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class RegisterScreenViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val sessionRepository: SessionRepository,
+    private val sessionHandler: SessionHandler,
     @MainDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -133,8 +134,9 @@ class RegisterScreenViewModel @Inject constructor(
             _registerUiState.value = RegisterUiState.Loading
 
             try {
+                sessionHandler.logoutOrSwitchUser()
                 val response = authRepository.registerUser(request)
-                sessionRepository.saveToken(response.token)
+                sessionHandler.sessionRepository.saveToken(response.token)
                 _registerUiState.value = RegisterUiState.Success
                 Log.d("RegisterVM", "Success and token saved: ${response.token}")
 
