@@ -7,6 +7,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,6 +24,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ui.components.AppButton
 import com.ui.components.AppTextField
+import com.ui.navigation.Screen
+import com.ui.state.LoginUiState
+import com.ui.state.RegisterUiState
 import com.ui.theme.Satoshi
 import com.ui.theme.TaskolithTheme
 import com.ui.viewmodels.LoginScreenViewModel
@@ -35,8 +39,23 @@ fun LoginScreen(
     val usernameState by viewModel.usernameState.collectAsState()
     val passwordState by viewModel.passwordState.collectAsState()
     val isButtonEnabled by viewModel.isLoginEnabled.collectAsState()
+    val loginUiState by viewModel.loginUiState.collectAsState()
 
     val scrollState = rememberScrollState()
+
+    LaunchedEffect(key1 = loginUiState) {
+        when (val state = loginUiState) {
+            is LoginUiState.Success -> {
+                navController.navigate(Screen.Main.route) {
+                    popUpTo(Screen.Auth.route) { inclusive = true }
+                }
+            }
+            is LoginUiState.Error -> {
+                /*TODO: ADD SNACK BAR OR SOMETHING ELSE*/
+            }
+            else -> { /* Do nothing for Idle or Loading */ }
+        }
+    }
 
     Column(
         modifier = Modifier

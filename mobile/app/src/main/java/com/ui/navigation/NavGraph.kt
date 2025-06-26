@@ -6,8 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ui.screens.AuthScreen
 import com.ui.screens.LoginScreen
+import com.ui.screens.MainScreen
 import com.ui.screens.RegisterScreen
 import com.ui.screens.SplashScreen
+import com.ui.screens.TasksScreen
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -17,5 +19,6 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Auth.route) { AuthScreen(navController) }
         composable(Screen.Register.route) { RegisterScreen(navController) }
         composable(Screen.Login.route) { LoginScreen(navController) }
+        composable(Screen.Main.route) { MainScreen(navController) }
     }
 }

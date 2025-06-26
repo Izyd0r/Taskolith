@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +31,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.ui.components.AppButton
 import com.ui.components.AppTextField
+import com.ui.navigation.Screen
+import com.ui.state.RegisterUiState
 import com.ui.theme.Satoshi
 import com.ui.theme.TaskolithTheme
 
@@ -45,8 +48,23 @@ fun RegisterScreen(
     val passwordState by viewModel.passwordState.collectAsState()
     val confirmPasswordState by viewModel.confirmPasswordState.collectAsState()
     val isButtonEnabled by viewModel.isRegisterEnabled.collectAsState()
+    val registerUiState by viewModel.registerUiState.collectAsState()
 
     val scrollState = rememberScrollState()
+
+    LaunchedEffect(key1 = registerUiState) {
+        when (val state = registerUiState) {
+            is RegisterUiState.Success -> {
+                navController.navigate(Screen.Main.route) {
+                    popUpTo(Screen.Auth.route) { inclusive = true }
+                }
+            }
+            is RegisterUiState.Error -> {
+                /*TODO: ADD SNACK BAR OR SOMETHING ELSE*/
+            }
+            else -> { /* Do nothing for Idle or Loading */ }
+        }
+    }
 
     Column(
         modifier = Modifier

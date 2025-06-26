@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Taskolith.Mobile</string>
+    <string name="bottom_nav_tasks">Tasks</string>
+    <string name="bottom_nav_profile">Profile</string>
 </resources>
