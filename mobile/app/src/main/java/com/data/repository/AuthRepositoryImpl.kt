@@ -1,6 +1,8 @@
 package com.data.repository
 
 import com.data.remote.api.AuthApiService
+import com.data.remote.dto.LoginRequest
+import com.data.remote.dto.LoginResponse
 import com.data.remote.dto.RegisterRequest
 import com.data.remote.dto.RegisterResponse
 import com.di.IoDispatcher
@@ -17,6 +19,12 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun registerUser(request: RegisterRequest): RegisterResponse {
         return withContext(dispatcher) {
             api.registerUser(request)
+        }
+    }
+
+    override suspend fun loginUser(request: LoginRequest): LoginResponse {
+        return withContext(dispatcher) {
+            api.loginUser(request)
         }
     }
 }

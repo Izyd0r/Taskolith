@@ -1,9 +1,13 @@
 package com.ui.viewmodels
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.data.remote.dto.LoginRequest
+import com.data.remote.dto.RegisterRequest
 import com.di.MainDispatcher
 import com.domain.repository.AuthRepository
 import com.ui.state.TextFieldState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,8 +16,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-
+@HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     @MainDispatcher private val dispatcher: CoroutineDispatcher
@@ -46,6 +51,18 @@ class LoginScreenViewModel @Inject constructor(
     }
 
     fun onLoginClick() {
-        // Login logic goes here
+        val request = LoginRequest(
+            username = _usernameState.value.text,
+            password = _passwordState.value.text
+        )
+
+        viewModelScope.launch(dispatcher) {
+            try {
+                val response = authRepository.loginUser(request)
+                Log.d("Register", "Success your JWT is: ${response.token}")
+            } catch (e: Exception) {
+                Log.e("Register", "Error: ${e.message}")
+            }
+        }
     }
 }
