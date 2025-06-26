@@ -6,6 +6,8 @@ import com.data.remote.dto.LoginRequest
 import com.data.remote.dto.RegisterRequest
 import com.di.MainDispatcher
 import com.domain.repository.AuthRepository
+import com.domain.repository.SessionRepository
+import com.ui.state.LoginUiState
 import com.ui.state.TextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -21,6 +23,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val sessionRepository: SessionRepository,
     @MainDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -29,6 +32,9 @@ class LoginScreenViewModel @Inject constructor(
 
     private val _passwordState = MutableStateFlow(TextFieldState())
     val passwordState: StateFlow<TextFieldState> = _passwordState.asStateFlow()
+
+    private val _loginUiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
+    val loginUiState: StateFlow<LoginUiState> = _loginUiState.asStateFlow()
 
     val isLoginEnabled: StateFlow<Boolean> = combine(
         _usernameState, _passwordState
@@ -51,16 +57,23 @@ class LoginScreenViewModel @Inject constructor(
     }
 
     fun onLoginClick() {
+        if (_loginUiState.value == LoginUiState.Loading) return
+
         val request = LoginRequest(
             username = _usernameState.value.text,
             password = _passwordState.value.text
         )
 
         viewModelScope.launch(dispatcher) {
+            _loginUiState.value = LoginUiState.Loading
+
             try {
                 val response = authRepository.loginUser(request)
+                sessionRepository.saveToken(response.token)
+                _loginUiState.value = LoginUiState.Success
                 Log.d("Register", "Success your JWT is: ${response.token}")
             } catch (e: Exception) {
+                _loginUiState.value = LoginUiState.Error(e.message)
                 Log.e("Register", "Error: ${e.message}")
             }
         }

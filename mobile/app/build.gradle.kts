@@ -62,6 +62,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation(libs.hilt.android)
+    //implementation(libs.androidx.security.crypto.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
@@ -85,4 +86,5 @@ dependencies {
     implementation(platform(libs.okhttp.bom))
     androidTestImplementation(libs.kotlinx.coroutines.test)
 
-}
+    implementation(libs.androidx.security.crypto)
+ }

@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.data.remote.dto.RegisterRequest
 import com.di.MainDispatcher
 import com.domain.repository.AuthRepository
+import com.domain.repository.SessionRepository
+import com.ui.state.RegisterUiState
 import com.ui.state.TextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -16,6 +18,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class RegisterScreenViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val sessionRepository: SessionRepository,
     @MainDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -36,6 +39,9 @@ class RegisterScreenViewModel @Inject constructor(
 
     private val _confirmPasswordState = MutableStateFlow(TextFieldState())
     val confirmPasswordState: StateFlow<TextFieldState> = _confirmPasswordState.asStateFlow()
+
+    private val _registerUiState = MutableStateFlow<RegisterUiState>(RegisterUiState.Idle)
+    val registerUiState: StateFlow<RegisterUiState> = _registerUiState.asStateFlow()
 
     private val firstFiveFieldsFlow = combine(
         _firstNameState, _lastNameState, _usernameState, _emailState, _passwordState
@@ -113,6 +119,8 @@ class RegisterScreenViewModel @Inject constructor(
     }
 
     fun onRegisterClick() {
+        if (_registerUiState.value == RegisterUiState.Loading) return
+
         val request = RegisterRequest(
             firstName = _firstNameState.value.text,
             lastName = _lastNameState.value.text,
@@ -122,11 +130,17 @@ class RegisterScreenViewModel @Inject constructor(
         )
 
         viewModelScope.launch(dispatcher) {
+            _registerUiState.value = RegisterUiState.Loading
+
             try {
                 val response = authRepository.registerUser(request)
-                Log.d("Register", "Success your JWT is: ${response.token}")
+                sessionRepository.saveToken(response.token)
+                _registerUiState.value = RegisterUiState.Success
+                Log.d("RegisterVM", "Success and token saved: ${response.token}")
+
             } catch (e: Exception) {
-                Log.e("Register", "Error: ${e.message}")
+                _registerUiState.value = RegisterUiState.Error(e.message)
+                Log.e("RegisterVM", "Error: ${e.message}")
             }
         }
     }
