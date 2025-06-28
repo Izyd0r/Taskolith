@@ -6,5 +6,6 @@ public record SignUpResponse(
     string FirstName,
     string LastName,
     string Email,
-    string Token
+    string Token,
+    string RefreshToken
 );

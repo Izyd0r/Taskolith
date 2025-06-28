@@ -3,10 +3,9 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Taskolith.API.Auth;
 using Taskolith.API.Auth.SignUp;
 
-namespace Taskolith.API.IntegrationTests.Auth;
+namespace Taskolith.API.IntegrationTests.Auth.SignUp;
 
 public class SignUpUserTests(IntegrationTestWebAppFactory factory) : BaseIntegrationTest(factory)
 {
@@ -28,6 +27,8 @@ public class SignUpUserTests(IntegrationTestWebAppFactory factory) : BaseIntegra
 
         var registerResponse = await response.Content.ReadFromJsonAsync<SignUpResponse>();
         registerResponse.Should().NotBeNull();
+        registerResponse.Token.Should().NotBeNullOrEmpty();
+        registerResponse.RefreshToken.Should().NotBeNullOrEmpty();
         
         var userInDb = await DbContext.Users.FindAsync(registerResponse.Id);
 

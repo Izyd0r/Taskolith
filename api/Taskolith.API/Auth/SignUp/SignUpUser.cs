@@ -27,6 +27,7 @@ public abstract class SignUpUser : IEndPoint
         
         var user = new User
         {
+            Id = Guid.NewGuid(),
             Username = request.Username,
             Password = request.Password, // TODO: add bcrypt hash password
             Email = request.Email,
@@ -34,7 +35,17 @@ public abstract class SignUpUser : IEndPoint
             LastName = request.LastName
         };
         
+        var refreshToken = new RefreshToken{
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Token = JwtTokenGenerator.GenerateRefreshToken(),
+            IsActive = true,
+            Created = DateTime.UtcNow,
+            Expires = DateTime.UtcNow.AddDays(7)
+        };
+        
         dbContext.Users.Add(user);
+        dbContext.RefreshTokens.Add(refreshToken);
         await dbContext.SaveChangesAsync();
 <<<<<<< mobile
         
@@ -47,7 +58,8 @@ public abstract class SignUpUser : IEndPoint
             user.FirstName,
             user.LastName,
             user.Email,
-            jwtTokenGenerator.GenerateToken(user)
+            jwtTokenGenerator.GenerateToken(user),
+            refreshToken.Token
         );
         
         return Results.Created($"/api/users/{signUpResponse.Id}", signUpResponse);
