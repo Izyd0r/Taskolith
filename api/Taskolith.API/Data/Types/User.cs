@@ -17,4 +17,5 @@ public class User
     public required string LastName { get; init; } = null!;
     
     public ICollection<ToDoTask> Tasks { get; init; } = new List<ToDoTask>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }
