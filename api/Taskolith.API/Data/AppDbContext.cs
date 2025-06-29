@@ -8,10 +8,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<User> Users { get; set; }
     public DbSet<ToDoTask> ToDoTasks { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Organisation> Organisations { get; set; }
+    public DbSet<Membership> OrganisationMembers { get; set; }
+    public DbSet<Role> Roles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureUsersTable(modelBuilder);
+        ConfigureOrganizationsTable(modelBuilder);
+        ConfigureOrganizationMembersTable(modelBuilder);
+        ConfigureRolesTable(modelBuilder);
         ConfigureTasksTable(modelBuilder);
         ConfigureUsersRefreshTokensTable(modelBuilder);
         base.OnModelCreating(modelBuilder);
@@ -32,6 +38,55 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         builder.HasIndex(u => u.Username).IsUnique();
     }
 
+    private static void ConfigureOrganizationsTable(ModelBuilder modelBuilder)
+    {
+        var builder = modelBuilder.Entity<Organisation>();
+        
+        builder.ToTable("Organizations");
+        builder.HasKey(o => o.Id);
+        builder.Property(o => o.Name).IsRequired().HasMaxLength(200);
+        builder.HasMany(o => o.OrganisationRoles)
+            .WithOne(o => o.Organisation)
+            .HasForeignKey(o => o.OrganisationId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(o => o.Members)
+            .WithOne(o => o.Organisation)
+            .HasForeignKey(o => o.OrganisationId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+
+    private static void ConfigureRolesTable(ModelBuilder modelBuilder)
+    {
+        var builder = modelBuilder.Entity<Role>();
+        
+        builder.ToTable("Roles");
+        builder.HasKey(r => r.Id);
+        builder.Property(r => r.Name).IsRequired().HasMaxLength(200);
+        builder.HasOne(r => r.Organisation)
+            .WithMany(r => r.OrganisationRoles)
+            .HasForeignKey(r => r.OrganisationId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(r => r.Members)
+            .WithMany(r => r.Roles);
+    }
+
+    private static void ConfigureOrganizationMembersTable(ModelBuilder modelBuilder)
+    {
+        var builder = modelBuilder.Entity<Membership>();
+        
+        builder.ToTable("OrganizationMembers");
+        builder.HasKey(o => o.Id);
+        builder.HasOne(m => m.User)
+            .WithMany()
+            .HasForeignKey(m => m.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(m => m.Organisation)
+            .WithMany(o => o.Members)
+            .HasForeignKey(m => m.OrganisationId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+
     private static void ConfigureTasksTable(ModelBuilder modelBuilder)
     {
         var builder = modelBuilder.Entity<ToDoTask>();
@@ -42,10 +97,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         builder.Property(t => t.Description).IsRequired().HasMaxLength(1024);
         builder.Property(t => t.DueDate).IsRequired();
         builder.Property(t => t.CreatedDate).IsRequired();
-        builder.HasOne<User>()
-            .WithMany(u => u.Tasks)
-            .HasForeignKey(t => t.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+        //builder.HasOne<User>()
+        //    .WithMany(u => u.Tasks)
+        //    .HasForeignKey(t => t.UserId)
+        //    .OnDelete(DeleteBehavior.Cascade);
     }
 
     private static void ConfigureUsersRefreshTokensTable(ModelBuilder modelBuilder)

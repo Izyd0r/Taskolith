@@ -2,8 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Taskolith.API.Data.Types;
 
-public class User
-{
+public class User {
     public Guid Id { get; init; }
     [MaxLength(20)]
     public required string Username { get; init; } = null!;
@@ -15,7 +14,5 @@ public class User
     public required string FirstName { get; init; } = null!;
     [MaxLength(20)]
     public required string LastName { get; init; } = null!;
-    
-    public ICollection<ToDoTask> Tasks { get; init; } = new List<ToDoTask>();
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

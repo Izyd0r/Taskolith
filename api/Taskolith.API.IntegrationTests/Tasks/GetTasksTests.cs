@@ -36,8 +36,8 @@ public class GetTasksTests(IntegrationTestWebAppFactory factory) : BaseIntegrati
         var firstRequest = new CreateTaskRequest("Title", "Description", DateTime.UtcNow.AddDays(3));
         var secondRequest = new CreateTaskRequest("New title", "New Description", DateTime.UtcNow.AddDays(3));
         
-        var firstCreateTask = await client.PostAsJsonAsync("/api/tasks/createtask", firstRequest);
-        var secondCreateTask = await client.PostAsJsonAsync("/api/tasks/createtask", secondRequest);
+        var firstCreateTask = await client.PostAsJsonAsync("/api/tasks/", firstRequest);
+        var secondCreateTask = await client.PostAsJsonAsync("/api/tasks/", secondRequest);
         
         var firstCreateTaskResponse = await firstCreateTask.Content.ReadFromJsonAsync<CreateTaskResponse>();
         var secondCreateTaskResponse = await secondCreateTask.Content.ReadFromJsonAsync<CreateTaskResponse>();
@@ -45,7 +45,7 @@ public class GetTasksTests(IntegrationTestWebAppFactory factory) : BaseIntegrati
         firstCreateTask.EnsureSuccessStatusCode();
         secondCreateTask.EnsureSuccessStatusCode();
         
-        var getTasksResponse = await client.GetAsync("/api/tasks/get-tasks");
+        var getTasksResponse = await client.GetAsync("/api/tasks/");
         getTasksResponse.EnsureSuccessStatusCode();
         var tasks = await getTasksResponse.Content.ReadFromJsonAsync<GetTasksResponse>();
         Assert.NotNull(tasks);
