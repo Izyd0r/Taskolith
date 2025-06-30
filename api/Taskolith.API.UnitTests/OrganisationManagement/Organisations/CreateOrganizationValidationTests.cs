@@ -1,4 +1,4 @@
-using Taskolith.API.OrganizationManagement.Organisations;
+using Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
 using Taskolith.API.Validators;
 
 namespace Taskolith.API.UnitTests.OrganisationManagement.Organisations;
