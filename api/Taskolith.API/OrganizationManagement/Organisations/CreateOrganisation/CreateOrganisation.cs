@@ -4,7 +4,7 @@ using Taskolith.API.Data;
 using Taskolith.API.Data.Types;
 using Taskolith.API.Filters;
 
-namespace Taskolith.API.OrganizationManagement.Organisations;
+namespace Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
 
 public class CreateOrganisation : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app

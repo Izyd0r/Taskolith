@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using Taskolith.API.OrganizationManagement.Organisations;
+using Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
 
 namespace Taskolith.API.IntegrationTests.OrganizationManagement.Organisations;
 
@@ -15,6 +15,6 @@ public class CreateOrganisationTests(IntegrationTestWebAppFactory factory) : Aut
         var response = await test.AuthorizedHttpClient.PostAsJsonAsync("/api/organisations", request);
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var responseFromCreateOrganisation = await response.Content.ReadFromJsonAsync<CreateOrganisationResponse>(); 
-        response.Headers.Location?.OriginalString.Should().Be($"/api/organisations/{responseFromCreateOrganisation!.OrganizationId}");
+        response.Headers.Location?.OriginalString.Should().Be($"/api/organisations/{responseFromCreateOrganisation!.OrganisationId}");
     }
 }
