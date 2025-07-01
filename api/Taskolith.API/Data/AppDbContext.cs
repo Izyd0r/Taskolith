@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Organisation> Organisations { get; set; }
     public DbSet<Membership> OrganisationMembers { get; set; }
+    public DbSet<Invitation> Invitations { get; set; }
     public DbSet<Role> Roles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -18,6 +19,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         ConfigureOrganizationsTable(modelBuilder);
         ConfigureOrganizationMembersTable(modelBuilder);
         ConfigureRolesTable(modelBuilder);
+        ConfigureInvitationsTable(modelBuilder);
         ConfigureTasksTable(modelBuilder);
         ConfigureUsersRefreshTokensTable(modelBuilder);
         base.OnModelCreating(modelBuilder);
@@ -87,6 +89,28 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .OnDelete(DeleteBehavior.Cascade);
     }
 
+    private static void ConfigureInvitationsTable(ModelBuilder modelBuilder)
+    {
+        var builder = modelBuilder.Entity<Invitation>();
+        
+        builder.ToTable("Invitations");
+        builder.HasKey(i => i.Id);
+        builder.HasOne(i => i.Organisation)
+            .WithMany()
+            .HasForeignKey(i => i.OrganisationId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(i => i.User)
+            .WithMany()
+            .HasForeignKey(i => i.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(i => i.Status)
+            .HasConversion<string>()
+            .HasDefaultValue(InvitationStatus.Pending)
+            .IsRequired();
+        builder.Property(i => i.DueDate)
+            .IsRequired();
+    }
+    
     private static void ConfigureTasksTable(ModelBuilder modelBuilder)
     {
         var builder = modelBuilder.Entity<ToDoTask>();
