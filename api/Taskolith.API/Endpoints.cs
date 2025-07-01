@@ -1,6 +1,7 @@
 using Taskolith.API.Auth.Login;
 using Taskolith.API.Auth.SignUp;
 using Taskolith.API.Common;
+using Taskolith.API.OrganizationManagement.InviteSystem;
 using Taskolith.API.OrganizationManagement.Organisations;
 using Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
 using Taskolith.API.OrganizationManagement.Organisations.DeleteOrganisation;
@@ -56,6 +57,9 @@ public static class Endpoints
             .MapEndpoint<CreateOrganisation>()
             .MapEndpoint<DeleteOrganisation>()
             .MapEndpoint<UpdateOrganisation>();
+
+        endpoints.MapPrivateGroup()
+            .MapEndpoint<InviteMember>();
     }
 
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)
