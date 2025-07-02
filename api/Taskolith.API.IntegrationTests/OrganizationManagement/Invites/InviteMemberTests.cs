@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using Taskolith.API.OrganizationManagement.InviteSystem;
+using Taskolith.API.OrganizationManagement.InviteSystem.InviteMember;
 using Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
 
-namespace Taskolith.API.IntegrationTests.OrganizationManagement.Organisations;
+namespace Taskolith.API.IntegrationTests.OrganizationManagement.Invites;
 
 public class InviteMemberTests(IntegrationTestWebAppFactory factory) : AuthorizedIntegrationTest(factory) {
     private readonly IntegrationTestWebAppFactory _factory = factory;
