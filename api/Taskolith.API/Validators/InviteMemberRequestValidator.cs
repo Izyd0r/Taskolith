@@ -1,5 +1,6 @@
 using FluentValidation;
 using Taskolith.API.OrganizationManagement.InviteSystem;
+using Taskolith.API.OrganizationManagement.InviteSystem.InviteMember;
 
 namespace Taskolith.API.Validators;
 

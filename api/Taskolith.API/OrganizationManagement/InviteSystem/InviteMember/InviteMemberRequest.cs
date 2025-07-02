@@ -1,4 +1,4 @@
-namespace Taskolith.API.OrganizationManagement.InviteSystem;
+namespace Taskolith.API.OrganizationManagement.InviteSystem.InviteMember;
 
 public record InviteMemberRequest(
     string Email,

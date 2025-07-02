@@ -5,7 +5,7 @@ using Taskolith.API.Data;
 using Taskolith.API.Data.Types;
 using Taskolith.API.Filters;
 
-namespace Taskolith.API.OrganizationManagement.InviteSystem;
+namespace Taskolith.API.OrganizationManagement.InviteSystem.InviteMember;
 
 public class InviteMember : IEndPoint
 {
