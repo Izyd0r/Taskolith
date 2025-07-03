@@ -2,6 +2,7 @@ using Taskolith.API.Auth.Login;
 using Taskolith.API.Auth.SignUp;
 using Taskolith.API.Common;
 using Taskolith.API.OrganizationManagement.InviteSystem;
+using Taskolith.API.OrganizationManagement.InviteSystem.AcceptInvite;
 using Taskolith.API.OrganizationManagement.InviteSystem.GetInvites;
 using Taskolith.API.OrganizationManagement.InviteSystem.InviteMember;
 using Taskolith.API.OrganizationManagement.Organisations;
@@ -69,7 +70,8 @@ public static class Endpoints
             .WithTags("Invitations");
 
         endpoints.MapPrivateGroup()
-            .MapEndpoint<GetInvites>();
+            .MapEndpoint<GetInvites>()
+            .MapEndpoint<AcceptInvite>();
     }
 
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)
