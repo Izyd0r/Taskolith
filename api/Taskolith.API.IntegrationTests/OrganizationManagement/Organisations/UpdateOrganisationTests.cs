@@ -35,7 +35,7 @@ public class UpdateOrganisationTests(IntegrationTestWebAppFactory factory) : Aut
         var userTwo = await BuildAuthorizedTest(_factory);
         var organisationUpdateRequest = new UpdateOrganisationRequest(readFromCreationResponse.Result.OrganisationId,"New Organisation");
         var updateResponse = await userTwo.AuthorizedHttpClient.PutAsJsonAsync("/api/organisations", organisationUpdateRequest);
-        updateResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        updateResponse.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
     
     [Fact]
@@ -51,6 +51,6 @@ public class UpdateOrganisationTests(IntegrationTestWebAppFactory factory) : Aut
         await userTwo.AuthorizedHttpClient.PostAsJsonAsync("/api/organisations", secondOrganisationCreationRequest);
         var organisationUpdateRequest = new UpdateOrganisationRequest(readFromCreationResponse.Result.OrganisationId,"New Organisation");
         var updateResponse = await userTwo.AuthorizedHttpClient.PutAsJsonAsync("/api/organisations", organisationUpdateRequest);
-        updateResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        updateResponse.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }

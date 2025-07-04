@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Taskolith.API.Auth;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
+using Taskolith.API.Data.Types;
 using Taskolith.API.Filters;
 
 namespace Taskolith.API.OrganizationManagement.Organisations.UpdateOrganisation;
@@ -13,18 +15,21 @@ public class UpdateOrganisation : IEndPoint
         .WithRequestValidation<UpdateOrganisationRequest>()
         .WithSummary("Updates organisation name");
 
-    private static async Task<IResult> Handle(UpdateOrganisationRequest request, AppDbContext dbContext, ClaimsPrincipal claims ,CancellationToken token) {
+    private static async Task<IResult> Handle(
+        UpdateOrganisationRequest request,
+        AppDbContext dbContext,
+        ClaimsPrincipal claims,
+        CancellationToken token,
+        PermissionService permissionService) {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if (userId == null) return Results.BadRequest();
-        
-        var isUserAdmin = await dbContext.OrganisationMembers
-            .Where(x => x.UserId == Guid.Parse(userId) && x.OrganisationId == request.OrganisationId)
-            .SelectMany(x => x.Roles)
-            .FirstOrDefaultAsync(r => r.Name == "Admin", cancellationToken: token);
-        if (isUserAdmin == null) return Results.BadRequest(); 
-        
+       
         var result = await dbContext.Organisations.SingleOrDefaultAsync(o => o.Id == request.OrganisationId, token);
-        if (result == null) return Results.BadRequest();
+        if (result == null) return Results.NotFound();
+        
+        var hasPermission = await permissionService.HasPermission(Guid.Parse(userId), request.OrganisationId, Permission.UpdateOrganisation);
+        if(!hasPermission) return Results.Forbid();
+        
         result.Name = request.OrganisationName;
         await dbContext.SaveChangesAsync(token);
         

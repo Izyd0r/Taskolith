@@ -6,7 +6,8 @@ public class Role {
     public required Guid Id { get; init; }
     public required Guid OrganisationId { get; init; }
     [MaxLength(100)]
-    public string Name { get; init; } = null!;
+    public string Name { get; set; }
     public Organisation Organisation { get; init; } = null!;
-    public ICollection<Membership> Members { get; init; } = new List<Membership>();
+    public ICollection<Membership> Members { get; set; } = new List<Membership>();
+    public Permission Permissions { get; set; }
 }

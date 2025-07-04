@@ -12,19 +12,13 @@ public class InviteMember : IEndPoint
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{organisationId:guid}/invitations", Handle)
         .WithRequestValidation<InviteMemberRequest>()
+        .RequireAuthorization("InviteMember")
         .WithSummary("Invites a user to join the organisation");
 
     private static async Task<IResult> Handle(Guid organisationId, InviteMemberRequest request, AppDbContext dbContext,
         ClaimsPrincipal claims, CancellationToken token) {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value; 
         if (userId == null) return Results.BadRequest();
-        
-        // TODO: for now only admins can invite, but in the future i should have role-based permissions system
-        var isUserAdmin = await dbContext.OrganisationMembers
-            .Where(x => x.UserId == Guid.Parse(userId) && x.OrganisationId == organisationId)
-            .SelectMany(x => x.Roles)
-            .FirstOrDefaultAsync(r => r.Name == "Admin", cancellationToken: token);
-        if (isUserAdmin == null) return Results.BadRequest();
 
         var invitedUser = await dbContext.Users
             .Where(u => u.Email == request.Email)

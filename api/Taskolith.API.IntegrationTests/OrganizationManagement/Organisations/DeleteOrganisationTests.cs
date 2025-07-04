@@ -21,14 +21,21 @@ public class DeleteOrganisationTests(IntegrationTestWebAppFactory factory) : Aut
     }
    
     [Fact]
-    public async Task Should_Return_BadRequest_When_Organisation_Does_Not_Exist() {
+    public async Task Should_Return_NotFound_When_Organisation_Does_Not_Exist() {
         var test = await BuildAuthorizedTest(_factory);
-        var deleteOrganisationResponse = await test.AuthorizedHttpClient.DeleteAsync($"/api/organisations/{Guid.NewGuid()}");
-        deleteOrganisationResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var request = new CreateOrganisationRequest("Organisation");
+        var response = await test.AuthorizedHttpClient.PostAsJsonAsync("/api/organisations", request);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var responseFromCreateOrganisation = await response.Content.ReadFromJsonAsync<CreateOrganisationResponse>(); 
+        response.Headers.Location?.OriginalString.Should().Be($"/api/organisations/{responseFromCreateOrganisation!.OrganisationId}");
+        var deleteOrganisationResponse = await test.AuthorizedHttpClient.DeleteAsync($"/api/organisations/{responseFromCreateOrganisation!.OrganisationId}");
+        deleteOrganisationResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        var deleteOrganisationResponseTwo = await test.AuthorizedHttpClient.DeleteAsync($"/api/organisations/{responseFromCreateOrganisation!.OrganisationId}");
+        deleteOrganisationResponseTwo.StatusCode.Should().Be(HttpStatusCode.NotFound); 
     }
 
     [Fact]
-    public async Task Should_Return_BadRequest_When_User_Is_Not_Admin() {
+    public async Task Should_Return_Forbid_When_User_Dont_Have_Permission() {
         // First User (Admin)
         var test = await BuildAuthorizedTest(_factory);
         var request = new CreateOrganisationRequest("Organisation");
@@ -39,7 +46,7 @@ public class DeleteOrganisationTests(IntegrationTestWebAppFactory factory) : Aut
         // Second User
         var testTwo = await BuildAuthorizedTest(_factory);
         var deleteOrganisationResponseTwo = await testTwo.AuthorizedHttpClient.DeleteAsync($"/api/organisations/{responseFromCreateOrganisation!.OrganisationId}");
-        deleteOrganisationResponseTwo.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        deleteOrganisationResponseTwo.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
     
     [Fact]
@@ -59,6 +66,6 @@ public class DeleteOrganisationTests(IntegrationTestWebAppFactory factory) : Aut
         var responseFromCreateOrganisationTwo = await responseTwo.Content.ReadFromJsonAsync<CreateOrganisationResponse>(); 
         responseTwo.Headers.Location?.OriginalString.Should().Be($"/api/organisations/{responseFromCreateOrganisationTwo!.OrganisationId}"); 
         var deleteOrganisationResponseTwo = await testTwo.AuthorizedHttpClient.DeleteAsync($"/api/organisations/{responseFromCreateOrganisation!.OrganisationId}");
-        deleteOrganisationResponseTwo.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        deleteOrganisationResponseTwo.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 }

@@ -4,9 +4,11 @@ using Taskolith.API;
 using Taskolith.API.Data;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Taskolith.API.Auth;
+using Taskolith.API.Data.Types;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,7 +77,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 )
         };
     });
-builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
+builder.Services.AddScoped<PermissionService>();
+builder.Services.AddAuthorization(options => {
+    foreach (var permission in Enum.GetValues<Permission>()) {
+        options.AddPolicy(permission.ToString(), policy => policy.Requirements.Add(new PermissionRequirement(permission)));
+    }
+});
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddTransient<JwtTokenGenerator>();
 
