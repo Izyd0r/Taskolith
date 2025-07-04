@@ -29,4 +29,19 @@ public class InviteMemberTests(IntegrationTestWebAppFactory factory) : Authorize
         readResponseFromInvite.Result.DueDate.Should().Be(secondRequest.DueDate);
         readResponseFromInvite.Result.Status.Should().Be("Pending");
     }
+
+    [Fact]
+    public async Task Member_Without_Permission_Cannot_Add_User_Should_Return_Forbidden() {
+        var userOne = await BuildAuthorizedTest(_factory);
+        var userTwo = await BuildAuthorizedTest(_factory);
+        var firstRequest = new CreateOrganisationRequest("Organisation");
+        var response = await userOne.AuthorizedHttpClient.PostAsJsonAsync("/api/organisations", firstRequest);
+        var readResponse = response.Content.ReadFromJsonAsync<CreateOrganisationResponse>();
+        var secondRequest = new InviteMemberRequest(userTwo.AuthorizedUser.Email, DateTime.UtcNow.AddDays(7));
+        var responseFromInvite = await userOne.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{readResponse.Result.OrganisationId}/invitations",secondRequest);
+        responseFromInvite.StatusCode.Should().Be(HttpStatusCode.Created);
+        var thirdRequest = new InviteMemberRequest(userTwo.AuthorizedUser.Email, DateTime.UtcNow.AddDays(7));
+        var responseFromNotAllowedInvite = await userTwo.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{readResponse.Result.OrganisationId}/invitations",thirdRequest);
+        responseFromNotAllowedInvite.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
 }

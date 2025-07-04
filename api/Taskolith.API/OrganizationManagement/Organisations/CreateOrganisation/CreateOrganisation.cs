@@ -24,6 +24,10 @@ public class CreateOrganisation : IEndPoint {
             Name = request.Name
         };
 
+        var allPermissions = Enum.GetValues(typeof(Permission))
+            .Cast<Permission>()
+            .Aggregate((current, next) => current | next);
+        
         var membership = new Membership {
             Id = Guid.NewGuid(),
             UserId = Guid.Parse(userId),
@@ -33,7 +37,8 @@ public class CreateOrganisation : IEndPoint {
             Roles = new List<Role>() { new Role {
                     Id = Guid.NewGuid(),
                     Name = "Admin",
-                    OrganisationId = organisation.Id
+                    OrganisationId = organisation.Id,
+                    Permissions = allPermissions 
                 }
             }
         };

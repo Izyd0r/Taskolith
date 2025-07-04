@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Taskolith.API.Auth;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
 using Taskolith.API.Data.Types;
@@ -12,16 +13,21 @@ public class DeleteOrganisation : IEndPoint
         .MapDelete("/{organisationId:guid}", Handle)
         .WithSummary("Deletes organisation");
 
-    static async Task<IResult> Handle(Guid organisationId, AppDbContext db, ClaimsPrincipal user ,CancellationToken token) {
+    static async Task<IResult> Handle(
+        Guid organisationId,
+        AppDbContext db,
+        ClaimsPrincipal user, 
+        CancellationToken token,
+        PermissionService permissionService) {
         var userId = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if (userId == null) return Results.BadRequest();
+
+        var org = await db.Organisations.FindAsync([organisationId], cancellationToken: token);
+        if (org is null) return Results.NotFound();
         
-        var isUserAdmin = await db.OrganisationMembers
-            .Where(x => x.UserId == Guid.Parse(userId) && x.OrganisationId == organisationId)
-            .SelectMany(x => x.Roles)
-            .FirstOrDefaultAsync(r => r.Name == "Admin", cancellationToken: token);
-        if (isUserAdmin == null) return Results.BadRequest();
-            
+        var hasPermission = await permissionService.HasPermission(Guid.Parse(userId), organisationId, Permission.DeleteOrganisation); 
+        if (!hasPermission) return Results.Forbid();
+        
         var deletedRows = await db.Organisations.Where(o => o.Id == organisationId).ExecuteDeleteAsync(cancellationToken: token);
         return deletedRows == 1 ? Results.NoContent() : Results.NotFound();
     }
