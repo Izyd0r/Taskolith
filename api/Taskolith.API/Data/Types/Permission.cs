@@ -8,7 +8,7 @@ public enum Permission
     // Role Management
     CreateRole = 1 << 0,
     DeleteRole = 1 << 1,
-    ChangeRole = 1 << 2,
+    UpdateRole = 1 << 2,
     AddRole = 1 << 3,
     RemoveRole = 1 << 4,
 

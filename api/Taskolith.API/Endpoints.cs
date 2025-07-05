@@ -10,6 +10,7 @@ using Taskolith.API.OrganizationManagement.Organisations;
 using Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
 using Taskolith.API.OrganizationManagement.Organisations.DeleteOrganisation;
 using Taskolith.API.OrganizationManagement.Organisations.UpdateOrganisation;
+using Taskolith.API.OrganizationManagement.Roles;
 using Taskolith.API.Tasks.CreateTask;
 using Taskolith.API.Tasks.DeleteTask;
 using Taskolith.API.Tasks.GetTasks;
@@ -64,6 +65,8 @@ public static class Endpoints
             .MapEndpoint<UpdateOrganisation>();
         endpoints.MapPrivateGroup()
             .MapEndpoint<InviteMember>();
+        endpoints.MapPrivateGroup()
+            .MapEndpoint<CreateRole>();
     }
 
     private static void MapInvitationEndpoints(this IEndpointRouteBuilder app) {
