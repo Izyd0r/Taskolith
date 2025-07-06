@@ -17,7 +17,7 @@ public class CreateRole : IEndPoint {
 
     private static async Task<IResult> Handle(Guid organisationId, CreateRoleRequest request , AppDbContext dbContext, ClaimsPrincipal claims, CancellationToken ct) {
         var userId = claims.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-        if(userId == null) return Results.BadRequest();
+        if(userId == null || request.Name == "Admin") return Results.BadRequest();
 
         var role = new Role {
             Id = Guid.NewGuid(),
