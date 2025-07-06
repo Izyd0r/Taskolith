@@ -69,7 +69,8 @@ public static class Endpoints
             .MapEndpoint<CreateRole>()
             .MapEndpoint<DeleteRole>()
             .MapEndpoint<GetRoles>()
-            .MapEndpoint<UpdateRole>();
+            .MapEndpoint<UpdateRole>()
+            .MapEndpoint<GetMemberRoles>();
     }
 
     private static void MapInvitationEndpoints(this IEndpointRouteBuilder app) {
