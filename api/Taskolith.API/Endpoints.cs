@@ -68,7 +68,8 @@ public static class Endpoints
         endpoints.MapPrivateGroup()
             .MapEndpoint<CreateRole>()
             .MapEndpoint<DeleteRole>()
-            .MapEndpoint<GetRoles>();
+            .MapEndpoint<GetRoles>()
+            .MapEndpoint<UpdateRole>();
     }
 
     private static void MapInvitationEndpoints(this IEndpointRouteBuilder app) {
