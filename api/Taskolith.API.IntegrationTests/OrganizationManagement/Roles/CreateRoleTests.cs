@@ -26,4 +26,6 @@ public class CreateRoleTests(IntegrationTestWebAppFactory factory) : AuthorizedI
         responseRole.Headers.Location.Should().Be($"/api/organisations/{responseContent?.OrganisationId}/roles/{role?.RoleId}");
         role?.RoleId.Should().NotBe(Guid.Empty);
     }
+    
+    // TODO: add integration tests that check permissions
 }
