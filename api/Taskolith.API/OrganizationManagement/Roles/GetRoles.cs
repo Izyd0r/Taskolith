@@ -1,5 +1,8 @@
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Common;
+using Taskolith.API.Data;
+using Taskolith.API.OrganizationManagement.Roles.Responses;
 
 namespace Taskolith.API.OrganizationManagement.Roles;
 
@@ -9,7 +12,20 @@ public class GetRoles : IEndPoint {
         .RequireAuthorization("Public")
         .WithSummary("Get all roles inside organisation");
 
-    private static async Task<IResult> Handle(Guid organisationId) {
-        return Results.Ok(/*response*/);
+    private static async Task<IResult> Handle(
+        Guid organisationId, 
+        AppDbContext dbContext, 
+        ClaimsPrincipal claims, 
+        CancellationToken ct) {
+        var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (userId is null) return Results.BadRequest();
+
+        var roles = await dbContext.Roles
+            .Where(r => r.OrganisationId == organisationId)
+            .ToListAsync(cancellationToken: ct);
+        var mappedRoles = roles.Select(role => new RoleDto(role.Id, role.OrganisationId, role.Name, role.Permissions)).ToList();
+        var response = new GetRolesResponse(mappedRoles);
+        
+        return Results.Ok(response);
     }
 }
