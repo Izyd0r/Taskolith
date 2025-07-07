@@ -1,5 +1,5 @@
 using FluentValidation;
-using Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
+using Taskolith.API.OrganizationManagement.Organisations.Requests;
 
 namespace Taskolith.API.Validators;
 

@@ -5,7 +5,7 @@ using Taskolith.API.Common;
 using Taskolith.API.Data;
 using Taskolith.API.Data.Types;
 
-namespace Taskolith.API.OrganizationManagement.Organisations.DeleteOrganisation;
+namespace Taskolith.API.OrganizationManagement.Organisations;
 
 public class DeleteOrganisation : IEndPoint
 {

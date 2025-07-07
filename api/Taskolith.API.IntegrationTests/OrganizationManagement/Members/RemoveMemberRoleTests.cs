@@ -4,7 +4,8 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Data.Types;
 using Taskolith.API.OrganizationManagement.Members.Requests;
-using Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
+using Taskolith.API.OrganizationManagement.Organisations.Requests;
+using Taskolith.API.OrganizationManagement.Organisations.Responses;
 using Xunit.Abstractions;
 
 namespace Taskolith.API.IntegrationTests.OrganizationManagement.Members;
