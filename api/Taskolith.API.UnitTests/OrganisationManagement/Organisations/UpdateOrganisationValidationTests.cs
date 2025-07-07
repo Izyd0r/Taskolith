@@ -1,5 +1,5 @@
 using FluentValidation.TestHelper;
-using Taskolith.API.OrganizationManagement.Organisations.UpdateOrganisation;
+using Taskolith.API.OrganizationManagement.Organisations.Requests;
 using Taskolith.API.Validators;
 
 namespace Taskolith.API.UnitTests.OrganisationManagement.Organisations;

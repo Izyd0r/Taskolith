@@ -3,8 +3,10 @@ using Taskolith.API.Common;
 using Taskolith.API.Data;
 using Taskolith.API.Data.Types;
 using Taskolith.API.Filters;
+using Taskolith.API.OrganizationManagement.Organisations.Requests;
+using Taskolith.API.OrganizationManagement.Organisations.Responses;
 
-namespace Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
+namespace Taskolith.API.OrganizationManagement.Organisations;
 
 public class CreateOrganisation : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app

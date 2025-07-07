@@ -8,9 +8,6 @@ using Taskolith.API.OrganizationManagement.InviteSystem.InviteMember;
 using Taskolith.API.OrganizationManagement.InviteSystem.RejectInvite;
 using Taskolith.API.OrganizationManagement.Members;
 using Taskolith.API.OrganizationManagement.Organisations;
-using Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
-using Taskolith.API.OrganizationManagement.Organisations.DeleteOrganisation;
-using Taskolith.API.OrganizationManagement.Organisations.UpdateOrganisation;
 using Taskolith.API.OrganizationManagement.Roles;
 using Taskolith.API.Tasks.CreateTask;
 using Taskolith.API.Tasks.DeleteTask;
@@ -63,7 +60,8 @@ public static class Endpoints
         endpoints.MapPrivateGroup()
             .MapEndpoint<CreateOrganisation>()
             .MapEndpoint<DeleteOrganisation>()
-            .MapEndpoint<UpdateOrganisation>();
+            .MapEndpoint<UpdateOrganisation>()
+            .MapEndpoint<GetUserOrganisations>();
         endpoints.MapPrivateGroup()
             .MapEndpoint<InviteMember>();
         endpoints.MapPrivateGroup()

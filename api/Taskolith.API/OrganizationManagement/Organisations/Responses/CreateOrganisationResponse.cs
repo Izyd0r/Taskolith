@@ -1,4 +1,4 @@
-namespace Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
+namespace Taskolith.API.OrganizationManagement.Organisations.Responses;
 
 public record CreateOrganisationResponse(
     Guid OrganisationId,

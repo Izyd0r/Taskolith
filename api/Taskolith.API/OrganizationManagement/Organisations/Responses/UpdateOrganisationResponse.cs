@@ -1,4 +1,4 @@
-namespace Taskolith.API.OrganizationManagement.Organisations.UpdateOrganisation;
+namespace Taskolith.API.OrganizationManagement.Organisations.Responses;
 
 public record UpdateOrganisationResponse(
     Guid OrganisationId,

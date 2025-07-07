@@ -2,7 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using Taskolith.API.OrganizationManagement.InviteSystem.InviteMember;
-using Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
+using Taskolith.API.OrganizationManagement.Organisations.Requests;
+using Taskolith.API.OrganizationManagement.Organisations.Responses;
 
 namespace Taskolith.API.IntegrationTests.OrganizationManagement.Invites;
 
