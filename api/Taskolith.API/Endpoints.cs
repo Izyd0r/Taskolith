@@ -63,7 +63,8 @@ public static class Endpoints
             .MapEndpoint<UpdateOrganisation>()
             .MapEndpoint<GetUserOrganisations>();
         endpoints.MapPrivateGroup()
-            .MapEndpoint<InviteMember>();
+            .MapEndpoint<InviteMember>()
+            .MapEndpoint<KickMember>();
         endpoints.MapPrivateGroup()
             .MapEndpoint<CreateRole>()
             .MapEndpoint<DeleteRole>()
