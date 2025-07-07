@@ -2,13 +2,14 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
+using Taskolith.API.OrganizationManagement.Members.Responses;
 using Taskolith.API.OrganizationManagement.Roles.Responses;
 
-namespace Taskolith.API.OrganizationManagement.Roles;
+namespace Taskolith.API.OrganizationManagement.Members;
 
 public class GetMemberRoles : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/{organisationId:guid}/members/{memberId:guid}/roles/", Handle)
+        .MapGet("/{organisationId:guid}/members/{memberId:guid}/roles", Handle)
         .RequireAuthorization("Public")
         .WithSummary("Get member roles");
 

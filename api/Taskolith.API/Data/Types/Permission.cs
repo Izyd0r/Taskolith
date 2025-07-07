@@ -19,5 +19,4 @@ public enum Permission
     // Member Management
     InviteMember = 1 << 7,
     KickMember = 1 << 8,
-    
 }

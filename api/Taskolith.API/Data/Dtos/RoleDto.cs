@@ -7,4 +7,8 @@ public record RoleDto(
     Guid OrganisationId,
     string Name,
     Permission Permissions
-);
+) {
+    public IEnumerable<string> PermissionNames =>
+        Permissions.ToString()
+            .Split(", ", StringSplitOptions.RemoveEmptyEntries);
+}
