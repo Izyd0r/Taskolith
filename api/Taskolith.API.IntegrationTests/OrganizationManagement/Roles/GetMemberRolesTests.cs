@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using Taskolith.API.Data.Types;
+using Taskolith.API.OrganizationManagement.Members.Responses;
 using Taskolith.API.OrganizationManagement.Organisations.CreateOrganisation;
 using Taskolith.API.OrganizationManagement.Roles.Responses;
 
