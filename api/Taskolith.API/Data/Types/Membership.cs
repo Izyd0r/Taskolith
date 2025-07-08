@@ -6,5 +6,7 @@ public class Membership {
     public Guid OrganisationId { get; set; }
     public User? User { get; init; }
     public Organisation? Organisation { get; init; }
+    public ICollection<Project> Projects { get; init; } = new List<Project>();
+    public ICollection<ToDoTask> Tasks { get; init; } = new List<ToDoTask>();
     public ICollection<Role> Roles { get; init; } = new List<Role>();
 }

@@ -12,6 +12,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Membership> OrganisationMembers { get; set; }
     public DbSet<Invitation> Invitations { get; set; }
     public DbSet<Role> Roles { get; set; }
+    public DbSet<Project> Projects { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,6 +22,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         ConfigureRolesTable(modelBuilder);
         ConfigureInvitationsTable(modelBuilder);
         ConfigureTasksTable(modelBuilder);
+        ConfigureProjectsTable(modelBuilder);
         ConfigureUsersRefreshTokensTable(modelBuilder);
         base.OnModelCreating(modelBuilder);
     }
@@ -121,10 +123,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         builder.Property(t => t.Description).IsRequired().HasMaxLength(1024);
         builder.Property(t => t.DueDate).IsRequired();
         builder.Property(t => t.CreatedDate).IsRequired();
-        //builder.HasOne<User>()
-        //    .WithMany(u => u.Tasks)
-        //    .HasForeignKey(t => t.UserId)
-        //    .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(t => t.Members)
+            .WithMany(m => m.Tasks);
     }
 
     private static void ConfigureUsersRefreshTokensTable(ModelBuilder modelBuilder)
@@ -141,5 +141,22 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany(u => u.RefreshTokens)
             .HasForeignKey(t => t.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+    }
+
+    private static void ConfigureProjectsTable(ModelBuilder modelBuilder) { 
+        var builder = modelBuilder.Entity<Project>();
+        
+        builder.ToTable("Projects");
+        builder.HasKey(t => t.Id);
+        builder.Property(t => t.Name).IsRequired().HasMaxLength(50);
+        builder.Property(t => t.Description).IsRequired().HasMaxLength(100);
+        builder.HasMany(p => p.Members)
+            .WithMany(p => p.Projects);
+        builder.HasMany(p => p.Tasks)
+           .WithOne(p => p.Project)
+           .HasForeignKey(t => t.ProjectId)
+           .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(p => p.Organisation)
+           .WithMany(o => o.Projects);
     }
 }

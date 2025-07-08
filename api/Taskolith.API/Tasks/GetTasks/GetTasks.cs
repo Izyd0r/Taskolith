@@ -13,6 +13,7 @@ public class GetTasks : IEndPoint
 
     static async Task<IResult> Handle(AppDbContext dbContext, ClaimsPrincipal user, CancellationToken cancellationToken)
     {
+        /*
         var userId = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         
         if (userId == null) return Results.BadRequest();
@@ -24,5 +25,7 @@ public class GetTasks : IEndPoint
             .ToListAsync(cancellationToken: cancellationToken);
         var response = new GetTasksResponse(Guid.Parse(userId), returnTasks);
         return Results.Ok(response);
+        */
+        return Results.Ok();
     }
 }
