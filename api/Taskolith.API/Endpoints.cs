@@ -83,7 +83,8 @@ public static class Endpoints
         projectsGroup.MapPrivateGroup()
             .MapEndpoint<CreateProject>()
             .MapEndpoint<GetProjects>()
-            .MapEndpoint<UpdateProject>();
+            .MapEndpoint<UpdateProject>()
+            .MapEndpoint<GetAssignedProjects>();
     }
 
     private static void MapInvitationEndpoints(this IEndpointRouteBuilder app) {
