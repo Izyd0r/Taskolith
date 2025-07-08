@@ -27,6 +27,7 @@ public static class Endpoints
         // Here we map groups of endpoints
         endpoints.MapAuthEndpoints();
         endpoints.MapOrganisationManagementEndpoints();
+        endpoints.MapProjectEndpoints();
         endpoints.MapInvitationEndpoints();
         endpoints.MapTasksEndpoints();
     }
@@ -76,15 +77,18 @@ public static class Endpoints
             .MapEndpoint<GetOrganisationMembers>()
             .MapEndpoint<AddMemberRole>()
             .MapEndpoint<RemoveMemberRole>();
-        
-        var projectsGroup = endpoints.MapGroup("{organisationId:guid}/projects")
+    }
+
+    private static void MapProjectEndpoints(this IEndpointRouteBuilder app) {
+        var endpoints = app.MapGroup("/organisations/{organisationId:guid}/projects")
             .WithTags("Projects");
 
-        projectsGroup.MapPrivateGroup()
+        endpoints.MapPrivateGroup()
             .MapEndpoint<CreateProject>()
             .MapEndpoint<GetProjects>()
             .MapEndpoint<UpdateProject>()
-            .MapEndpoint<GetAssignedProjects>();
+            .MapEndpoint<GetAssignedProjects>()
+            .MapEndpoint<AssignProject>(); 
     }
 
     private static void MapInvitationEndpoints(this IEndpointRouteBuilder app) {
