@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
 using Taskolith.API.Filters;
@@ -21,6 +22,18 @@ public class UpdateProject : IEndPoint {
         ClaimsPrincipal claims,
         CancellationToken ct
     ) {
-        return Results.Ok(/*response*/);
+        var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) return Results.BadRequest();
+        
+        var project = await dbContext.Projects
+            .Where(p => p.OrganisationId == organisationId && p.Id == projectId)
+            .FirstOrDefaultAsync(ct);
+        if (project == null) return Results.NotFound();
+        dbContext.Entry(project).State = EntityState.Modified;
+        project.Name = request.Name;
+        project.Description = request.Description;
+        await dbContext.SaveChangesAsync(ct);
+        
+        return Results.NoContent();
     }
 }
