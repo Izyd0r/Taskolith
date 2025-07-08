@@ -19,4 +19,12 @@ public enum Permission
     // Member Management
     InviteMember = 1 << 7,
     KickMember = 1 << 8,
+    
+    // Project Management
+    CreateProject = 1 << 9,
+    UpdateProject = 1 << 10,
+    DeleteProject = 1 << 11,
+    AssignProject = 1 << 12,
+    RemoveFromProject = 1 << 13,
+    GetAllProjects = 1 << 14,
 }

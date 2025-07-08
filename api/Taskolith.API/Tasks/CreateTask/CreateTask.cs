@@ -15,6 +15,7 @@ public class CreateTask : IEndPoint
 
     static async Task<IResult> Handle(CreateTaskRequest request, AppDbContext context, ClaimsPrincipal user, CancellationToken cancellationToken)
     {
+        /*
         var value = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if (value == null) return Results.BadRequest();
         var taskCreationTime = DateTime.UtcNow;
@@ -23,7 +24,7 @@ public class CreateTask : IEndPoint
             Title = request.Title,
             Description = request.Description,
             DueDate = request.DueDate,
-            UserId = Guid.Parse(value),
+            Members = Guid.Parse(value),
             IsCompleted = false,
             Id = Guid.NewGuid(),
             CreatedDate = taskCreationTime,
@@ -34,5 +35,7 @@ public class CreateTask : IEndPoint
             
         var response = new CreateTaskResponse(task.UserId, task.Id, task.Title, task.Description, task.DueDate, taskCreationTime, task.IsCompleted);
         return Results.Created($"/api/tasks/{task.Id}",response);
+        */
+        return Results.Created();
     }
 }
