@@ -17,5 +17,6 @@ public class ToDoTask
     public required Project Project { get; init; }
     public required KanbanColumn KanbanColumn { get; set; }
     public ICollection<Membership> Members { get; init; } = new List<Membership>();
+    public int Order { get; set; }
     // TODO: add comments, updated at, labels, assigned members and priority
 }
