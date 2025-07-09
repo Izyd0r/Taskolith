@@ -22,7 +22,7 @@ public class CreateKanbanColumnTests(IntegrationTestWebAppFactory factory) : Aut
         var projectCreationRequest = new CreateProjectRequest("Backend API", "Project for XYZ firm");
         var responseFromProjectCreation = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects", projectCreationRequest);
         var contentProject = await responseFromProjectCreation.Content.ReadFromJsonAsync<CreateProjectResponse>();
-        var kanbanCreationRequest = new CreateKanbanColumnRequest(contentProject!.ProjectId, "ToDo");
+        var kanbanCreationRequest = new CreateKanbanColumnRequest("ToDo");
         var responseFromKanbanCreation = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/columns", kanbanCreationRequest);
         responseFromKanbanCreation.Should().NotBeNull();
         responseFromKanbanCreation.StatusCode.Should().Be(HttpStatusCode.Created);
