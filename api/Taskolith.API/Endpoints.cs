@@ -88,7 +88,8 @@ public static class Endpoints
             .MapEndpoint<GetProjects>()
             .MapEndpoint<UpdateProject>()
             .MapEndpoint<GetAssignedProjects>()
-            .MapEndpoint<AssignProject>(); 
+            .MapEndpoint<AssignProject>()
+            .MapEndpoint<RemoveFromProject>(); 
     }
 
     private static void MapInvitationEndpoints(this IEndpointRouteBuilder app) {

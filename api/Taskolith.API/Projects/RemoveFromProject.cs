@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
 
@@ -18,6 +19,19 @@ public class RemoveFromProject : IEndPoint {
         ClaimsPrincipal claims,
         CancellationToken ct
     ) {
+        var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (userId is null) return Results.BadRequest();
+        
+        var project = await dbContext.Projects
+            .Include(p => p.Members)
+            .FirstOrDefaultAsync(p => p.Id == projectId, ct);
+        if (project is null) return Results.NotFound();
+        var memberToRemove = project?.Members.FirstOrDefault(m => m.Id == memberId);
+        if (memberToRemove is null) return Results.NotFound();
+        
+        dbContext.Entry(memberToRemove).State = EntityState.Deleted;
+        await dbContext.SaveChangesAsync(ct);
+        
         return Results.NoContent();
     }
 }
