@@ -1,6 +1,7 @@
 using Taskolith.API.Auth.Login;
 using Taskolith.API.Auth.SignUp;
 using Taskolith.API.Common;
+using Taskolith.API.Kanban;
 using Taskolith.API.OrganizationManagement.InviteSystem;
 using Taskolith.API.OrganizationManagement.InviteSystem.AcceptInvite;
 using Taskolith.API.OrganizationManagement.InviteSystem.GetInvites;
@@ -29,6 +30,7 @@ public static class Endpoints
         endpoints.MapOrganisationManagementEndpoints();
         endpoints.MapProjectEndpoints();
         endpoints.MapInvitationEndpoints();
+        endpoints.MapKanbanEndpoints();
         endpoints.MapTasksEndpoints();
     }
 
@@ -91,6 +93,14 @@ public static class Endpoints
             .MapEndpoint<AssignProject>()
             .MapEndpoint<RemoveFromProject>()
             .MapEndpoint<DeleteProject>(); 
+    }
+
+    private static void MapKanbanEndpoints(this IEndpointRouteBuilder app) {
+        var endpoints = app.MapGroup("/organisations/{organisationId:guid}/projects/{projectId:guid}/columns")
+            .WithTags("Kanban columns");
+
+        endpoints.MapPrivateGroup()
+            .MapEndpoint<CreateKanbanColumn>();
     }
 
     private static void MapInvitationEndpoints(this IEndpointRouteBuilder app) {

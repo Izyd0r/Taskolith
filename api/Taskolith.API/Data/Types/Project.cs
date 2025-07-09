@@ -14,4 +14,5 @@ public class Project {
     public ICollection<Membership> Members { get; set; } = new List<Membership>();
     public Organisation? Organisation { get; set; }
     public ICollection<ToDoTask> Tasks { get; set; } = new List<ToDoTask>();
+    public ICollection<KanbanColumn> KanbanColumns { get; set; } = new List<KanbanColumn>();
 }

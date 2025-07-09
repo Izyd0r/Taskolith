@@ -13,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Invitation> Invitations { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<Project> Projects { get; set; }
+    public DbSet<KanbanColumn> KanbanColumns { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,6 +25,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         ConfigureTasksTable(modelBuilder);
         ConfigureProjectsTable(modelBuilder);
         ConfigureUsersRefreshTokensTable(modelBuilder);
+        ConfigureKanbanColumnsTable(modelBuilder);
         base.OnModelCreating(modelBuilder);
     }
 
@@ -158,5 +160,18 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
            .OnDelete(DeleteBehavior.Cascade);
         builder.HasOne(p => p.Organisation)
            .WithMany(o => o.Projects);
+    }
+
+    private static void ConfigureKanbanColumnsTable(ModelBuilder modelBuilder) {
+        var builder = modelBuilder.Entity<KanbanColumn>();
+        
+        builder.ToTable("KanbanColumns");
+        builder.HasKey(k => k.Id);
+        builder.Property(k => k.Name).IsRequired().HasMaxLength(100);
+        builder.Property(k => k.Order).IsRequired();
+        builder.HasOne(k => k.Project)
+            .WithMany(p => p.KanbanColumns)
+            .HasForeignKey(k => k.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
