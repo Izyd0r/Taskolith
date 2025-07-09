@@ -103,6 +103,7 @@ public static class Endpoints
             .MapEndpoint<CreateKanbanColumn>()
             .MapEndpoint<UpdateKanbanColumn>()
             .MapEndpoint<DeleteKanbanColumn>()
+            .MapEndpoint<GetKanbanColumns>()
             .MapEndpoint<ChangeOrderKanbanColumn>();
     }
 
