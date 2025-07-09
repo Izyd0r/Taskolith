@@ -27,4 +27,11 @@ public enum Permission
     AssignProject = 1 << 12,
     RemoveFromProject = 1 << 13,
     GetAllProjects = 1 << 14,
+    
+    // Kanban Management
+    CreateKanbanColumn = 1 << 15,
+    UpdateKanbanColumn = 1 << 16,
+    DeleteKanbanColumn = 1 << 17,
+    
+    // Task Management TODO
 }

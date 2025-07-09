@@ -6,6 +6,7 @@ public class ToDoTask
 {
     public Guid Id { get; init; }
     public Guid ProjectId { get; init; }
+    public Guid KanbanColumnId { get; init; }
     [MaxLength(256)]
     public required string Title { get; set; }
     [MaxLength(1024)]
@@ -14,5 +15,7 @@ public class ToDoTask
     public DateTime CreatedDate { get; init; }
     public bool IsCompleted { get; set; }
     public required Project Project { get; init; }
-    public ICollection<Membership> Members { get; init; } = new List<Membership>(); 
+    public required KanbanColumn KanbanColumn { get; set; }
+    public ICollection<Membership> Members { get; init; } = new List<Membership>();
+    // TODO: add comments, updated at, labels, assigned members and priority
 }
