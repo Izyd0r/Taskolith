@@ -101,7 +101,8 @@ public static class Endpoints
 
         endpoints.MapPrivateGroup()
             .MapEndpoint<CreateKanbanColumn>()
-            .MapEndpoint<UpdateKanbanColumn>();
+            .MapEndpoint<UpdateKanbanColumn>()
+            .MapEndpoint<DeleteKanbanColumn>();
     }
 
     private static void MapInvitationEndpoints(this IEndpointRouteBuilder app) {
