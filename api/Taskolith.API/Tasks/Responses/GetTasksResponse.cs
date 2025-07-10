@@ -1,8 +1,8 @@
+using Taskolith.API.Data.Dtos;
 using Taskolith.API.Data.Types;
 
-namespace Taskolith.API.Tasks.GetTasks;
+namespace Taskolith.API.Tasks.Responses;
 
 public record GetTasksResponse(
-    Guid UserId,
-    List<ToDoTask> Tasks
+    List<TaskDto> Tasks
 );
