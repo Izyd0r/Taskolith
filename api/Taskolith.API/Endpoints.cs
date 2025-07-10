@@ -73,15 +73,17 @@ public static class Endpoints
             .MapEndpoint<InviteMember>()
             .MapEndpoint<KickMember>();
         endpoints.MapPrivateGroup()
+            .MapEndpoint<GetOrganisationMembers>()
+            .MapEndpoint<AddMemberRole>()
+            .MapEndpoint<RemoveMemberRole>()
+            .MapEndpoint<GetMemberRoles>();
+        
+        var rolesGroup = endpoints.MapGroup("/{organisationId:guid}/roles").WithTags("Roles");
+        rolesGroup.MapPrivateGroup()
             .MapEndpoint<CreateRole>()
             .MapEndpoint<DeleteRole>()
             .MapEndpoint<GetRoles>()
-            .MapEndpoint<UpdateRole>()
-            .MapEndpoint<GetMemberRoles>();
-        endpoints.MapPrivateGroup()
-            .MapEndpoint<GetOrganisationMembers>()
-            .MapEndpoint<AddMemberRole>()
-            .MapEndpoint<RemoveMemberRole>();
+            .MapEndpoint<UpdateRole>();
     }
 
     private static void MapProjectEndpoints(this IEndpointRouteBuilder app) {

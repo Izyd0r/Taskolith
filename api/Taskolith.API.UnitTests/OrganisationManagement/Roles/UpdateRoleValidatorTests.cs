@@ -45,7 +45,7 @@ public class UpdateRoleValidatorTests {
 
     [Fact]
     public void Should_Have_Error_When_Permissions_Are_Invalid() {
-        var invalidPermission = (Permission)(1 << 20);
+        var invalidPermission = (Permission)(1 << 30);
         var model = new UpdateRoleRequest("Invalid", invalidPermission);
         var result = _validator.TestValidate(model);
 

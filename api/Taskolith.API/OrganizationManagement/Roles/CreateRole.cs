@@ -10,7 +10,7 @@ namespace Taskolith.API.OrganizationManagement.Roles;
 
 public class CreateRole : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{organisationId:guid}/roles", Handle)
+        .MapPost("", Handle)
         .RequireAuthorization("CreateRole")
         .WithRequestValidation<CreateRoleRequest>()
         .WithSummary("Creates a role");
