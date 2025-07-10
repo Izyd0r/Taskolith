@@ -5,7 +5,7 @@ namespace Taskolith.API.Data.Types;
 public class ToDoTask {
     public Guid Id { get; init; }
     public Guid ProjectId { get; init; }
-    public Guid KanbanColumnId { get; init; }
+    public Guid KanbanColumnId { get; set; }
     [MaxLength(256)]
     public required string Title { get; set; }
     [MaxLength(1024)]
