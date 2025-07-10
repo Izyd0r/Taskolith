@@ -1,16 +1,15 @@
 using FluentValidation.TestHelper;
-using Taskolith.API.Tasks.CreateTask;
+using Taskolith.API.Data.Types;
+using Taskolith.API.Tasks.Requests;
 using Taskolith.API.Validators;
 
 namespace Taskolith.API.UnitTests.Tasks;
 
-public class CreateTaskValidatorTests
-{
+public class CreateTaskValidatorTests {
    private readonly CreateTaskValidator validator = new();
 
    public static IEnumerable<object[]> TaskValidationCases =>
-      new List<object[]>
-      {
+      new List<object[]> {
          new object[] { null, "Description", DateTime.UtcNow.AddHours(1), false },
          new object[] { "", "Description", DateTime.UtcNow.AddHours(1), false },
          new object[] { "Ok", "Description", DateTime.UtcNow.AddHours(1), true },
@@ -25,13 +24,15 @@ public class CreateTaskValidatorTests
          new object[] { "Valid", "Description", DateTime.UtcNow.AddDays(1), true },
       };
 
-   
    [Theory]
    [MemberData(nameof(TaskValidationCases))]
-   public void Should_Validate_Title_Description_And_DueTime(string title, string description, DateTime dueTime, bool expected)
-   {
-      var task = new CreateTaskRequest(title, description, dueTime);
-      var result = validator.TestValidate(task);
+   public void Should_Validate_Title_Description_And_DueDate(string title, string description, DateTime dueDate,
+      bool expected) {
+      var assignedMembers = new List<Guid> { Guid.NewGuid() };
+      int order = 1;
+      Priority priority = Priority.Medium;
+      var request = new CreateTaskRequest(title, description, dueDate, assignedMembers, order, priority);
+      var result = validator.TestValidate(request);
       Assert.Equal(expected, result.IsValid);
    }
 }

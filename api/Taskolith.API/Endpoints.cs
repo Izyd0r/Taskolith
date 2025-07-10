@@ -11,7 +11,7 @@ using Taskolith.API.OrganizationManagement.Members;
 using Taskolith.API.OrganizationManagement.Organisations;
 using Taskolith.API.OrganizationManagement.Roles;
 using Taskolith.API.Projects;
-using Taskolith.API.Tasks.CreateTask;
+using Taskolith.API.Tasks;
 using Taskolith.API.Tasks.DeleteTask;
 using Taskolith.API.Tasks.GetTasks;
 using Taskolith.API.Tasks.UpdateTask;
@@ -46,7 +46,7 @@ public static class Endpoints
 
     private static void MapTasksEndpoints(this IEndpointRouteBuilder app)
     {
-        var endpoints = app.MapGroup("/tasks")
+        var endpoints = app.MapGroup("/organisations/{organisationId:guid}/projects/{projectId:guid}/columns/{kanbanColumnId:guid}/tasks")
             .WithTags("Tasks");
 
         endpoints.MapPrivateGroup()

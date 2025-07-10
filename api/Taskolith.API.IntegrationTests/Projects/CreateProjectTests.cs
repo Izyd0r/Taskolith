@@ -39,7 +39,8 @@ public class CreateProjectTests(IntegrationTestWebAppFactory factory) : Authoriz
         var member = new Membership() {
             Id = Guid.NewGuid(),
             OrganisationId = content.OrganisationId,
-            UserId = userTwo.AuthorizedUser.Id
+            UserId = userTwo.AuthorizedUser.Id,
+            User = userTwo.AuthorizedUser,
         };
         DbContext.OrganisationMembers.Add(member);
         var projectCreationRequest = new CreateProjectRequest("Backend API", "Project for XYZ firm");

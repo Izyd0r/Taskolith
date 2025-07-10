@@ -119,14 +119,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         var builder = modelBuilder.Entity<ToDoTask>();
 
-        builder.ToTable("ToDoTasks");
+        builder.ToTable("Tasks");
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Title).IsRequired().HasMaxLength(256);
         builder.Property(t => t.Description).IsRequired().HasMaxLength(1024);
         builder.Property(t => t.DueDate).IsRequired();
         builder.Property(t => t.CreatedDate).IsRequired();
-        builder.HasMany(t => t.Members)
+        builder.Property(t => t.IsCompleted).IsRequired();
+        builder.Property(t => t.Order).IsRequired();
+        builder.Property(t => t.Priority).IsRequired();
+        builder.HasMany(t => t.AssignedMembers)
             .WithMany(m => m.Tasks);
+        builder.HasOne(t => t.Project)
+            .WithMany(p => p.Tasks);
+        builder.HasOne(t => t.KanbanColumn)
+            .WithMany(c => c.Tasks)
+            .HasForeignKey(t => t.KanbanColumnId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     private static void ConfigureUsersRefreshTokensTable(ModelBuilder modelBuilder)

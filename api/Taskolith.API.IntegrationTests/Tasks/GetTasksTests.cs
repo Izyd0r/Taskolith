@@ -2,7 +2,6 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Taskolith.API.Auth.Login;
 using Taskolith.API.Data.Types;
-using Taskolith.API.Tasks.CreateTask;
 using Taskolith.API.Tasks.GetTasks;
 
 namespace Taskolith.API.IntegrationTests.Tasks;

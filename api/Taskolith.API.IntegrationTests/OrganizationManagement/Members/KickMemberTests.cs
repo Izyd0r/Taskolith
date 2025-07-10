@@ -20,7 +20,8 @@ public class KickMemberTests(IntegrationTestWebAppFactory factory) : AuthorizedI
         var member = new Membership() {
             Id = Guid.NewGuid(),
             OrganisationId = responseContent!.OrganisationId,
-            UserId = userTwo.AuthorizedUser.Id
+            UserId = userTwo.AuthorizedUser.Id,
+            User = userTwo.AuthorizedUser,
         };
         DbContext.OrganisationMembers.Add(member);
         await DbContext.SaveChangesAsync();

@@ -33,5 +33,10 @@ public enum Permission
     UpdateKanbanColumn = 1 << 16,
     DeleteKanbanColumn = 1 << 17,
     
-    // Task Management TODO
+    // Task Management
+    CreateTask = 1 << 18,
+    UpdateTask = 1 << 19,
+    DeleteTask = 1 << 20,
+    AssignTask = 1 << 21,
+    RemoveFromTask = 1 << 22,
 }
