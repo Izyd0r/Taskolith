@@ -4,80 +4,41 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using Taskolith.API.Auth.Login;
 using Taskolith.API.Data.Types;
+using Taskolith.API.Kanban.Requests;
+using Taskolith.API.Kanban.Responses;
+using Taskolith.API.OrganizationManagement.Organisations.Requests;
+using Taskolith.API.OrganizationManagement.Organisations.Responses;
+using Taskolith.API.Projects.Requests;
+using Taskolith.API.Projects.Responses;
+using Taskolith.API.Tasks;
 using Taskolith.API.Tasks.Requests;
 using Xunit.Abstractions;
 
 namespace Taskolith.API.IntegrationTests.Tasks;
 
-public class DeleteTaskTests(IntegrationTestWebAppFactory factory, ITestOutputHelper testOutputHelper) : BaseIntegrationTest(factory)
-{
+public class DeleteTaskTests(IntegrationTestWebAppFactory factory, ITestOutputHelper testOutputHelper) : AuthorizedIntegrationTest(factory) {
     private readonly ITestOutputHelper _testOutputHelper = testOutputHelper;
     private readonly IntegrationTestWebAppFactory _factory = factory;
 
     [Fact]
-    public async Task Should_Delete_Task_That_Exists()
-    {
-        /*
-        var client = _factory.CreateClient();
-        var user = new User {
-            Username = "testusername",
-            Password = "PasswordExample123!",
-            Email = "example@email.com",
-            FirstName = "Firstname",
-            LastName = "Lastname"
-        };
-        DbContext.Users.Add(user);
-        await DbContext.SaveChangesAsync();
+    public async Task Should_Delete_Task_That_Exist_And_Return_NoContent() {
+        var test = await BuildAuthorizedTest(_factory);
+        var request = new CreateOrganisationRequest("Organisation");
+        var response = await test.AuthorizedHttpClient.PostAsJsonAsync("/api/organisations", request);
+        var content = await response.Content.ReadFromJsonAsync<CreateOrganisationResponse>();
+        var projectCreationRequest = new CreateProjectRequest("Backend API", "Project for XYZ firm");
+        var responseFromProjectCreation = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects", projectCreationRequest);
+        var contentProject = await responseFromProjectCreation.Content.ReadFromJsonAsync<CreateProjectResponse>();
+        var kanbanCreationRequest = new CreateKanbanColumnRequest("ToDo");
+        var responseFromKanbanCreation = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/columns", kanbanCreationRequest);
+        var contentFromKanbanCreation = await responseFromKanbanCreation.Content.ReadFromJsonAsync<CreateKanbanColumnResponse>();
         
-        var loginRequest = new LoginRequest(user.Username, user.Password);
-        var response = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var createTaskRequest = new CreateTaskRequest("Title", "Description", DateTime.UtcNow.AddDays(7), new List<Guid>(), 1, Priority.Critical);
+        var responseFromCreateTask = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/columns/{contentFromKanbanCreation!.KanbanColumnId}/tasks", createTaskRequest);
         
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
-        
-        var createTaskRequest = new CreateTaskRequest("Title", "Description", DateTime.UtcNow.AddDays(1));
-        var createResponse = await client.PostAsJsonAsync("/api/tasks/", createTaskRequest);
-        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-        
-        var created = await createResponse.Content.ReadFromJsonAsync<CreateTaskResponse>();
-        created.Should().NotBeNull();
-        var taskId = created!.TaskId;
-        
-        var deleteResponse = await client.DeleteAsync($"/api/tasks/{taskId}");
-        var responseBody = await deleteResponse.Content.ReadAsStringAsync();
-
-        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent, $"Response: {responseBody}");
-        responseBody.Should().BeNullOrEmpty();*/
+        var createTaskResponse = await responseFromCreateTask.Content.ReadFromJsonAsync<CreateTaskResponse>();
+        var responseFromDelete = await test.AuthorizedHttpClient.DeleteAsync(
+            $"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/columns/{contentFromKanbanCreation!.KanbanColumnId}/tasks/{createTaskResponse!.TaskId}");
+        responseFromDelete.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
-    
-    [Fact]
-    public async Task Should_Return_NotFound_When_Task_Dont_Exist()
-    {/*
-        var client = _factory.CreateClient();
-        var user = new User {
-            Username = "testusername",
-            Password = "PasswordExample123!",
-            Email = "example@email.com",
-            FirstName = "Firstname",
-            LastName = "Lastname"
-        };
-        DbContext.Users.Add(user);
-        await DbContext.SaveChangesAsync();
-        
-        var loginRequest = new LoginRequest(user.Username, user.Password);
-        var response = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
-
-        var deleteResponse = await client.DeleteAsync($"/api/tasks/{Guid.NewGuid()}");
-        var responseBody = await deleteResponse.Content.ReadAsStringAsync();
-
-        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NotFound, $"Response: {responseBody}");
-        responseBody.Should().BeNullOrEmpty();*/
-    } 
 }

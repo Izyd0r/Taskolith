@@ -12,9 +12,7 @@ using Taskolith.API.OrganizationManagement.Organisations;
 using Taskolith.API.OrganizationManagement.Roles;
 using Taskolith.API.Projects;
 using Taskolith.API.Tasks;
-using Taskolith.API.Tasks.DeleteTask;
 using Taskolith.API.Tasks.GetTasks;
-using Taskolith.API.Tasks.UpdateTask;
 
 namespace Taskolith.API;
 

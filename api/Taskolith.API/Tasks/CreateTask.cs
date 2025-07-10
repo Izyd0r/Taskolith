@@ -9,8 +9,7 @@ using Taskolith.API.Tasks.Requests;
 
 namespace Taskolith.API.Tasks;
 
-public class CreateTask : IEndPoint
-{
+public class CreateTask : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("", Handle)
         .WithRequestValidation<CreateTaskRequest>()

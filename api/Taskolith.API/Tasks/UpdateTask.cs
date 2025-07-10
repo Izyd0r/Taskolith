@@ -5,10 +5,9 @@ using Taskolith.API.Data;
 using Taskolith.API.Filters;
 using Taskolith.API.Tasks.Requests;
 
-namespace Taskolith.API.Tasks.UpdateTask;
+namespace Taskolith.API.Tasks;
 
-public class UpdateTask : IEndPoint
-{
+public class UpdateTask : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPut("/{taskId:guid}", Handle)
         .WithSummary("Updates a task")
@@ -45,5 +44,4 @@ public class UpdateTask : IEndPoint
         
         return Results.NoContent();
     }
-    
 }
