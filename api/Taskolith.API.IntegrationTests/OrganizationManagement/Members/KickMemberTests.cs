@@ -17,6 +17,7 @@ public class KickMemberTests(IntegrationTestWebAppFactory factory) : AuthorizedI
         var request = new CreateOrganisationRequest("Organisation");
         var response = await userOne.AuthorizedHttpClient.PostAsJsonAsync("/api/organisations", request);
         var responseContent = await response.Content.ReadFromJsonAsync<CreateOrganisationResponse>();
+        DbContext.Users.Attach(userTwo.AuthorizedUser);
         var member = new Membership() {
             Id = Guid.NewGuid(),
             OrganisationId = responseContent!.OrganisationId,

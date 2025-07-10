@@ -16,7 +16,7 @@ public class AuthorizedIntegrationTest : BaseIntegrationTest {
         var client = factory.CreateClient();
        
         var userFaker = new Faker<User>()
-            .RuleFor(u => u.Username, f => f.Internet.UserName())
+            .RuleFor(u => u.Username, f => f.Random.String2(8, 20, "abcdefghijklmnopqrstuvwxyz0123456789"))
             .RuleFor(u => u.Password, f => f.Internet.Password(12, false, "\\w", "Example123!")) // creates something like 'Example123!abc'
             .RuleFor(u => u.Email, f => f.Internet.Email())
             .RuleFor(u => u.FirstName, f => f.Name.FirstName())

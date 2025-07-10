@@ -20,18 +20,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Version = "v1",
         Title = "Taskolith API",
-        Description = "An API for managing tasks",
-        TermsOfService = new Uri("https://example.com/terms"),
-        Contact = new OpenApiContact
-        {
-            Name = "Example Contact",
-            Url = new Uri("https://example.com/contact"),
-        },
-        License = new OpenApiLicense
-        {
-            Name = "Example License",
-            Url = new Uri("https://example.com/license"),
-        }
+        Description = "An API for Taskolith"
     });
 
     var securityScheme = new OpenApiSecurityScheme

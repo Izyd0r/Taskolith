@@ -14,39 +14,57 @@ public class GetOrganisationsMembersTests(IntegrationTestWebAppFactory factory) 
     [Fact]
     public async Task Get_All_Members_Inside_Organisation_And_Return_Ok() {
         var userOne = await BuildAuthorizedTest(_factory);
-        var request = new CreateOrganisationRequest("Organisation");
-        var response = await userOne.AuthorizedHttpClient.PostAsJsonAsync("/api/organisations", request);
-        var responseContent = await response.Content.ReadFromJsonAsync<CreateOrganisationResponse>();
+        var createOrgRequest = new CreateOrganisationRequest("Organisation");
+        var createOrgResponse = await userOne.AuthorizedHttpClient
+            .PostAsJsonAsync("/api/organisations", createOrgRequest);
+        var orgContent = await createOrgResponse.Content.ReadFromJsonAsync<CreateOrganisationResponse>();
+        var organisationId = orgContent!.OrganisationId;
+
         var userTwo = await BuildAuthorizedTest(_factory);
-        var memberOne = new Membership() {
+
+        DbContext.Users.Attach(userTwo.AuthorizedUser);
+
+        var memberRole = new Role {
             Id = Guid.NewGuid(),
-            OrganisationId = responseContent!.OrganisationId,
+            Name = "Member",
+            OrganisationId = organisationId,
+            Permissions = Permission.Public
+        };
+
+        var membershipForUserTwo = new Membership {
+            Id = Guid.NewGuid(),
+            OrganisationId = organisationId,
             UserId = userTwo.AuthorizedUser.Id,
             User = userTwo.AuthorizedUser,
-            Roles = [new Role() {
-                Id = Guid.NewGuid(),
-                Name = "Member",
-                OrganisationId = responseContent!.OrganisationId,
-                Permissions = Permission.Public
-            }]
+            Roles = [memberRole]
         };
-        DbContext.OrganisationMembers.Add(memberOne);
+
+        DbContext.OrganisationMembers.Add(membershipForUserTwo);
         await DbContext.SaveChangesAsync();
-        var responseFromGetMembers = await userOne.AuthorizedHttpClient.GetAsync($"/api/organisations/{responseContent.OrganisationId}/members");
-        responseFromGetMembers.Should().NotBeNull();
-        responseFromGetMembers.StatusCode.Should().Be(HttpStatusCode.OK);
-        var content = await responseFromGetMembers.Content.ReadFromJsonAsync<List<GetOrganisationMembersResponse>>();
-        content!.Count.Should().Be(2);
-        content[0].UserId.Should().Be(userOne.AuthorizedUser.Id);
-        content[1].UserId.Should().Be(userTwo.AuthorizedUser.Id);
-        content[0].Roles.Should().HaveCount(1);
-        content[1].Roles.Should().HaveCount(1);
-        content[0].OrganisationId.Should().Be(responseContent!.OrganisationId);
-        content[1].OrganisationId.Should().Be(responseContent!.OrganisationId);
-        content[0].Roles.ElementAt(0).Name.Should().Be("Admin");
-        content[1].Roles.ElementAt(0).Name.Should().Be("Member");
+
+        var getMembersResponse = await userOne.AuthorizedHttpClient
+            .GetAsync($"/api/organisations/{organisationId}/members");
+
+        getMembersResponse.Should().NotBeNull();
+        getMembersResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var members = await getMembersResponse.Content.ReadFromJsonAsync<List<GetOrganisationMembersResponse>>();
+        members.Should().NotBeNull();
+        members!.Count.Should().Be(2);
+
+        var memberOne = members.FirstOrDefault(m => m.UserId == userOne.AuthorizedUser.Id);
+        var memberTwo = members.FirstOrDefault(m => m.UserId == userTwo.AuthorizedUser.Id);
+
+        memberOne.Should().NotBeNull();
+        memberTwo.Should().NotBeNull();
+
+        memberOne!.OrganisationId.Should().Be(organisationId);
+        memberTwo!.OrganisationId.Should().Be(organisationId);
+
+        memberOne.Roles.Should().ContainSingle(r => r.Name == "Admin");
+        memberTwo.Roles.Should().ContainSingle(r => r.Name == "Member");
     }
-    
+
     [Fact]
     public async Task Outside_User_Cant_Get_All_Members_Of_Organisation_And_Return_Forbidden() {
         var userOne = await BuildAuthorizedTest(_factory);

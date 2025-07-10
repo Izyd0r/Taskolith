@@ -8,7 +8,7 @@ namespace Taskolith.API.OrganizationManagement.Roles;
 
 public class GetRoles : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/{organisationId:guid}/roles", Handle)
+        .MapGet("", Handle)
         .RequireAuthorization("Public")
         .WithSummary("Get all roles inside organisation");
 
