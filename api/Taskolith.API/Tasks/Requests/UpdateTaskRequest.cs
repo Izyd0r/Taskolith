@@ -1,9 +1,13 @@
-namespace Taskolith.API.Tasks.UpdateTask;
+using Taskolith.API.Data.Types;
 
-public record UpdateTaskRequest(
-    Guid TaskId,
-    string? Title,
-    string? Description,
-    DateTime? DueDate,
-    bool? Completed
-);
+namespace Taskolith.API.Tasks.Requests;
+
+public class UpdateTaskRequest {
+    public string? Title { get; init; }
+    public string? Description { get; init; }
+    public DateTime? DueDate { get; init; }
+    public int? Order { get; init; }
+    public Priority? Priority { get; init; }
+    public bool? IsCompleted { get; init; }
+    public Guid? KanbanColumnId { get; init; }
+};

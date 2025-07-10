@@ -6,79 +6,53 @@ using FluentAssertions.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Auth.Login;
 using Taskolith.API.Data.Types;
+using Taskolith.API.Kanban.Requests;
+using Taskolith.API.Kanban.Responses;
+using Taskolith.API.OrganizationManagement.Organisations.Requests;
+using Taskolith.API.OrganizationManagement.Organisations.Responses;
+using Taskolith.API.Projects.Requests;
+using Taskolith.API.Projects.Responses;
+using Taskolith.API.Tasks;
 using Taskolith.API.Tasks.Requests;
 using Taskolith.API.Tasks.UpdateTask;
+using Xunit.Abstractions;
 
 namespace Taskolith.API.IntegrationTests.Tasks;
 
-public class UpdateTaskTests(IntegrationTestWebAppFactory factory) : BaseIntegrationTest(factory)
-{
+public class UpdateTaskTests(IntegrationTestWebAppFactory factory, ITestOutputHelper testOutputHelper) : AuthorizedIntegrationTest(factory) {
     private readonly IntegrationTestWebAppFactory _factory = factory;
+    private readonly ITestOutputHelper _testOutputHelper = testOutputHelper;
 
     [Fact]
-    public async Task Should_Update_Task()
-    {/*
-        var client = _factory.CreateClient();
-        var user = new User {
-            Username = "testusername",
-            Password = "PasswordExample123!",
-            Email = "example@email.com",
-            FirstName = "Firstname",
-            LastName = "Lastname"
-        };
-        DbContext.Users.Add(user);
-        await DbContext.SaveChangesAsync();
+    public async Task Should_Update_Task_And_Return_NoContent() {
+        var test = await BuildAuthorizedTest(_factory);
+        var request = new CreateOrganisationRequest("Organisation");
+        var response = await test.AuthorizedHttpClient.PostAsJsonAsync("/api/organisations", request);
+        var content = await response.Content.ReadFromJsonAsync<CreateOrganisationResponse>();
+        var projectCreationRequest = new CreateProjectRequest("Backend API", "Project for XYZ firm");
+        var responseFromProjectCreation = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects", projectCreationRequest);
+        var contentProject = await responseFromProjectCreation.Content.ReadFromJsonAsync<CreateProjectResponse>();
+        var kanbanCreationRequest = new CreateKanbanColumnRequest("ToDo");
+        var responseFromKanbanCreation = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/columns", kanbanCreationRequest);
+        var contentFromKanbanCreation = await responseFromKanbanCreation.Content.ReadFromJsonAsync<CreateKanbanColumnResponse>();
         
-        var loginRequest = new LoginRequest(user.Username, user.Password);
-        var response = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
-
-        var createTaskRequest = new CreateTaskRequest("Title", "Description", DateTime.UtcNow.AddDays(1));
-        var responseFromCreateTask = await client.PostAsJsonAsync("/api/tasks/", createTaskRequest);
-        responseFromCreateTask.StatusCode.Should().Be(HttpStatusCode.Created);
+        var createTaskRequest = new CreateTaskRequest("Title", "Description", DateTime.UtcNow.AddDays(7), new List<Guid>(), 1, Priority.Critical);
+        var responseFromCreateTask = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/columns/{contentFromKanbanCreation!.KanbanColumnId}/tasks", createTaskRequest);
         
         var createTaskResponse = await responseFromCreateTask.Content.ReadFromJsonAsync<CreateTaskResponse>();
-        responseFromCreateTask.Headers.Location?.OriginalString.Should().Be($"/api/tasks/{createTaskResponse!.TaskId}");
-        
-        var updateTaskRequest = new UpdateTaskRequest(createTaskResponse!.TaskId, "New title", "New description", DateTime.UtcNow.AddDays(1), createTaskResponse.Completed);
-        var responseFromUpdateTask = await client.PutAsJsonAsync("/api/tasks/", updateTaskRequest);
-        responseFromUpdateTask.StatusCode.Should().Be(HttpStatusCode.OK);
-        
-        var updatedTask = await DbContext.ToDoTasks.SingleAsync(x => x.Id == updateTaskRequest.TaskId);
-        updatedTask!.Title.Should().Be(updateTaskRequest.Title);
-        updatedTask.Description.Should().Be(updateTaskRequest.Description);
-        updatedTask.DueDate.Should().BeCloseTo(updateTaskRequest.DueDate!.Value,2.Seconds());
-        updatedTask.IsCompleted.Should().BeFalse();*/
-    }
-    
-    [Fact]
-    public async Task Should_Return_Bad_Request_When_Task_Doesnt_Exist()
-    {/*
-        var client = _factory.CreateClient();
-        var user = new User {
-            Username = "testusername",
-            Password = "PasswordExample123!",
-            Email = "example@email.com",
-            FirstName = "Firstname",
-            LastName = "Lastname"
+        var updateTaskRequest = new UpdateTaskRequest() {
+            Title = "Updated Title",
+            Description = "Updated Description",
+            Priority = Priority.Critical,
+            DueDate = DateTime.Parse("2025-08-01T12:00:00Z"),
+            Order = 2,
+            IsCompleted = false
         };
-        DbContext.Users.Add(user);
-        await DbContext.SaveChangesAsync();
-        
-        var loginRequest = new LoginRequest(user.Username, user.Password);
-        var response = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
-
-        var updateTaskRequest = new UpdateTaskRequest(Guid.NewGuid(), "New title", "New description", DateTime.UtcNow.AddDays(1), true);
-        var responseFromUpdateTask = await client.PutAsJsonAsync("/api/tasks/", updateTaskRequest);
-        responseFromUpdateTask.StatusCode.Should().Be(HttpStatusCode.BadRequest, "No task found");*/
+        var responseFromUpdate = await test.AuthorizedHttpClient.PutAsJsonAsync(
+            $"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/columns/{contentFromKanbanCreation!.KanbanColumnId}/tasks/{createTaskResponse.TaskId}",
+            updateTaskRequest);
+        responseFromUpdate.Content.Should().NotBeNull();
+        _testOutputHelper.WriteLine(responseFromUpdate.Content.ReadAsStringAsync().Result);
+        responseFromUpdate.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 }
