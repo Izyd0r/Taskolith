@@ -4,7 +4,7 @@ public class Membership {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public Guid OrganisationId { get; set; }
-    public User? User { get; init; }
+    public required User User { get; init; }
     public Organisation? Organisation { get; init; }
     public ICollection<Project> Projects { get; init; } = new List<Project>();
     public ICollection<ToDoTask> Tasks { get; init; } = new List<ToDoTask>();

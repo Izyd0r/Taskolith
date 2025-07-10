@@ -26,7 +26,7 @@ public class GetKanbanColumns : IEndPoint {
         var columns = await dbContext.KanbanColumns
             .Where(c => c.ProjectId == projectId)
             .Include(c => c.Tasks)
-            .ThenInclude(t => t.Members)
+            .ThenInclude(t => t.AssignedMembers)
             .Select(c => new GetKanbanColumnResponse(
                 c.Id,
                 c.Name,
@@ -39,10 +39,12 @@ public class GetKanbanColumns : IEndPoint {
                     t.DueDate,
                     t.CreatedDate,
                     t.IsCompleted,
-                    t.Members.Select(m => new MembershipDto(
+                    t.AssignedMembers.Select(m => new MembershipDto(
                         m.Id,
                         m.UserId,
-                        m.OrganisationId
+                        m.OrganisationId,
+                        m.User.Username,
+                        m.User.Email
                     )).ToList()
                 )).ToList()))
             .ToListAsync(ct);

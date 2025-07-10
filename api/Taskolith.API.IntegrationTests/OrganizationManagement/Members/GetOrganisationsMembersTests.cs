@@ -22,6 +22,7 @@ public class GetOrganisationsMembersTests(IntegrationTestWebAppFactory factory) 
             Id = Guid.NewGuid(),
             OrganisationId = responseContent!.OrganisationId,
             UserId = userTwo.AuthorizedUser.Id,
+            User = userTwo.AuthorizedUser,
             Roles = [new Role() {
                 Id = Guid.NewGuid(),
                 Name = "Member",

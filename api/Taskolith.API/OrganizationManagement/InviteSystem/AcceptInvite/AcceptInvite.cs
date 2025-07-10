@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
 using Taskolith.API.Data.Types;
@@ -22,6 +23,7 @@ public class AcceptInvite : IEndPoint {
 
         var membership = new Membership {
             UserId = Guid.Parse(userId),
+            User = await dbContext.Users.SingleAsync(u => u.Id == Guid.Parse(userId), cancellationToken: token),
             OrganisationId = invitation.OrganisationId,
             Roles = [new Role {
                 Id = Guid.Parse(userId),
