@@ -1,105 +1,46 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Auth.Login;
 using Taskolith.API.Data.Types;
-using Taskolith.API.Tasks.GetTasks;
+using Taskolith.API.Kanban.Requests;
+using Taskolith.API.Kanban.Responses;
+using Taskolith.API.OrganizationManagement.Organisations.Requests;
+using Taskolith.API.OrganizationManagement.Organisations.Responses;
+using Taskolith.API.Projects.Requests;
+using Taskolith.API.Projects.Responses;
+using Taskolith.API.Tasks.Requests;
+using Taskolith.API.Tasks.Responses;
 
 namespace Taskolith.API.IntegrationTests.Tasks;
 
-public class GetTasksTests(IntegrationTestWebAppFactory factory) : BaseIntegrationTest(factory)
-{
+public class GetTasksTests(IntegrationTestWebAppFactory factory) : AuthorizedIntegrationTest(factory) {
     private readonly IntegrationTestWebAppFactory _factory = factory;
 
     [Fact]
-    public async Task Get_All_User_Tasks()
-    {
-        /*
-        var client = _factory.CreateClient();
-        var user = new User {
-            Id = Guid.NewGuid(),
-            Username = "testusername",
-            Password = "PasswordExample123!",
-            Email = "example@email.com",
-            FirstName = "Firstname",
-            LastName = "Lastname"
-        };
-        DbContext.Users.Add(user);
-        await DbContext.SaveChangesAsync();
-        
-        var loginRequest = new LoginRequest(user.Username, user.Password);
-        var response = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
-        
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
+    public async Task Get_All_Tasks_Assigned_To_A_Member_And_Return_Ok() {
+        var test = await BuildAuthorizedTest(_factory);
+        var request = new CreateOrganisationRequest("Organisation");
+        var response = await test.AuthorizedHttpClient.PostAsJsonAsync("/api/organisations", request);
+        var content = await response.Content.ReadFromJsonAsync<CreateOrganisationResponse>();
+        var projectCreationRequest = new CreateProjectRequest("Backend API", "Project for XYZ firm");
+        var responseFromProjectCreation = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects", projectCreationRequest);
+        var contentProject = await responseFromProjectCreation.Content.ReadFromJsonAsync<CreateProjectResponse>();
+        var kanbanCreationRequest = new CreateKanbanColumnRequest("ToDo");
+        var responseFromKanbanCreation = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/columns", kanbanCreationRequest);
+        var contentFromKanbanCreation = await responseFromKanbanCreation.Content.ReadFromJsonAsync<CreateKanbanColumnResponse>();
 
-        var firstRequest = new CreateTaskRequest("Title", "Description", DateTime.UtcNow.AddDays(3));
-        var secondRequest = new CreateTaskRequest("New title", "New Description", DateTime.UtcNow.AddDays(3));
+        var member = await DbContext.OrganisationMembers.FirstOrDefaultAsync(m => m.UserId == test.AuthorizedUser.Id);
         
-        var firstCreateTask = await client.PostAsJsonAsync("/api/tasks/", firstRequest);
-        var secondCreateTask = await client.PostAsJsonAsync("/api/tasks/", secondRequest);
+        var createTaskRequest = new CreateTaskRequest("Title", "Description", DateTime.UtcNow.AddDays(7), [member!.Id], 1, Priority.Critical);
+        await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/columns/{contentFromKanbanCreation!.KanbanColumnId}/tasks", createTaskRequest);
         
-        var firstCreateTaskResponse = await firstCreateTask.Content.ReadFromJsonAsync<CreateTaskResponse>();
-        var secondCreateTaskResponse = await secondCreateTask.Content.ReadFromJsonAsync<CreateTaskResponse>();
-        
-        firstCreateTask.EnsureSuccessStatusCode();
-        secondCreateTask.EnsureSuccessStatusCode();
-        
-        var getTasksResponse = await client.GetAsync("/api/tasks/");
-        getTasksResponse.EnsureSuccessStatusCode();
-        var tasks = await getTasksResponse.Content.ReadFromJsonAsync<GetTasksResponse>();
-        Assert.NotNull(tasks);
-        Assert.NotEmpty(tasks.Tasks);
-        var firstExists = tasks.Tasks.Any(t =>
-            t.Title == firstCreateTaskResponse!.Title &&
-            t.Description == firstCreateTaskResponse.Description &&
-            t.DueDate <= firstCreateTaskResponse.DueDate.AddSeconds(2) &&
-            t.DueDate >= firstCreateTaskResponse.DueDate.AddSeconds(-2) &&
-            t.IsCompleted == firstCreateTaskResponse.Completed &&
-            t.UserId == firstCreateTaskResponse.UserId &&
-            t.Id == firstCreateTaskResponse!.TaskId
-        );
-        var secondExists = tasks.Tasks.Any(t =>
-            t.Title == secondCreateTaskResponse!.Title &&
-            t.Description == secondCreateTaskResponse.Description &&
-            t.DueDate <= secondCreateTaskResponse.DueDate.AddSeconds(2) &&
-            t.DueDate >= secondCreateTaskResponse.DueDate.AddSeconds(-2) &&
-            t.IsCompleted == secondCreateTaskResponse.Completed &&
-            t.UserId == secondCreateTaskResponse.UserId &&
-            t.Id == secondCreateTaskResponse!.TaskId
-        );
-        Assert.True(firstExists);
-        Assert.True(secondExists);
-        */
-    }
-
-    [Fact]
-    public async Task Should_Return_Empty_When_User_Have_Zero_Tasks()
-    {
-        var client = _factory.CreateClient();
-        var user = new User {
-            Id = Guid.NewGuid(),
-            Username = "testusername2",
-            Password = "PasswordExample123!",
-            Email = "example2@email.com",
-            FirstName = "Firstname",
-            LastName = "Lastname"
-        };
-        DbContext.Users.Add(user);
-        await DbContext.SaveChangesAsync();
-        
-        var loginRequest = new LoginRequest(user.Username, user.Password);
-        var response = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
-        
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
-        
-        var getTasksResponse = await client.GetAsync("/api/tasks/");
-        getTasksResponse.EnsureSuccessStatusCode();
-        var tasks = await getTasksResponse.Content.ReadFromJsonAsync<GetTasksResponse>();
-        Assert.NotNull(tasks);
-        Assert.Empty(tasks.Tasks);
-        Assert.Equal(tasks.UserId, user.Id);
+        var getTaskResponse = await test.AuthorizedHttpClient.GetAsync($"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/tasks");
+        getTaskResponse.EnsureSuccessStatusCode();
+        var contentFromGetTask = await getTaskResponse.Content.ReadFromJsonAsync<GetTasksResponse>();
+        contentFromGetTask!.Tasks.Count().Should().Be(1);
+        contentFromGetTask!.Tasks.First().Title.Should().Be("Title");
+        contentFromGetTask!.Tasks.First().Description.Should().Be("Description");
     }
 }

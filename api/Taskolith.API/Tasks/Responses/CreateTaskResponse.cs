@@ -1,7 +1,7 @@
 using Taskolith.API.Data.Dtos;
 using Taskolith.API.Data.Types;
 
-namespace Taskolith.API.Tasks;
+namespace Taskolith.API.Tasks.Responses;
 
 public record CreateTaskResponse(
     Guid TaskId,

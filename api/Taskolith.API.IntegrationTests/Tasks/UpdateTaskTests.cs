@@ -14,6 +14,7 @@ using Taskolith.API.Projects.Requests;
 using Taskolith.API.Projects.Responses;
 using Taskolith.API.Tasks;
 using Taskolith.API.Tasks.Requests;
+using Taskolith.API.Tasks.Responses;
 using Xunit.Abstractions;
 
 namespace Taskolith.API.IntegrationTests.Tasks;
