@@ -47,11 +47,6 @@ public abstract class SignUpUser : IEndPoint
         dbContext.Users.Add(user);
         dbContext.RefreshTokens.Add(refreshToken);
         await dbContext.SaveChangesAsync();
-<<<<<<< mobile
-        
-=======
-
->>>>>>> master
         var signUpResponse = new SignUpResponse(
             user.Id,
             user.Username,
