@@ -90,9 +90,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
 app.MapEndpoints();
 
 using var scope = app.Services.CreateScope();
