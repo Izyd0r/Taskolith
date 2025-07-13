@@ -1,4 +1,5 @@
 import { Github, Linkedin } from 'lucide-react';
+import { AppLogo } from '../AppLogo';
 
 const SocialLink = ({ href, icon: Icon, 'aria-label': ariaLabel }) => (
     <a href={href} aria-label={ariaLabel} className="text-gray-500 hover:text-gray-900">
@@ -12,7 +13,7 @@ export function Footer() {
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
                     <div className="md:col-span-1">
-                        <h2 className="text-2xl font-bold tracking-widest text-main-font-color mb-2">Taskolith</h2>
+                        <AppLogo className="mb-2 text-left"/>
                         <p className="text-sm">Get Stuff Done, Stone Age Style.</p>
                     </div>
 

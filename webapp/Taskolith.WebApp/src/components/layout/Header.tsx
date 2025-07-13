@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Menu, X } from 'lucide-react';
+import { AppLogo } from '../AppLogo';
+
 
 export function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,8 +10,8 @@ export function Header() {
     return (
         <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-sm">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                <a href="/" className="text-2xl font-bold tracking-widest text-gray-900">
-                    Taskolith
+                <a href="/">
+                    <AppLogo className="mb-0"/>
                 </a>
 
                 <nav className="hidden items-center space-x-2 md:flex">
