@@ -10,8 +10,25 @@ using Microsoft.OpenApi.Models;
 using Taskolith.API.Auth;
 using Taskolith.API.Data.Types;
 
+const string WebAppCorsPolicy = "_webAppCorsPolicy";
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: WebAppCorsPolicy,
+                      policy =>
+                      {
+                          // This needs to be changed
+                          policy.WithOrigins(
+                                "http://localhost:5173",
+                                "http://localhost:5174",
+                                "http://localhost:5175"
+                           )
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+                      });
+});
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -90,6 +107,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCors(WebAppCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
