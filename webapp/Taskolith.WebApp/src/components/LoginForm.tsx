@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLogin } from '../hooks/useAuth';
@@ -13,13 +13,21 @@ const EyeOffIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xml
 
 export function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors } } = useForm<LoginCredentials>({
         resolver: zodResolver(loginScheme),
     });
 
     const { mutate: login, isPending, isError } = useLogin();
 
-    const onSubmit: SubmitHandler<LoginCredentials> = (data) => login(data);
+    const onSubmit: SubmitHandler<LoginCredentials> = (data) => {
+        login(data, {
+            onSuccess: () => {
+                navigate('/dashboard');
+            },
+        });
+    };
+
 
     return (
         <div className="w-full max-w-md bg-white rounded-xl border border-gray-200 shadow-lg p-8">
@@ -38,7 +46,7 @@ export function LoginForm() {
                         id="password"
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Password"
-                        toggle={<button type="button" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}</button>}
+                        toggle={<button id="eye-icon" type="button" onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}</button>}
                         {...register("password")}
                     />
                     {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
