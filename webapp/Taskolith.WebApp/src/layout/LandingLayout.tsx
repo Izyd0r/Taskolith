@@ -1,6 +1,6 @@
 import React from 'react';
-import { Header } from '../components/layout/Header';
-import { Footer } from '../components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 
 export function LandingLayout({ children }: { children: React.ReactNode }) {
   return (

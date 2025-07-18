@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppLogo } from '../components/AppLogo';
+import { AppLogo } from '@/components/AppLogo';
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
     return (

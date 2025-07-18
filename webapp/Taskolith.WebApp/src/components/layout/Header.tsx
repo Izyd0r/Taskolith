@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from '../ui/Button';
+import { Button } from '@/components/ui/Button';
 import { Menu, X } from 'lucide-react';
-import { AppLogo } from '../AppLogo';
+import { AppLogo } from '@/components/AppLogo';
 
 
 export function Header() {
@@ -11,7 +11,7 @@ export function Header() {
         <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-sm">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
                 <a href="/">
-                    <AppLogo className="mb-0"/>
+                    <AppLogo className="mb-0" />
                 </a>
 
                 <nav className="hidden items-center space-x-2 md:flex">
