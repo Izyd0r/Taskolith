@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { signupScheme } from '../../validators/signupSchema';
+import { signupScheme } from '@/validators/signupSchema';
 
 const validData = {
     username: 'testuser',
