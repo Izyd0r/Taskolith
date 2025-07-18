@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { loginScheme } from '@/validators/loginSchema';
+import { loginScheme } from '@/features/auth/validators/loginSchema';
 
 const validData = {
     username: 'validUser',

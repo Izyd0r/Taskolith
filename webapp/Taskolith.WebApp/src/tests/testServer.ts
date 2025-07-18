@@ -1,6 +1,6 @@
 import { setupServer } from 'msw/node'
 import { http } from 'msw'
-import { type LoginCredentials } from '@/types/auth'
+import { type LoginCredentials } from '@/features/auth/types/auth'
 
 export const server = setupServer(
     http.post('http://localhost:5000/api/auth/login', async ({ request }) => {

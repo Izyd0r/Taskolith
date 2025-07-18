@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/axios';
-import { type LoginCredentials, type SignupCredentials } from '@/types/auth';
+import { type LoginCredentials, type SignupCredentials } from '@/features/auth/types/auth';
 
 export const login = async (credentials: LoginCredentials) => {
   const { data } = await apiClient.post('/auth/login', credentials);
