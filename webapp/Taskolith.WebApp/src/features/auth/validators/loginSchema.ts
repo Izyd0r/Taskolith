@@ -1,11 +1,13 @@
 import { z } from 'zod';
 
 export const loginScheme = z.object({
-    username: z.string() 
+    username: z.string()
+        .trim()
         .nonempty("Username is required")
         .min(3, "Username must be at least 3 characters long")
         .max(20, "Username must not exceed 20 characters long"),
     password: z.string()
+        .trim()
         .nonempty("Password is required")
         .min(8, "Password must be at least 8 characters long")
         .max(100, "Password must not exceed 100 characters long")
