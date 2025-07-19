@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSignup } from '@/features/auth/hooks/useAuth';
@@ -13,13 +13,20 @@ const EyeOffIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} xml
 
 export function SignupForm() {
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors } } = useForm<SignupCredentials>({
         resolver: zodResolver(signupScheme),
     });
 
     const { mutate: signup, isPending, isError } = useSignup();
 
-    const onSubmit: SubmitHandler<SignupCredentials> = (data) => signup(data);
+    const onSubmit: SubmitHandler<SignupCredentials> = (data) => {
+        signup(data, {
+            onSuccess: () => {
+                navigate('/dashboard');
+            },
+        });
+    };
 
     return (
         <div className="w-full max-w-md bg-white rounded-xl border border-gray-200 shadow-lg p-8">

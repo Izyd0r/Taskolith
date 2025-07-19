@@ -2,18 +2,24 @@ import { z } from 'zod';
 
 export const signupScheme = z.object({
     username: z.string()
+        .trim() 
+        .nonempty("Username is required")
         .min(3, "Username must be at least 3 characters long")
-        .max(20, "Username must not exceed 20 characters long")
-        .nonempty("Username is required"),
+        .max(20, "Username must not exceed 20 characters long"),
     firstname: z.string()
-        .max(20, "First name must not exceed 20 characters long")
-        .nonempty("First name is required"),
+        .trim() 
+        .nonempty("First name is required")
+        .max(20, "First name must not exceed 20 characters long"),
     lastname: z.string()
-        .max(20, "Last name must not exceed 20 characters long")
-        .nonempty("Last name is required"),
+        .trim()        
+        .nonempty("Last name is required")
+        .max(20, "Last name must not exceed 20 characters long"),
     email: z.string()
-        .regex(/^(?!.*\.\.)(?!\.)(?!.*\.$)[a-zA-Z0-9]+([._+-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/),
+        .trim()
+        .nonempty("Email address is required")
+        .regex(/^(?!.*\.\.)(?!\.)(?!.*\.$)[a-zA-Z0-9]+([._+-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/, "Invalid email"),
     password: z.string()
+        .trim()
         .nonempty("Password is required")
         .min(8, "Password must be at least 8 characters long")
         .max(100, "Password must not exceed 100 characters long")

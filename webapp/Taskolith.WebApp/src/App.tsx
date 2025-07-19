@@ -1,8 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import DashboardPage from './pages/DashboardPage';
+import LandingPage from '@/features/landing-page/pages/LandingPage';
+import LoginPage from '@/features/auth/pages/LoginPage';
+import SignupPage from '@/features/auth/pages/SignupPage';
+import DashboardPage from '@/features/dashboard/pages/DashboardPage';
 
 function App() {
   return (

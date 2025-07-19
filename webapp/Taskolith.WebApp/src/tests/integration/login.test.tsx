@@ -1,19 +1,11 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { LoginForm } from '@/features/auth/components/LoginForm'
 import { BrowserRouter } from 'react-router-dom'
 import { describe, it, expect } from 'vitest';
-
-const createTestQueryClient = () =>
-    new QueryClient({
-        defaultOptions: {
-            queries: {
-                retry: false,
-            },
-        },
-    })
+import createTestQueryClient from '@/tests/integration/utils/createTestQueryDefault'
 
 describe('Login integration', () => {
     it('should login with correct credentials', async () => {
