@@ -3,6 +3,7 @@
 @theme {
     --color-main-background: #fefeff;
     --color-second-background: #fafaff;
+    --color-third-background: #fefefe;
     --color-main-font-color: oklch(0.141 0.005 285.823);
     --color-second-font-color: oklch(0.274 0.006 286.033);
     --color-third-font-color: oklch(0.967 0.001 286.375);
