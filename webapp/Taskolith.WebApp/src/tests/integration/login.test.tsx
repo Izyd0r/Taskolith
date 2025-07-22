@@ -45,7 +45,7 @@ describe('Login integration', () => {
         await userEvent.type(screen.getByPlaceholderText(/password/i), 'Wrong123!')
         await userEvent.click(screen.getByRole('button', { name: /log in/i }))
 
-        expect(await screen.findByText(/Authentication failed. Please check credentials./i)).toBeInTheDocument()
+        expect(await screen.findByText(/Authentication failed. Please check your credentials./i)).toBeInTheDocument()
     })
 })
 

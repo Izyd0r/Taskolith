@@ -19,12 +19,14 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: WebAppCorsPolicy,
                       policy =>
                       {
-                          // This needs to be changed
-                          policy.WithOrigins(
-                                "http://localhost:5173",
-                                "http://localhost:5174",
-                                "http://localhost:5175"
-                           )
+                            // This still needs to change
+                            policy.SetIsOriginAllowed(origin =>
+                            {
+                                if (string.IsNullOrWhiteSpace(origin)) return false;
+                                var uri = new Uri(origin);
+                                return (uri.Host == "localhost" || uri.Host.StartsWith("172."))
+                                && (uri.Port == 5173 || uri.Port == 5174 || uri.Port == 5175);
+                            })
                            .AllowAnyHeader()
                            .AllowAnyMethod();
                       });
@@ -106,7 +108,7 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = string.Empty;
     });
 }
-
+app.UseRouting();
 app.UseCors(WebAppCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();

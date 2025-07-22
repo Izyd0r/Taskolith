@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import createTestQueryClient from '@/tests/integration/utils/createTestQueryDefault';
 import SignupPage from '@/features/auth/pages/SignupPage';
-import DashboardPage from '@/features/dashboard/pages/DashboardPage';
+import DashboardLayout from '@/features/dashboard/layout/DashboardLayout';
 
 export function renderSignupForm() {
     const queryClient = createTestQueryClient();
@@ -13,7 +13,7 @@ export function renderSignupForm() {
             <MemoryRouter initialEntries={['/signup']}>
                 <Routes>
                     <Route path="/signup" element={<SignupPage />} />
-                    <Route path="/dashboard" element={<DashboardPage />}>
+                    <Route path="/dashboard" element={<DashboardLayout />}>
                     </Route>
                 </Routes>
             </MemoryRouter>
