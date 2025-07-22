@@ -20,7 +20,7 @@ describe('SignupForm Integration', () => {
         await user.click(screen.getByRole('button', { name: /^Create Account$/i }))
 
         await waitFor(() => {
-            expect(screen.getByText('Dashboard')).toBeInTheDocument()
+            expect(screen.getByText('Taskolith')).toBeInTheDocument()
         })
     })
 
