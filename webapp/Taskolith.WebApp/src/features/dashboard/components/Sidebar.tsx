@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import { Button } from '@/components/ui/Button'
+import { useLogout } from '@/features/auth/hooks/useLogout'
 import {
     LayoutDashboard,
     CheckSquare,
@@ -35,6 +37,8 @@ const Sidebar: React.FC = () => {
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    const { mutate: logout } = useLogout();
 
     return (
         <aside
@@ -109,10 +113,13 @@ const Sidebar: React.FC = () => {
                             alt="User avatar"
                             className="w-12 h-12 rounded-full shrink-0"
                         />
-                        <div className="text-center mt-2">
+                        <div className="text-center mt-2 mb-2">
                             <h4 className="font-semibold text-sm">Ada Lovelace</h4>
                             <p className="text-xs text-gray-500">ada@example.com</p>
                         </div>
+                        <Button variant="default" onClick={() => logout()} >
+                            Logout
+                        </Button>
                     </div>
                 </div>
             </div>

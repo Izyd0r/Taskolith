@@ -3,8 +3,14 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect } from 'vitest'
 import { renderSignupForm } from '@/tests/integration/utils/renderSignupForm'
+import { afterEach } from 'vitest'
 
 describe('SignupForm Integration', () => {
+    
+    afterEach(() => {
+        localStorage.clear()
+    })
+
     it('should submit form with valid credentials and show dashboard', async () => {
         renderSignupForm()
 

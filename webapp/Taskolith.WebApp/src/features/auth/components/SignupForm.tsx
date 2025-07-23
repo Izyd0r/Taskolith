@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useSignup } from '@/features/auth/hooks/useAuth';
+import { useSignup } from '@/features/auth/hooks/useSignup';
 import { InputField } from '@/components/ui/InputField';
 import { Button } from '@/components/ui/Button';
 import { signupScheme } from '@/features/auth/validators/signupSchema';

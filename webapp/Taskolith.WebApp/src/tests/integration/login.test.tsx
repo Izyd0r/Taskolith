@@ -3,19 +3,40 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { LoginForm } from '@/features/auth/components/LoginForm'
-import { BrowserRouter } from 'react-router-dom'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { describe, it, expect } from 'vitest';
+import { PrivateRoute } from '@/features/auth/components/PrivateRoute'
+import { PublicOnlyRoute } from '@/features/auth/components/PublicOnlyRoute'
+import { AuthProvider } from '@/features/auth/context/AuthContext'
 import createTestQueryClient from '@/tests/integration/utils/createTestQueryDefault'
+import DashboardHome from '@/features/dashboard/components/DashboardHome';
+import DashboardLayout from '@/features/dashboard/layout/DashboardLayout';
+import { afterEach } from 'vitest'
 
 describe('Login integration', () => {
+    afterEach(() => {
+        localStorage.clear()
+    })
+
     it('should login with correct credentials', async () => {
         const queryClient = createTestQueryClient()
 
         render(
             <QueryClientProvider client={queryClient}>
-                <BrowserRouter>
-                    <LoginForm />
-                </BrowserRouter>
+                <MemoryRouter initialEntries={['/login']}>
+                    <AuthProvider>
+                        <Routes>
+                            <Route element={<PublicOnlyRoute />}>
+                                <Route path="/login" element={<LoginForm />} />
+                            </Route>
+                            <Route element={<PrivateRoute />}>
+                                <Route path="/dashboard" element={<DashboardLayout />}>
+                                    <Route index element={<DashboardHome />} />
+                                </Route>
+                            </Route>
+                        </Routes>
+                    </AuthProvider>
+                </MemoryRouter>
             </QueryClientProvider>
         )
 
@@ -27,7 +48,7 @@ describe('Login integration', () => {
         await userEvent.type(passwordInput, 'StrongPass123!')
         await userEvent.click(submitBtn)
 
-        expect(await screen.findByText(/welcome/i)).toBeInTheDocument()
+        expect(await screen.findByText(/Taskolith/i)).toBeInTheDocument()
     })
 
     it('should show error for invalid credentials', async () => {
@@ -35,9 +56,20 @@ describe('Login integration', () => {
 
         render(
             <QueryClientProvider client={queryClient}>
-                <BrowserRouter>
-                    <LoginForm />
-                </BrowserRouter>
+                <MemoryRouter initialEntries={['/login']}>
+                    <AuthProvider>
+                        <Routes>
+                            <Route element={<PublicOnlyRoute />}>
+                                <Route path="/login" element={<LoginForm />} />
+                            </Route>
+                            <Route element={<PrivateRoute />}>
+                                <Route path="/dashboard" element={<DashboardLayout />}>
+                                    <Route index element={<DashboardHome />} />
+                                </Route>
+                            </Route>
+                        </Routes>
+                    </AuthProvider>
+                </MemoryRouter>
             </QueryClientProvider>
         )
 
