@@ -9,3 +9,13 @@ export type LoginResponse = {
     username: string
     token: string
 }
+
+export type SignupResponse = {
+    userId: string
+    username: string
+    firstName: string
+    lastName: string
+    email: string
+    token: string
+    refreshToken: string
+}
