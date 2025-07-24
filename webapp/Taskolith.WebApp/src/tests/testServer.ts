@@ -1,7 +1,9 @@
 import { setupServer } from 'msw/node'
 import { http } from 'msw'
 import { type LoginCredentials, type SignupCredentials } from '@/features/auth/types/auth'
+import { CreateOrganisationScheme } from '@/features/dashboard/validators/CreateOrganisationScheme'
 import { randomUUID } from 'crypto'
+import { z } from 'zod'
 
 export const server = setupServer(
     http.post('http://localhost:5000/api/auth/login', async ({ request }) => {
@@ -45,5 +47,20 @@ export const server = setupServer(
             status: 401,
             headers: { 'Content-Type': 'application/json' },
         })
+    }),
+    http.post('http://localhost:5000/api/organisations', async ({ request }) => {
+        try {
+            const json = await request.json()
+            const body = CreateOrganisationScheme.parse(json)
+            return new Response(null, { status: 201 })
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                return new Response(
+                    JSON.stringify({ errors: err.message }),
+                    { status: 400, headers: { 'Content-Type': 'application/json' } }
+                )
+            }
+        }
+        return new Response('Internal Server Error', { status: 500 })
     })
 ) 

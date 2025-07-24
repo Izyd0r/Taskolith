@@ -7,8 +7,8 @@ const DashboardHome: React.FC = () => (
             {/* My Projects list goes here */}
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-4">My Organizations</h2>
-            {/* My Organizations list goes here */}
+            <h2 className="text-2xl font-bold mb-4">My Organisations</h2>
+            {/* My Organisations list goes here */}
         </div>
     </div>
 );
