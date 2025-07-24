@@ -5,7 +5,7 @@ import { cleanup } from '@testing-library/react'
 
 beforeAll(() => server.listen())
 afterEach(() => {
-  server.resetHandlers()
-  cleanup()
+    server.resetHandlers()
+    cleanup()
 })
 afterAll(() => server.close())

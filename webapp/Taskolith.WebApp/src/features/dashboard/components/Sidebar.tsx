@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'
+import { NavLink } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { useLogout } from '@/features/auth/hooks/useLogout'
+import { useAuth } from '@/features/auth/context/AuthContext'
 import {
     LayoutDashboard,
     CheckSquare,
@@ -39,6 +40,8 @@ const Sidebar: React.FC = () => {
     }, []);
 
     const { mutate: logout } = useLogout();
+
+    const { user } = useAuth()
 
     return (
         <aside
@@ -114,8 +117,7 @@ const Sidebar: React.FC = () => {
                             className="w-12 h-12 rounded-full shrink-0"
                         />
                         <div className="text-center mt-2 mb-2">
-                            <h4 className="font-semibold text-sm">Ada Lovelace</h4>
-                            <p className="text-xs text-gray-500">ada@example.com</p>
+                            <h4 className="font-semibold text-sm">{user}</h4>
                         </div>
                         <Button variant="default" onClick={() => logout()} >
                             Logout
