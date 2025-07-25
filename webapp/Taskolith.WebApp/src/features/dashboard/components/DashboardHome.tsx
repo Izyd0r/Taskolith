@@ -1,4 +1,5 @@
 import React from 'react';
+import OrganisationsList from '@/features/dashboard/components/OrganisationsList'
 
 const DashboardHome: React.FC = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -8,7 +9,7 @@ const DashboardHome: React.FC = () => (
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-4">My Organisations</h2>
-            {/* My Organisations list goes here */}
+            <OrganisationsList />
         </div>
     </div>
 );
