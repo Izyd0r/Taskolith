@@ -62,5 +62,29 @@ export const server = setupServer(
             }
         }
         return new Response('Internal Server Error', { status: 500 })
+    }),
+    http.get('http://localhost:5000/api/organisations/user', async () => {
+        try {
+            const mockData = [
+                {
+                    organisationId: 'c4c03394-bd10-4c3f-9a02-bda4e3fbf55f',
+                    organisationName: 'Org One',
+                },
+                {
+                    organisationId: '1e201439-3dcd-428f-92b8-9ba1eb8c605e',
+                    organisationName: 'Org Two',
+                },
+            ]
+
+            return Response.json(mockData, { status: 200 })
+        } catch (err: any) {
+            return new Response(
+                JSON.stringify({ errors: err.message }),
+                {
+                    status: 401,
+                    headers: { 'Content-Type': 'application/json' },
+                }
+            )
+        }
     })
 ) 
