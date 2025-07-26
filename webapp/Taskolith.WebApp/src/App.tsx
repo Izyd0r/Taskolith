@@ -9,6 +9,13 @@ import DashboardHome from '@/features/dashboard/components/DashboardHome';
 import DashboardTasks from '@/features/dashboard/components/DashboardTasks';
 import DashboardOrganisation from '@/features/dashboard/components/DashboardOrganisation';
 import DashboardMyInvites from '@/features/dashboard/components/MyInvites';
+import OrganisationLayout from '@/features/organisation/layout/OrganisationLayout'
+import ProjectsPage from '@/features/organisation/components/ProjectsPage'
+import MembersPage from '@/features/organisation/components/MembersPage'
+import SchedulePage from '@/features/organisation/components/SchedulePage'
+import RolesPage from '@/features/organisation/components/RolesPage'
+import InvitesPage from '@/features/organisation/components/InvitesPage'
+import EditOrganisationPage from '@/features/organisation/components/EditOrganisationPage'
 
 function App() {
     return (
@@ -24,6 +31,14 @@ function App() {
                     <Route path="tasks" element={<DashboardTasks />} />
                     <Route path="create-organisation" element={<DashboardOrganisation />} />
                     <Route path="invites" element={<DashboardMyInvites />} />
+                </Route>
+                <Route path="/organisations/:organisationId" element={<OrganisationLayout />}>
+                    <Route path="projects" element={<ProjectsPage />} />
+                    <Route path="members" element={<MembersPage />} />
+                    <Route path="schedule" element={<SchedulePage />} />
+                    <Route path="roles" element={<RolesPage />} />
+                    <Route path="invites" element={<InvitesPage />} />
+                    <Route path="settings" element={<EditOrganisationPage />} />
                 </Route>
             </Route>
             {/*other routes*/}
