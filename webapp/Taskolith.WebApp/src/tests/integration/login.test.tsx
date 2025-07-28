@@ -48,7 +48,10 @@ describe('Login integration', () => {
         await userEvent.type(passwordInput, 'StrongPass123!')
         await userEvent.click(submitBtn)
 
-        expect(await screen.findByText(/Taskolith/i)).toBeInTheDocument()
+        expect(await screen.findByText(/Dashboard/i)).toBeInTheDocument()
+        expect(await screen.findByText(/My Tasks/i)).toBeInTheDocument()
+        expect(await screen.findByText(/Create Org/i)).toBeInTheDocument()
+        expect(await screen.findByText(/My Invites/i)).toBeInTheDocument()
     })
 
     it('should show error for invalid credentials', async () => {
