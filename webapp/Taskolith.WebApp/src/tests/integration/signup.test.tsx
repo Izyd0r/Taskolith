@@ -6,7 +6,7 @@ import { renderSignupForm } from '@/tests/integration/utils/renderSignupForm'
 import { afterEach } from 'vitest'
 
 describe('SignupForm Integration', () => {
-    
+
     afterEach(() => {
         localStorage.clear()
     })
@@ -26,7 +26,10 @@ describe('SignupForm Integration', () => {
         await user.click(screen.getByRole('button', { name: /^Create Account$/i }))
 
         await waitFor(() => {
-            expect(screen.getByText('Taskolith')).toBeInTheDocument()
+            expect(screen.getByText(/Dashboard/i)).toBeInTheDocument()
+            expect(screen.getByText(/My Tasks/i)).toBeInTheDocument()
+            expect(screen.getByText(/Create Org/i)).toBeInTheDocument()
+            expect(screen.getByText(/My Invites/i)).toBeInTheDocument()
         })
     })
 
