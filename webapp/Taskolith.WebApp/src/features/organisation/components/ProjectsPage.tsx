@@ -1,7 +1,12 @@
 import React from 'react'
+import ProjectTiles from '@/features/organisation/components/ProjectTiles'
 
 const ProjectsPage = () => {
-    return <h1 className="text-xl font-bold">Projects</h1>
+    return (
+        <div>
+            <ProjectTiles />
+        </div>
+    )
 }
 
 export default ProjectsPage
