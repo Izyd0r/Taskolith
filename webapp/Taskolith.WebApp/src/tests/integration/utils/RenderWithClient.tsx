@@ -5,12 +5,16 @@ import { AuthProvider } from '@/features/auth/context/AuthContext'
 import createTestQueryClient from '@/tests/integration/utils/createTestQueryDefault'
 import { MemoryRouter } from 'react-router-dom'
 
-const RenderWithClient = (ui: React.ReactNode, { isLoggedIn = false } = {}) => {
+const RenderWithClient = (
+    ui: React.ReactNode,
+    { isLoggedIn = false, initialEntries = ['/'] } = {}
+) => {
     const queryClient = createTestQueryClient()
     const user = isLoggedIn ? 'test-user' : null
     const token = isLoggedIn ? 'fake-token' : null
+
     return render(
-        <MemoryRouter>
+        <MemoryRouter initialEntries={initialEntries}>
             <AuthProvider initialUsername={user} initialToken={token}>
                 <QueryClientProvider client={queryClient}>
                     {ui}
@@ -19,4 +23,5 @@ const RenderWithClient = (ui: React.ReactNode, { isLoggedIn = false } = {}) => {
         </MemoryRouter>
     )
 }
-export default RenderWithClient;
+
+export default RenderWithClient
