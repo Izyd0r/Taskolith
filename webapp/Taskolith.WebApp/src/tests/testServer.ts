@@ -4,6 +4,8 @@ import { type LoginCredentials, type SignupCredentials } from '@/features/auth/t
 import { CreateOrganisationScheme } from '@/features/dashboard/validators/CreateOrganisationScheme'
 import { randomUUID } from 'crypto'
 import { z } from 'zod'
+import { type CreateProjectRequest } from '@/features/organisation/types/CreateProjectRequest'
+import { type Project } from '@/features/organisation/types/Project'
 
 export const server = setupServer(
     http.post('http://localhost:5000/api/auth/login', async ({ request }) => {
@@ -86,5 +88,44 @@ export const server = setupServer(
                 }
             )
         }
+    }),
+    http.post('http://localhost:5000/api/organisations/:organisationId/projects', async ({ request, params }) => {
+        const body = await request.json() as CreateProjectRequest
+        const { organisationId } = params
+
+        console.log(`✅ [MSW] Intercepted POST /organisations/${organisationId}/projects with body:`, body);
+
+        if (!body.name || !organisationId) {
+            return new Response(
+                JSON.stringify({ message: 'Invalid data' }),
+                { status: 400, headers: { 'Content-Type': 'application/json' } }
+            )
+        }
+        return new Response(JSON.stringify({
+            ProjectId: crypto.randomUUID()
+        }),
+            {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+            })
+    }),
+    http.get('http://localhost:5000/api/organisations/:organisationId/projects', async ({ params }) => {
+        const { organisationId } = params
+        const mockProjects: Project[] = [
+            {
+                projectId: crypto.randomUUID(),
+                projectName: 'Website Redesign',
+                projectDescription: 'Revamp the marketing site for Q3 launch.',
+            },
+            {
+                projectId: crypto.randomUUID(),
+                projectName: 'Internal Dashboard',
+                projectDescription: 'Create an internal dashboard for tracking tasks.',
+            },
+        ]
+
+        return Response.json(mockProjects, {
+            status: 200,
+        })
     })
 ) 
