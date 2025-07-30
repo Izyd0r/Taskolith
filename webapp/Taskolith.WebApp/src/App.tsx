@@ -16,6 +16,10 @@ import SchedulePage from '@/features/organisation/components/SchedulePage'
 import RolesPage from '@/features/organisation/components/RolesPage'
 import InvitesPage from '@/features/organisation/components/InvitesPage'
 import EditOrganisationPage from '@/features/organisation/components/EditOrganisationPage'
+import ProjectLayout from '@/features/project/layout/ProjectLayout'
+import Kanban from '@/features/project/components/Kanban'
+import AssignedMembersPage from '@/features/project/components/AssignedMembersPage'
+import EditProjectPage from '@/features/project/components/EditProjectPage'
 
 function App() {
     return (
@@ -39,6 +43,12 @@ function App() {
                     <Route path="roles" element={<RolesPage />} />
                     <Route path="invites" element={<InvitesPage />} />
                     <Route path="settings" element={<EditOrganisationPage />} />
+                </Route>
+                <Route path="/organisations/:organisationId/projects/:projectId" element={<ProjectLayout />}>
+                    <Route path="kanban" element={<Kanban />} />
+                    <Route path="members" element={<AssignedMembersPage />} />
+                    <Route path="schedule" element={<SchedulePage />} />
+                    <Route path="settings" element={<EditProjectPage />} />
                 </Route>
             </Route>
             {/*other routes*/}
