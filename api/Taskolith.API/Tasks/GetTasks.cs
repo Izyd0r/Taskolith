@@ -43,7 +43,8 @@ public class GetTasks : IEndPoint {
                     am.OrganisationId,
                     am.User.Username,
                     am.User.Email
-                )).ToList()
+                )).ToList(),
+                t.Priority
             ))
             .ToListAsync(ct);
         

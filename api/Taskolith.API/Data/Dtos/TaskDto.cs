@@ -1,3 +1,5 @@
+using Taskolith.API.Data.Types;
+
 namespace Taskolith.API.Data.Dtos;
 
 public record TaskDto(
@@ -8,5 +10,6 @@ public record TaskDto(
     DateTime DueDate,
     DateTime CreatedDate,
     bool Completed,
-    ICollection<MembershipDto> AssignedMembers
+    ICollection<MembershipDto> AssignedMembers,
+    Priority Priority
 );
