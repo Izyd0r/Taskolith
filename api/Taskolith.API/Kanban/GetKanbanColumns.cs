@@ -45,7 +45,8 @@ public class GetKanbanColumns : IEndPoint {
                         m.OrganisationId,
                         m.User.Username,
                         m.User.Email
-                    )).ToList()
+                    )).ToList(),
+                    t.Priority
                 )).ToList()))
             .ToListAsync(ct);
         

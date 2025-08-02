@@ -11,12 +11,12 @@ export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) 
     if (!open) return null
 
     return createPortal(
-        <div 
-            onClick={() => onOpenChange(false)} 
-           className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+        <div
+            onClick={() => onOpenChange(false)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
         >
-            <div 
-                onClick={(e) => e.stopPropagation()} 
+            <div
+                onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative"
             >
                 <button
