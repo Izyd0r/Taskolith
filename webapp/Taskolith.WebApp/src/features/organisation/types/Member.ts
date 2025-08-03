@@ -1,7 +1,9 @@
+import { type Role } from '@/features/organisation/types/Role'
+
 export type Member = {
-    MemberId: string
-    UserId: string
-    OrganisationId: string
-    Username: string
-    Email: string
+    memberId: string
+    userId: string
+    organisationId: string
+    username: string
+    email: string
 }

@@ -8,6 +8,7 @@ export type LoginCredentials = z.infer<typeof loginScheme>
 export type LoginResponse = {
     username: string
     token: string
+    userId: string
 }
 
 export type SignupResponse = {
