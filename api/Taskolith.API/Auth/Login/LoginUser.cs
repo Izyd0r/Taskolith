@@ -23,7 +23,7 @@ public class LoginUser : IEndPoint
            return Results.Unauthorized();
        }
 
-       var loginResponse = new LoginResponse(jwtTokenGenerator.GenerateToken(user), user.Username);
+       var loginResponse = new LoginResponse(jwtTokenGenerator.GenerateToken(user), user.Username, user.Id);
        
        return Results.Ok(loginResponse);
     }

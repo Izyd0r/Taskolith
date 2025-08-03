@@ -9,7 +9,7 @@ export const useSignup = () => {
     return useMutation<SignupResponse, Error, SignupCredentials>({
         mutationFn: authService.signup,
         onSuccess: (data) => {
-            login(data.username, data.token)
+            login(data.username, data.token, data.userId)
         },
     });
 }

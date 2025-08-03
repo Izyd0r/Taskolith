@@ -9,7 +9,7 @@ export const useLogin = () => {
     return useMutation<LoginResponse, Error, LoginCredentials>({
         mutationFn: authService.login,
         onSuccess: (data) => {
-            login(data.username, data.token);
+            login(data.username, data.token, data.userId);
         },
     });
 };
