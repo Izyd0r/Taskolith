@@ -6,4 +6,5 @@ export type Member = {
     organisationId: string
     username: string
     email: string
+    roles: Role[]
 }

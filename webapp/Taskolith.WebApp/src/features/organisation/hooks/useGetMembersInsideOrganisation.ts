@@ -5,10 +5,11 @@ import { type GetOrganisationMembersResponse } from '@/features/organisation/typ
 
 export const useGetMembersInsideOrganisation = (organisationId: string) => {
     return useQuery<GetOrganisationMembersResponse[], Error, Member[]>({
-        queryKey: ['members', organisationId],
+        queryKey: ['organisation', organisationId, 'members'], // undo
         queryFn: () => GetMembersInsideOrganisation(organisationId),
         enabled: !!organisationId,
-        select: (data) => {
+        select: (data: GetOrganisationMembersResponse[]): Member[] => {
+            if (!data) return []
             return data.map(responseItem => {
                 return {
                     ...responseItem.member,
