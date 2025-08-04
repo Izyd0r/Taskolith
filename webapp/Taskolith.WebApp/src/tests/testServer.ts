@@ -6,6 +6,56 @@ import { randomUUID } from 'crypto'
 import { z } from 'zod'
 import { type CreateProjectRequest } from '@/features/organisation/types/CreateProjectRequest'
 import { type Project } from '@/features/organisation/types/Project'
+import { Permission } from '@/features/organisation/types/Permission';
+import { type GetOrganisationMembersResponse } from '@/features/organisation/types/GetOrganisationMembersResponse'
+
+const mockApiMembersResponse: GetOrganisationMembersResponse[] = [
+    {
+        member: {
+            memberId: 'mem-alice',
+            userId: 'user-alice-id',
+            organisationId: 'org123',
+            username: 'Alice',
+            email: 'alice@example.com',
+            roles: [],
+        },
+        roles: [
+            { id: 'role1', organisationId: 'org123', name: 'Organisation Admin', permissions: Permission.InviteMember | Permission.KickMember },
+        ],
+    },
+    {
+        member: {
+            memberId: 'mem-bob',
+            userId: 'user-bob-id',
+            organisationId: 'org123',
+            username: 'Bob',
+            email: 'bob@example.com',
+            roles: [],
+        },
+        roles: [
+            { id: 'role2', organisationId: 'org123', name: 'Developer', permissions: Permission.CreateTask }
+        ],
+    },
+    {
+        member: {
+            memberId: 'mem3',
+            userId: 'user3',
+            organisationId: 'org123',
+            username: 'Charlie',
+            email: 'charlie@example.com',
+            roles: [],
+        },
+        roles: [
+            { id: 'role3', organisationId: 'org123', name: 'Viewer', permissions: Permission.Public }
+        ],
+    },
+];
+
+let liveMockData: GetOrganisationMembersResponse[] = JSON.parse(JSON.stringify(mockApiMembersResponse));
+
+export const resetMockData = () => {
+    liveMockData = JSON.parse(JSON.stringify(mockApiMembersResponse));
+}
 
 export const server = setupServer(
     http.post('http://localhost:5000/api/auth/login', async ({ request }) => {
@@ -89,11 +139,17 @@ export const server = setupServer(
             )
         }
     }),
+    http.get('http://localhost:5000/api/organisations/:organisationId/members', () => {
+        return Response.json(liveMockData, { status: 200 });
+    }),
+    http.delete('http://localhost:5000/api/organisations/:organisationId/members/:memberId', ({ params }) => {
+        const { memberId } = params;
+        liveMockData = liveMockData.filter(item => item.member.memberId !== memberId);
+        return new Response(null, { status: 204 });
+    }),
     http.post('http://localhost:5000/api/organisations/:organisationId/projects', async ({ request, params }) => {
         const body = await request.json() as CreateProjectRequest
         const { organisationId } = params
-
-        console.log(`✅ [MSW] Intercepted POST /organisations/${organisationId}/projects with body:`, body);
 
         if (!body.name || !organisationId) {
             return new Response(
@@ -123,9 +179,8 @@ export const server = setupServer(
                 projectDescription: 'Create an internal dashboard for tracking tasks.',
             },
         ]
-
         return Response.json(mockProjects, {
             status: 200,
         })
     })
-) 
+)
