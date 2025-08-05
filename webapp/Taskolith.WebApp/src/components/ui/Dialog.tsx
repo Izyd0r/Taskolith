@@ -17,6 +17,9 @@ export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) 
         >
             <div
                 onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="dialog-title"
                 className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative"
             >
                 <button

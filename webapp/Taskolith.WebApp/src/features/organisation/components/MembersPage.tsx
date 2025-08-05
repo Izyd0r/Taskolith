@@ -9,6 +9,7 @@ import { type Role } from '@/features/organisation/types/Role'
 import { Search, UserPlus, UserX, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/features/auth/context/AuthContext'
 import { Button } from '@/components/ui/Button'
+import { InviteMemberModal } from '@/features/organisation/components/InviteMemberModal'
 
 const MemberRow = ({ member, canKick, isCurrentUser }: { member: Member, canKick: boolean, isCurrentUser: boolean }) => {
     const { organisationId } = useParams<{ organisationId: string }>()
@@ -70,12 +71,12 @@ const MemberRow = ({ member, canKick, isCurrentUser }: { member: Member, canKick
     )
 }
 
-
 const MembersPage = () => {
     const { organisationId } = useParams<{ organisationId: string }>()
     const { userId: currentUserId } = useAuth()
     const { data: members, isLoading, isError } = useGetMembersInsideOrganisation(organisationId!)
     const [query, setQuery] = useState('')
+    const [isInviteModalOpen, setInviteModalOpen] = useState(false)
 
     const pageState = useMemo(() => {
         if (!members) {
@@ -107,7 +108,7 @@ const MembersPage = () => {
         }
     }, [members, currentUserId, query])
 
-    const handleInvite = () => alert('Opening invite member modal...')
+    const handleInvite = () => setInviteModalOpen(true)
 
     return (
         <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 h-full">
@@ -169,6 +170,14 @@ const MembersPage = () => {
                     </div>
                 </div>
             </div>
+
+            {organisationId && (
+                <InviteMemberModal
+                    open={isInviteModalOpen}
+                    onOpenChange={setInviteModalOpen}
+                    organisationId={organisationId}
+                />
+            )}
         </div>
     )
 }
