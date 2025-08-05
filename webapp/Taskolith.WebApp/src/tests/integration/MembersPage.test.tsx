@@ -90,4 +90,85 @@ describe('MembersPage - Full Integration Test', () => {
             })
         })
     })
+
+    describe('Invite Member Modal', () => {
+        beforeEach(() => {
+            useAuthMock.mockReturnValue({ userId: 'user-alice-id' })
+            vi.spyOn(window, 'alert').mockImplementation(() => { })
+        })
+
+        it('should open the invite modal when the invite button is clicked', async () => {
+            const user = userEvent.setup()
+            RenderWithClient(<MembersPage />, { initialEntries: initialRoute })
+            const inviteButton = await screen.findByRole('button', { name: /invite member/i })
+            await user.click(inviteButton)
+            expect(await screen.findByRole('dialog')).toBeInTheDocument()
+            expect(screen.getByText(/invite new member/i)).toBeInTheDocument()
+        })
+
+        it('should show client-side validation errors if fields are empty', async () => {
+            const user = userEvent.setup()
+            RenderWithClient(<MembersPage />, { initialEntries: initialRoute })
+            const inviteButton = await screen.findByRole('button', { name: /invite member/i })
+            await user.click(inviteButton)
+            const sendButton = await screen.findByRole('button', { name: /send invitation/i })
+            await user.click(sendButton)
+            expect(await screen.findByText(/email is required/i)).toBeInTheDocument()
+            const emailInput = screen.getByPlaceholderText(/enter member's email/i)
+            await user.type(emailInput, 'new.member@test.com')
+            await user.click(sendButton)
+            expect(await screen.findByText(/expiry date is required/i)).toBeInTheDocument()
+        })
+
+        it('should successfully send an invitation and close the modal', async () => {
+            const user = userEvent.setup()
+            server.use(
+                http.post('*/api/organisations/org123/invitations', () => {
+                    return new HttpResponse(null, { status: 200 })
+                })
+            )
+            RenderWithClient(<MembersPage />, { initialEntries: initialRoute })
+            const inviteButton = await screen.findByRole('button', { name: /invite member/i })
+            await user.click(inviteButton)
+            const emailInput = await screen.findByPlaceholderText(/enter member's email/i)
+            const dateInput = screen.getByPlaceholderText(/invitation expiry date/i)
+            const sendButton = screen.getByRole('button', { name: /send invitation/i })
+            await user.type(emailInput, 'new.user@example.com')
+            await user.type(dateInput, '2025-12-31')
+            await user.click(sendButton)
+            await waitFor(() => {
+                expect(window.alert).toHaveBeenCalledWith('Invitation sent successfully!')
+            })
+            await waitFor(() => {
+                expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+            })
+        })
+
+        it('should display a specific API error inside the modal if the backend fails', async () => {
+            const user = userEvent.setup()
+            server.use(
+                http.post('*/api/organisations/org123/invitations', () => {
+                    return new HttpResponse(
+                        JSON.stringify({
+                            title: 'One or more validation errors occurred.',
+                            status: 400,
+                            errors: { DueDate: ['Invitation date cannot be in the past.'] },
+                        }),
+                        { status: 400, headers: { 'Content-Type': 'application/json' } }
+                    )
+                })
+            )
+            RenderWithClient(<MembersPage />, { initialEntries: initialRoute })
+            const inviteButton = await screen.findByRole('button', { name: /invite member/i })
+            await user.click(inviteButton)
+            const emailInput = await screen.findByPlaceholderText(/enter member's email/i)
+            const dateInput = screen.getByPlaceholderText(/invitation expiry date/i)
+            const sendButton = screen.getByRole('button', { name: /send invitation/i })
+            await user.type(emailInput, 'new.user@example.com')
+            await user.type(dateInput, '2020-01-01')
+            await user.click(sendButton)
+            expect(await screen.findByText(/Invitation date cannot be in the past/i)).toBeInTheDocument()
+            expect(screen.getByRole('dialog')).toBeInTheDocument()
+        })
+    })
 })
