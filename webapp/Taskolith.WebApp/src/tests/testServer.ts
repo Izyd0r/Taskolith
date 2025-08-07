@@ -6,8 +6,9 @@ import { randomUUID } from 'crypto'
 import { z } from 'zod'
 import { type CreateProjectRequest } from '@/features/organisation/types/CreateProjectRequest'
 import { type Project } from '@/features/organisation/types/Project'
-import { Permission } from '@/features/organisation/types/Permission';
+import { Permission } from '@/features/organisation/types/Permission'
 import { type GetOrganisationMembersResponse } from '@/features/organisation/types/GetOrganisationMembersResponse'
+import { type InviteMemberRequest } from '@/features/organisation/types/InviteMemberRequest'
 
 const mockApiMembersResponse: GetOrganisationMembersResponse[] = [
     {
@@ -49,15 +50,16 @@ const mockApiMembersResponse: GetOrganisationMembersResponse[] = [
             { id: 'role3', organisationId: 'org123', name: 'Viewer', permissions: Permission.Public }
         ],
     },
-];
+]
 
-let liveMockData: GetOrganisationMembersResponse[] = JSON.parse(JSON.stringify(mockApiMembersResponse));
+let liveMockData: GetOrganisationMembersResponse[] = JSON.parse(JSON.stringify(mockApiMembersResponse))
 
 export const resetMockData = () => {
-    liveMockData = JSON.parse(JSON.stringify(mockApiMembersResponse));
+    liveMockData = JSON.parse(JSON.stringify(mockApiMembersResponse))
 }
 
 export const server = setupServer(
+    // --- AUTH HANDLERS ---
     http.post('http://localhost:5000/api/auth/login', async ({ request }) => {
         const body = await request.json() as LoginCredentials
         if (body?.username === 'user1' && body?.password === 'StrongPass123!') {
@@ -100,10 +102,12 @@ export const server = setupServer(
             headers: { 'Content-Type': 'application/json' },
         })
     }),
+
+    // --- ORGANISATION HANDLERS ---
     http.post('http://localhost:5000/api/organisations', async ({ request }) => {
         try {
             const json = await request.json()
-            const body = CreateOrganisationScheme.parse(json)
+            CreateOrganisationScheme.parse(json)
             return new Response(null, { status: 201 })
         } catch (err) {
             if (err instanceof z.ZodError) {
@@ -116,65 +120,63 @@ export const server = setupServer(
         return new Response('Internal Server Error', { status: 500 })
     }),
     http.get('http://localhost:5000/api/organisations/user', async () => {
-        try {
-            const mockData = [
-                {
-                    organisationId: 'c4c03394-bd10-4c3f-9a02-bda4e3fbf55f',
-                    organisationName: 'Org One',
-                },
-                {
-                    organisationId: '1e201439-3dcd-428f-92b8-9ba1eb8c605e',
-                    organisationName: 'Org Two',
-                },
-            ]
-
-            return Response.json(mockData, { status: 200 })
-        } catch (err: any) {
-            return new Response(
-                JSON.stringify({ errors: err.message }),
-                {
-                    status: 401,
-                    headers: { 'Content-Type': 'application/json' },
-                }
-            )
-        }
+        const mockData = [
+            {
+                organisationId: 'c4c03394-bd10-4c3f-9a02-bda4e3fbf55f',
+                organisationName: 'Org One',
+            },
+            {
+                organisationId: '1e201439-3dcd-428f-92b8-9ba1eb8c605e',
+                organisationName: 'Org Two',
+            },
+        ]
+        return Response.json(mockData, { status: 200 })
     }),
+
+    // --- MEMBERS HANDLERS ---
     http.get('http://localhost:5000/api/organisations/:organisationId/members', () => {
-        return Response.json(liveMockData, { status: 200 });
+        return Response.json(liveMockData, { status: 200 })
     }),
     http.delete('http://localhost:5000/api/organisations/:organisationId/members/:memberId', ({ params }) => {
-        const { memberId } = params;
-        liveMockData = liveMockData.filter(item => item.member.memberId !== memberId);
-        return new Response(null, { status: 204 });
+        const { memberId } = params
+        liveMockData = liveMockData.filter(item => item.member.memberId !== memberId)
+        return new Response(null, { status: 204 })
     }),
-    http.post('http://localhost:5000/api/organisations/:organisationId/projects', async ({ request, params }) => {
-        const body = await request.json() as CreateProjectRequest
-        const { organisationId } = params
 
-        if (!body.name || !organisationId) {
+    // --- INVITATIONS HANDLER ---
+    http.post('http://localhost:5000/api/organisations/:organisationId/invitations', async ({ request }) => {
+        const body = await request.json() as InviteMemberRequest
+        if (body.email && body.dueDate) {
+            return new Response(null, { status: 200 })
+        }
+        return new Response(JSON.stringify({ message: 'Invalid invitation request' }), { status: 400 })
+    }),
+
+    // --- PROJECTS HANDLERS ---
+    http.post('http://localhost:5000/api/organisations/:organisationId/projects', async ({ request }) => {
+        const body = await request.json() as CreateProjectRequest
+        if (!body.name) {
             return new Response(
                 JSON.stringify({ message: 'Invalid data' }),
                 { status: 400, headers: { 'Content-Type': 'application/json' } }
             )
         }
         return new Response(JSON.stringify({
-            ProjectId: crypto.randomUUID()
-        }),
-            {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-            })
+            ProjectId: randomUUID()
+        }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+        })
     }),
-    http.get('http://localhost:5000/api/organisations/:organisationId/projects', async ({ params }) => {
-        const { organisationId } = params
+    http.get('http://localhost:5000/api/organisations/:organisationId/projects', () => {
         const mockProjects: Project[] = [
             {
-                projectId: crypto.randomUUID(),
+                projectId: randomUUID(),
                 projectName: 'Website Redesign',
                 projectDescription: 'Revamp the marketing site for Q3 launch.',
             },
             {
-                projectId: crypto.randomUUID(),
+                projectId: randomUUID(),
                 projectName: 'Internal Dashboard',
                 projectDescription: 'Create an internal dashboard for tracking tasks.',
             },

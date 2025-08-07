@@ -4,7 +4,7 @@ import { Dialog, DialogContent } from '@/components/ui/Dialog'
 import { Button } from '@/components/ui/Button'
 import { InputField } from '@/components/ui/InputField'
 import { useInviteMember } from '@/features/organisation/hooks/useInviteMember'
-import { Mail, AlertCircle, Calendar } from 'lucide-react'
+import { Mail, AlertCircle } from 'lucide-react'
 
 interface InviteMemberModalProps {
     open: boolean
@@ -105,7 +105,6 @@ export const InviteMemberModal: React.FC<InviteMemberModalProps> = ({ open, onOp
                                 value={dueDate}
                                 onChange={(e) => setDueDate(e.target.value)}
                                 disabled={isPending}
-                                toggle={<Calendar className="text-gray-400" size={18} />}
                             />
                         </div>
                         <div className="flex justify-end gap-3 pt-4">
