@@ -9,6 +9,7 @@ import { type Project } from '@/features/organisation/types/Project'
 import { Permission } from '@/features/organisation/types/Permission'
 import { type GetOrganisationMembersResponse } from '@/features/organisation/types/GetOrganisationMembersResponse'
 import { type InviteMemberRequest } from '@/features/organisation/types/InviteMemberRequest'
+import { type Role } from '@/features/organisation/types/Role'
 
 const mockApiMembersResponse: GetOrganisationMembersResponse[] = [
     {
@@ -21,7 +22,7 @@ const mockApiMembersResponse: GetOrganisationMembersResponse[] = [
             roles: [],
         },
         roles: [
-            { id: 'role1', organisationId: 'org123', name: 'Organisation Admin', permissions: Permission.InviteMember | Permission.KickMember },
+            { id: 'role1', organisationId: 'org123', name: 'Organisation Admin', permissions: Permission.InviteMember | Permission.KickMember | Permission.CreateRole | Permission.UpdateRole | Permission.DeleteRole | Permission.Public },
         ],
     },
     {
@@ -52,14 +53,21 @@ const mockApiMembersResponse: GetOrganisationMembersResponse[] = [
     },
 ]
 
+let mockRoles: Role[] = [
+    { id: 'role1', organisationId: 'org123', name: 'Organisation Admin', permissions: Permission.InviteMember | Permission.KickMember },
+    { id: 'role2', organisationId: 'org123', name: 'Developer', permissions: Permission.CreateTask },
+    { id: 'role3', organisationId: 'org123', name: 'Viewer', permissions: Permission.Public }
+]
+
+let liveMockRole: Role[] = JSON.parse(JSON.stringify(mockRoles))
 let liveMockData: GetOrganisationMembersResponse[] = JSON.parse(JSON.stringify(mockApiMembersResponse))
 
 export const resetMockData = () => {
     liveMockData = JSON.parse(JSON.stringify(mockApiMembersResponse))
+    liveMockRole = JSON.parse(JSON.stringify(mockRoles))
 }
 
 export const server = setupServer(
-    // --- AUTH HANDLERS ---
     http.post('http://localhost:5000/api/auth/login', async ({ request }) => {
         const body = await request.json() as LoginCredentials
         if (body?.username === 'user1' && body?.password === 'StrongPass123!') {
@@ -102,8 +110,6 @@ export const server = setupServer(
             headers: { 'Content-Type': 'application/json' },
         })
     }),
-
-    // --- ORGANISATION HANDLERS ---
     http.post('http://localhost:5000/api/organisations', async ({ request }) => {
         try {
             const json = await request.json()
@@ -132,8 +138,6 @@ export const server = setupServer(
         ]
         return Response.json(mockData, { status: 200 })
     }),
-
-    // --- MEMBERS HANDLERS ---
     http.get('http://localhost:5000/api/organisations/:organisationId/members', () => {
         return Response.json(liveMockData, { status: 200 })
     }),
@@ -142,8 +146,6 @@ export const server = setupServer(
         liveMockData = liveMockData.filter(item => item.member.memberId !== memberId)
         return new Response(null, { status: 204 })
     }),
-
-    // --- INVITATIONS HANDLER ---
     http.post('http://localhost:5000/api/organisations/:organisationId/invitations', async ({ request }) => {
         const body = await request.json() as InviteMemberRequest
         if (body.email && body.dueDate) {
@@ -151,8 +153,6 @@ export const server = setupServer(
         }
         return new Response(JSON.stringify({ message: 'Invalid invitation request' }), { status: 400 })
     }),
-
-    // --- PROJECTS HANDLERS ---
     http.post('http://localhost:5000/api/organisations/:organisationId/projects', async ({ request }) => {
         const body = await request.json() as CreateProjectRequest
         if (!body.name) {
@@ -184,5 +184,31 @@ export const server = setupServer(
         return Response.json(mockProjects, {
             status: 200,
         })
+    }),
+    http.get('http://localhost:5000/api/organisations/:organisationId/roles', () => {
+        return Response.json({ roles: liveMockRole }, { status: 200 })
+    }),
+    http.post('http://localhost:5000/api/organisations/:organisationId/roles', async ({ request, params }) => {
+        const newRoleData = await request.json() as { name: string, permissions: number }
+        const newRole: Role = {
+            id: `role-new-${randomUUID()}`,
+            organisationId: params.organisationId as string,
+            ...newRoleData
+        }
+        liveMockRole.push(newRole)  // Update live roles
+        return Response.json(newRole, { status: 201 })
+    }),
+
+    http.put('http://localhost:5000/api/organisations/:organisationId/roles/:roleId', async ({ params, request }) => {
+        const { roleId } = params
+        const updatedData = await request.json() as { name: string, permissions: number }
+        liveMockRole = liveMockRole.map(role => (role.id === roleId ? { ...role, ...updatedData } : role))
+        return new Response(null, { status: 204 })
+    }),
+
+    http.delete('http://localhost:5000/api/organisations/:organisationId/roles/:roleId', ({ params }) => {
+        const { roleId } = params
+        liveMockRole = liveMockRole.filter(role => role.id !== roleId)
+        return new Response(null, { status: 204 })
     })
 )
