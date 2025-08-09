@@ -5,3 +5,7 @@ export type Role = {
     name: string
     permissions: number
 }
+
+export interface GetRolesResponse {
+    roles: Role[]
+}
