@@ -11,6 +11,12 @@ import { type GetOrganisationMembersResponse } from '@/features/organisation/typ
 import { type InviteMemberRequest } from '@/features/organisation/types/InviteMemberRequest'
 import { type Role } from '@/features/organisation/types/Role'
 
+const mockRoles: Role[] = [
+    { id: 'role1', organisationId: 'org123', name: 'Organisation Admin', permissions: Permission.InviteMember | Permission.KickMember | Permission.CreateRole | Permission.UpdateRole | Permission.DeleteRole | Permission.Public | Permission.AddRole | Permission.RemoveRole },
+    { id: 'role2', organisationId: 'org123', name: 'Developer', permissions: Permission.CreateTask },
+    { id: 'role3', organisationId: 'org123', name: 'Viewer', permissions: Permission.Public }
+]
+
 const mockApiMembersResponse: GetOrganisationMembersResponse[] = [
     {
         member: {
@@ -19,11 +25,9 @@ const mockApiMembersResponse: GetOrganisationMembersResponse[] = [
             organisationId: 'org123',
             username: 'Alice',
             email: 'alice@example.com',
-            roles: [],
+            roles: [mockRoles[0]],
         },
-        roles: [
-            { id: 'role1', organisationId: 'org123', name: 'Organisation Admin', permissions: Permission.InviteMember | Permission.KickMember | Permission.CreateRole | Permission.UpdateRole | Permission.DeleteRole | Permission.Public },
-        ],
+        roles: [mockRoles[0]],
     },
     {
         member: {
@@ -32,11 +36,9 @@ const mockApiMembersResponse: GetOrganisationMembersResponse[] = [
             organisationId: 'org123',
             username: 'Bob',
             email: 'bob@example.com',
-            roles: [],
+            roles: [mockRoles[1]],
         },
-        roles: [
-            { id: 'role2', organisationId: 'org123', name: 'Developer', permissions: Permission.CreateTask }
-        ],
+        roles: [mockRoles[1]],
     },
     {
         member: {
@@ -45,18 +47,10 @@ const mockApiMembersResponse: GetOrganisationMembersResponse[] = [
             organisationId: 'org123',
             username: 'Charlie',
             email: 'charlie@example.com',
-            roles: [],
+            roles: [mockRoles[2]],
         },
-        roles: [
-            { id: 'role3', organisationId: 'org123', name: 'Viewer', permissions: Permission.Public }
-        ],
+        roles: [mockRoles[2]],
     },
-]
-
-let mockRoles: Role[] = [
-    { id: 'role1', organisationId: 'org123', name: 'Organisation Admin', permissions: Permission.InviteMember | Permission.KickMember },
-    { id: 'role2', organisationId: 'org123', name: 'Developer', permissions: Permission.CreateTask },
-    { id: 'role3', organisationId: 'org123', name: 'Viewer', permissions: Permission.Public }
 ]
 
 let liveMockRole: Role[] = JSON.parse(JSON.stringify(mockRoles))
@@ -198,17 +192,39 @@ export const server = setupServer(
         liveMockRole.push(newRole)  // Update live roles
         return Response.json(newRole, { status: 201 })
     }),
-
     http.put('http://localhost:5000/api/organisations/:organisationId/roles/:roleId', async ({ params, request }) => {
         const { roleId } = params
         const updatedData = await request.json() as { name: string, permissions: number }
         liveMockRole = liveMockRole.map(role => (role.id === roleId ? { ...role, ...updatedData } : role))
         return new Response(null, { status: 204 })
     }),
-
     http.delete('http://localhost:5000/api/organisations/:organisationId/roles/:roleId', ({ params }) => {
         const { roleId } = params
         liveMockRole = liveMockRole.filter(role => role.id !== roleId)
         return new Response(null, { status: 204 })
+    }),
+    http.post('http://localhost:5000/api/organisations/:organisationId/members/:memberId/roles', async ({ request, params }) => {
+        const { memberId } = params as { memberId: string };
+
+        const { roleId } = await request.json() as { roleId: string };
+
+        const memberDataItem = liveMockData.find(d => d.member.memberId === memberId);
+        const roleDefinition = liveMockRole.find(r => r.id === roleId);
+
+        if (memberDataItem && roleDefinition && !memberDataItem.roles.some(r => r.id === roleId)) {
+            memberDataItem.roles.push(roleDefinition);
+            memberDataItem.member.roles.push(roleDefinition);
+        }
+        return new Response(null, { status: 204 });
+    }),
+    http.delete('http://localhost:5000/api/organisations/:organisationId/members/:memberId/roles/:roleId', ({ params }) => {
+        const { memberId, roleId } = params as { memberId: string, roleId: string };
+        const memberDataItem = liveMockData.find(d => d.member.memberId === memberId);
+
+        if (memberDataItem) {
+            memberDataItem.roles = memberDataItem.roles.filter(r => r.id !== roleId);
+            memberDataItem.member.roles = memberDataItem.member.roles.filter(r => r.id !== roleId);
+        }
+        return new Response(null, { status: 204 });
     })
 )

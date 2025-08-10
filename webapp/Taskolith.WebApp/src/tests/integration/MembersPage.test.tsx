@@ -1,9 +1,9 @@
 import React from 'react'
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
 import { http, HttpResponse } from 'msw'
-import { server } from '@/tests/testServer'
+import { server, resetMockData } from '@/tests/testServer'
 import MembersPage from '@/features/organisation/components/MembersPage'
 import RenderWithClient from '@/tests/integration/utils/RenderWithClient'
 import { useAuth } from '@/features/auth/context/AuthContext'
@@ -30,6 +30,7 @@ describe('MembersPage - Full Integration Test', () => {
 
     beforeEach(() => {
         vi.clearAllMocks()
+        resetMockData()
         useAuthMock.mockReturnValue({ userId: 'user-generic-id' })
         vi.spyOn(window, 'confirm').mockImplementation(() => true)
     })
@@ -40,8 +41,7 @@ describe('MembersPage - Full Integration Test', () => {
         expect(await screen.findByText('Alice')).toBeInTheDocument()
     })
 
-    describe('User Interaction', () => {
-        const initialRoute = '/organisations/org-123'
+    describe('API Error Handling', () => {
         it('should display an error message if the API call fails', async () => {
             server.use(
                 http.get('*/api/organisations/:organisationId/members', () => {
@@ -51,7 +51,7 @@ describe('MembersPage - Full Integration Test', () => {
                     })
                 })
             )
-            RenderWithClient(<MembersPage />, { initialEntries: [initialRoute] })
+            RenderWithClient(<MembersPage />, { initialEntries: initialRoute })
             const errorMessage = await screen.findByText(/Failed to load members./i)
             expect(errorMessage).toBeInTheDocument()
         })
@@ -169,6 +169,75 @@ describe('MembersPage - Full Integration Test', () => {
             await user.click(sendButton)
             expect(await screen.findByText(/Invitation date cannot be in the past/i)).toBeInTheDocument()
             expect(screen.getByRole('dialog')).toBeInTheDocument()
+        })
+    })
+    describe('Manage Roles Modal', () => {
+        beforeEach(() => {
+            useAuthMock.mockReturnValue({ userId: 'user-alice-id' })
+        })
+
+        it('should open the modal when clicking "Manage Roles"', async () => {
+            const user = userEvent.setup()
+            RenderWithClient(<MembersPage />, { initialEntries: initialRoute })
+            const bobRow = await screen.findByText('Bob').then(node => node.closest('tr'))
+            const manageButton = within(bobRow!).getByRole('button', { name: /manage roles/i })
+            await user.click(manageButton)
+            expect(await screen.findByRole('dialog')).toBeInTheDocument()
+            expect(screen.getByText(/manage roles for bob/i)).toBeInTheDocument()
+        })
+
+        it('should add a role to a member and update the UI', async () => {
+            const user = userEvent.setup()
+            RenderWithClient(<MembersPage />, { initialEntries: initialRoute })
+            const bobRow = await screen.findByText('Bob').then(node => node.closest('tr'))
+            expect(within(bobRow!).queryByText('Viewer')).not.toBeInTheDocument()
+
+            const manageButton = within(bobRow!).getByRole('button', { name: /manage roles/i })
+            await user.click(manageButton)
+
+            const viewerCheckbox = await screen.findByLabelText('Viewer')
+            expect(viewerCheckbox).not.toBeChecked()
+
+            await user.click(viewerCheckbox)
+            await waitFor(() => {
+                expect(viewerCheckbox).toBeChecked()
+            })
+
+            await user.click(screen.getByRole('button', { name: /done/i }))
+            await waitFor(() => {
+                expect(within(bobRow!).getByText('Viewer')).toBeInTheDocument()
+            })
+        })
+
+        it('should remove a role from a member and update the UI', async () => {
+            const user = userEvent.setup()
+            RenderWithClient(<MembersPage />, { initialEntries: initialRoute })
+            const bobRow = await screen.findByText('Bob').then(node => node.closest('tr'))
+            expect(within(bobRow!).getByText('Developer')).toBeInTheDocument()
+
+            const manageButton = within(bobRow!).getByRole('button', { name: /manage roles/i })
+            await user.click(manageButton)
+
+            const developerCheckbox = await screen.findByLabelText('Developer')
+            expect(developerCheckbox).toBeChecked()
+
+            await user.click(developerCheckbox)
+
+            await waitFor(() => {
+                expect(developerCheckbox).not.toBeChecked()
+            })
+
+            await user.click(screen.getByRole('button', { name: /done/i }))
+            await waitFor(() => {
+                expect(within(bobRow!).queryByText('Developer')).not.toBeInTheDocument()
+            })
+        })
+
+        it('should not show the Manage Roles button if user lacks permission', async () => {
+            useAuthMock.mockReturnValue({ userId: 'user3' })
+            RenderWithClient(<MembersPage />, { initialEntries: initialRoute })
+            expect(await screen.findByText('Alice')).toBeInTheDocument()
+            expect(screen.queryByRole('button', { name: /manage roles/i })).not.toBeInTheDocument()
         })
     })
 })
