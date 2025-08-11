@@ -12,7 +12,7 @@ import { type InviteMemberRequest } from '@/features/organisation/types/InviteMe
 import { type Role } from '@/features/organisation/types/Role'
 
 const mockRoles: Role[] = [
-    { id: 'role1', organisationId: 'org123', name: 'Organisation Admin', permissions: Permission.InviteMember | Permission.KickMember | Permission.CreateRole | Permission.UpdateRole | Permission.DeleteRole | Permission.Public | Permission.AddRole | Permission.RemoveRole },
+    { id: 'role1', organisationId: 'org123', name: 'Organisation Admin', permissions: Permission.InviteMember | Permission.KickMember | Permission.CreateRole | Permission.UpdateRole | Permission.DeleteRole | Permission.Public | Permission.AddRole | Permission.RemoveRole | Permission.CreateProject | Permission.DeleteProject | Permission.UpdateProject },
     { id: 'role2', organisationId: 'org123', name: 'Developer', permissions: Permission.CreateTask },
     { id: 'role3', organisationId: 'org123', name: 'Viewer', permissions: Permission.Public }
 ]
@@ -53,13 +53,22 @@ const mockApiMembersResponse: GetOrganisationMembersResponse[] = [
     },
 ]
 
-let liveMockRole: Role[] = JSON.parse(JSON.stringify(mockRoles))
-let liveMockData: GetOrganisationMembersResponse[] = JSON.parse(JSON.stringify(mockApiMembersResponse))
+const initialMockProjects: Project[] = [
+    { projectId: 'proj-alpha-123', projectName: 'Project Alpha', projectDescription: 'Description for Alpha' },
+    { projectId: 'proj-beta-456', projectName: 'Project Beta', projectDescription: 'Description for Beta' },
+]
+
+let liveMockRole: Role[] = []
+let liveMockData: GetOrganisationMembersResponse[] = []
+let liveMockProjects: Project[] = []
 
 export const resetMockData = () => {
     liveMockData = JSON.parse(JSON.stringify(mockApiMembersResponse))
     liveMockRole = JSON.parse(JSON.stringify(mockRoles))
+    liveMockProjects = JSON.parse(JSON.stringify(initialMockProjects))
 }
+
+resetMockData()
 
 export const server = setupServer(
     http.post('http://localhost:5000/api/auth/login', async ({ request }) => {
@@ -147,37 +156,56 @@ export const server = setupServer(
         }
         return new Response(JSON.stringify({ message: 'Invalid invitation request' }), { status: 400 })
     }),
+    http.get('http://localhost:5000/api/organisations/:organisationId/projects', () => {
+        return Response.json(liveMockProjects)
+    }),
     http.post('http://localhost:5000/api/organisations/:organisationId/projects', async ({ request }) => {
         const body = await request.json() as CreateProjectRequest
-        if (!body.name) {
-            return new Response(
-                JSON.stringify({ message: 'Invalid data' }),
-                { status: 400, headers: { 'Content-Type': 'application/json' } }
-            )
+
+        if (!body.name || !body.description) {
+            return new Response(JSON.stringify({ message: 'Invalid data' }), { status: 400 });
         }
-        return new Response(JSON.stringify({
-            ProjectId: randomUUID()
-        }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        })
+
+        const newProject: Project = {
+            projectId: `proj-${Math.random().toString(36).substr(2, 9)}`, // Create a random ID
+            projectName: body.name,
+            projectDescription: body.description,
+        }
+
+        liveMockProjects.push(newProject)
+
+        return Response.json(newProject, { status: 201 })
     }),
-    http.get('http://localhost:5000/api/organisations/:organisationId/projects', () => {
-        const mockProjects: Project[] = [
-            {
-                projectId: randomUUID(),
-                projectName: 'Website Redesign',
-                projectDescription: 'Revamp the marketing site for Q3 launch.',
-            },
-            {
-                projectId: randomUUID(),
-                projectName: 'Internal Dashboard',
-                projectDescription: 'Create an internal dashboard for tracking tasks.',
-            },
-        ]
-        return Response.json(mockProjects, {
-            status: 200,
-        })
+
+    http.put('http://localhost:5000/api/organisations/:organisationId/projects/:projectId', async ({ params, request }) => {
+        const { projectId } = params
+        const body = await request.json() as { payload: { name?: string; description?: string } }
+
+        const projectIndex = liveMockProjects.findIndex(p => p.projectId === projectId)
+
+        if (projectIndex === -1) {
+            return new Response('Project not found', { status: 404 })
+        }
+
+        const updatedProject = {
+            ...liveMockProjects[projectIndex],
+            projectName: body.payload.name ?? liveMockProjects[projectIndex].projectName,
+            projectDescription: body.payload.description ?? liveMockProjects[projectIndex].projectDescription
+        }
+
+        liveMockProjects[projectIndex] = updatedProject
+
+        return new Response(null, { status: 204 })
+    }),
+    http.delete('http://localhost:5000/api/organisations/:organisationId/projects/:projectId', ({ params }) => {
+        const { projectId } = params
+        const initialLength = liveMockProjects.length
+        liveMockProjects = liveMockProjects.filter(p => p.projectId !== projectId)
+
+        if (liveMockProjects.length === initialLength) {
+            return new Response('Project not found', { status: 404 })
+        }
+        return new Response(null, { status: 204 })
     }),
     http.get('http://localhost:5000/api/organisations/:organisationId/roles', () => {
         return Response.json({ roles: liveMockRole }, { status: 200 })
