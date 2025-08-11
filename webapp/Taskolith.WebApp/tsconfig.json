@@ -16,7 +16,9 @@
             ]
         },
         "types": [
-            "vite/client"
+            "vite/client",
+            "vite/globals",
+            "@testing-library/jest-dom"
         ]
     }
 }
