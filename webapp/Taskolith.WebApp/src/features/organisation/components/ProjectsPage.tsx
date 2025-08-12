@@ -1,22 +1,22 @@
 import React, { useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/Button'
 import { InputField } from '@/components/ui/InputField'
 import { TextareaField } from '@/components/ui/TextareaField'
+import { Plus, Trash, Users, ArrowRight, AlertCircle } from 'lucide-react'
+import { useAuth } from '@/features/auth/context/AuthContext'
+import { type Project } from '@/features/organisation/types/Project'
+import { Permission, type TPermission } from '@/features/organisation/types/Permission'
+import { useGetMembersInsideOrganisation } from '@/features/organisation/hooks/useGetMembersInsideOrganisation'
 import {
-    useGetProjects,
+    useGetAllProjects,
+    useGetMyProjects,
     useCreateProject,
     useUpdateProject,
     useDeleteProject,
     useAssignMembersToProject,
     useRemoveMemberFromProject,
 } from '@/features/organisation/hooks/useProjects'
-import { type Project } from '@/features/organisation/types/Project'
-import { Plus, Trash, Users, ArrowRight } from 'lucide-react'
-import { useAuth } from '@/features/auth/context/AuthContext'
-import { useGetMembersInsideOrganisation } from '@/features/organisation/hooks/useGetMembersInsideOrganisation'
-import { Permission } from '@/features/organisation/types/Permission'
 
 function ManageMembersModal({
     organisationId,
@@ -49,8 +49,9 @@ function ManageMembersModal({
                     alert(`Successfully initiated request to add '${memberIdToAdd}'`)
                     setMemberIdToAdd('')
                 },
-                onError: (error) => {
-                    alert(`Failed to add member: ${error.message}`)
+                onError: (error: any) => {
+                    const message = error.response?.data?.message || error.message
+                    alert(`Failed to add member: ${message}`)
                 },
             }
         )
@@ -68,8 +69,9 @@ function ManageMembersModal({
                     alert(`Successfully initiated request to remove '${memberIdToRemove}'`)
                     setMemberIdToRemove('')
                 },
-                onError: (error) => {
-                    alert(`Failed to remove member: ${error.message}`)
+                onError: (error: any) => {
+                    const message = error.response?.data?.message || error.message
+                    alert(`Failed to remove member: ${message}`)
                 },
             }
         )
@@ -80,7 +82,7 @@ function ManageMembersModal({
             <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
                 <h2 className="text-xl font-bold mb-4">Manage Members</h2>
                 <p className="text-sm text-gray-600 mb-4">
-                    Please enter a user ID to add or remove them from the project
+                    Enter a user's ID to add or remove them from this project.
                 </p>
                 {canAssign && (
                     <div className="space-y-2">
@@ -91,7 +93,7 @@ function ManageMembersModal({
                             onChange={(e) => setMemberIdToAdd(e.target.value)}
                         />
                         <Button onClick={handleAssignMember} disabled={assignMemberMutation.isPending}>
-                            {assignMemberMutation.isPending ? 'Adding' : 'Add Member'}
+                            {assignMemberMutation.isPending ? 'Adding...' : 'Add Member'}
                         </Button>
                     </div>
                 )}
@@ -105,7 +107,7 @@ function ManageMembersModal({
                             onChange={(e) => setMemberIdToRemove(e.target.value)}
                         />
                         <Button variant="destructive" onClick={handleRemoveMember} disabled={removeMemberMutation.isPending}>
-                            {removeMemberMutation.isPending ? 'Removing' : 'Remove Member'}
+                            {removeMemberMutation.isPending ? 'Removing...' : 'Remove Member'}
                         </Button>
                     </div>
                 )}
@@ -171,32 +173,30 @@ function ProjectTile({
 
 export default function ProjectsPage() {
     const { organisationId } = useParams<{ organisationId: string }>()
-    const navigate = useNavigate()
-    const queryClient = useQueryClient()
     const { userId: currentUserId } = useAuth()
-
-    const { data: projects, isLoading: isLoadingProjects } = useGetProjects(organisationId ?? '')
-    const { data: members, isLoading: isLoadingMembers } = useGetMembersInsideOrganisation(organisationId ?? '')
-    const createProject = useCreateProject(organisationId ?? '')
-    const updateProject = useUpdateProject(organisationId ?? '')
-    const deleteProject = useDeleteProject(organisationId ?? '')
+    const navigate = useNavigate()
 
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
-    const [openProjectModal, setOpenProjectModal] = useState(false)
+    const [isProjectModalOpen, setProjectModalOpen] = useState(false)
     const [form, setForm] = useState({ name: '', description: '' })
     const [editingProject, setEditingProject] = useState<Project | null>(null)
 
+    const { data: members, isLoading: isLoadingMembers } = useGetMembersInsideOrganisation(organisationId!)
+
     const permissions = useMemo(() => {
-        if (!members) return { canCreate: false, canUpdate: false, canDelete: false, canAssign: false, canRemove: false }
+        const defaultPermissions = {
+            canGetAllProjects: false, canCreate: false, canUpdate: false,
+            canDelete: false, canAssign: false, canRemove: false,
+        }
+        if (!members) return defaultPermissions
 
         const currentUserAsMember = members.find(m => m.userId === currentUserId)
-        const currentUserPermissions = currentUserAsMember
-            ? currentUserAsMember.roles.reduce((acc: number, role) => acc | role.permissions, Permission.Public)
-            : Permission.Public
+        const userPermissions = currentUserAsMember?.roles.reduce((acc, role) => acc | role.permissions, 0) ?? 0
 
-        const has = (p: number) => (currentUserPermissions & p) === p
+        const has = (p: TPermission) => (userPermissions & p) === p
 
         return {
+            canGetAllProjects: has(Permission.GetAllProjects),
             canCreate: has(Permission.CreateProject),
             canUpdate: has(Permission.UpdateProject),
             canDelete: has(Permission.DeleteProject),
@@ -205,49 +205,64 @@ export default function ProjectsPage() {
         }
     }, [members, currentUserId])
 
+    const { data: allProjects, isLoading: isLoadingAll, isError: isErrorAll } = useGetAllProjects(organisationId!, {
+        enabled: !isLoadingMembers && permissions.canGetAllProjects,
+    })
+
+    const { data: myProjects, isLoading: isLoadingMy, isError: isErrorMy } = useGetMyProjects(organisationId!, {
+        enabled: !isLoadingMembers && !permissions.canGetAllProjects,
+    })
+
+    const projects = permissions.canGetAllProjects ? allProjects : myProjects
+    const isLoading = isLoadingMembers || (permissions.canGetAllProjects ? isLoadingAll : isLoadingMy)
+    const isError = permissions.canGetAllProjects ? isErrorAll : isErrorMy
+
+    const createProjectMutation = useCreateProject(organisationId!)
+    const updateProjectMutation = useUpdateProject(organisationId!)
+    const deleteProjectMutation = useDeleteProject(organisationId!)
+
     const handleCreateOrUpdate = () => {
         if (!organisationId) return
+
         const mutationOptions = {
             onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ['projects', organisationId] })
-                setOpenProjectModal(false)
+                setProjectModalOpen(false)
                 setEditingProject(null)
             },
         }
 
         if (editingProject) {
-            updateProject.mutate(
-                {
-                    projectId: editingProject.projectId,
-                    payload: { name: form.name, description: form.description },
-                },
-                mutationOptions
-            )
+            updateProjectMutation.mutate({
+                projectId: editingProject.projectId,
+                payload: { name: form.name, description: form.description },
+            }, mutationOptions)
         } else {
-            createProject.mutate(
-                { name: form.name, description: form.description },
-                mutationOptions
-            )
+            createProjectMutation.mutate({ name: form.name, description: form.description }, mutationOptions)
         }
     }
 
     const handleDeleteProject = (projectId: string) => {
         if (!organisationId) return
         if (window.confirm('Are you sure you want to delete this project?')) {
-            deleteProject.mutate(projectId, {
-                onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ['projects', organisationId] })
-                },
-            })
+            deleteProjectMutation.mutate(projectId)
         }
     }
 
     const handleGoToKanban = (projectId: string) => {
         navigate(`/organisations/${organisationId}/projects/${projectId}`)
     }
-    
-    const isLoading = isLoadingProjects || isLoadingMembers;
-    if (isLoading) return <div>Loading...</div>
+
+    if (isLoading) {
+        return <div className="p-6 text-gray-500">Loading projects...</div>
+    }
+
+    if (isError) {
+        return (
+            <div className="p-6 text-red-600 flex gap-2 items-center">
+                <AlertCircle size={18} /> Failed to load projects. You may not have the required permissions.
+            </div>
+        )
+    }
 
     return (
         <div className="p-6 h-full flex flex-col">
@@ -258,7 +273,7 @@ export default function ProjectsPage() {
                         onClick={() => {
                             setEditingProject(null)
                             setForm({ name: '', description: '' })
-                            setOpenProjectModal(true)
+                            setProjectModalOpen(true)
                         }}
                     >
                         <Plus className="mr-2 h-4 w-4" /> New Project
@@ -267,29 +282,30 @@ export default function ProjectsPage() {
             </div>
 
             <div className="space-y-3 max-h-[75vh] overflow-y-auto pr-2">
-                {projects?.map((project: Project) => (
-                    <ProjectTile
-                        key={project.projectId}
-                        project={project}
-                        onEdit={() => {
-                            setEditingProject(project)
-                            setForm({
-                                name: project.projectName,
-                                description: project.projectDescription,
-                            })
-                            setOpenProjectModal(true)
-                        }}
-                        onDelete={() => handleDeleteProject(project.projectId)}
-                        onManageMembers={() => setSelectedProjectId(project.projectId)}
-                        onGoToKanban={() => handleGoToKanban(project.projectId)}
-                        canUpdate={permissions.canUpdate}
-                        canDelete={permissions.canDelete}
-                        canManageMembers={permissions.canAssign || permissions.canRemove}
-                    />
-                ))}
+                {projects && projects.length > 0 ? (
+                    projects.map((project: Project) => (
+                        <ProjectTile
+                            key={project.projectId}
+                            project={project}
+                            onEdit={() => {
+                                setEditingProject(project)
+                                setForm({ name: project.projectName, description: project.projectDescription })
+                                setProjectModalOpen(true)
+                            }}
+                            onDelete={() => handleDeleteProject(project.projectId)}
+                            onManageMembers={() => setSelectedProjectId(project.projectId)}
+                            onGoToKanban={() => handleGoToKanban(project.projectId)}
+                            canUpdate={permissions.canUpdate}
+                            canDelete={permissions.canDelete}
+                            canManageMembers={permissions.canAssign || permissions.canRemove}
+                        />
+                    ))
+                ) : (
+                    <div className="text-center p-10 text-gray-500">No projects found.</div>
+                )}
             </div>
 
-            {openProjectModal && (
+            {isProjectModalOpen && (
                 <div className="fixed inset-0 bg-black/25 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
                         <h2 className="text-xl font-bold mb-4">
@@ -310,10 +326,10 @@ export default function ProjectsPage() {
                             />
                         </div>
                         <div className="mt-6 flex gap-2 justify-end">
-                            <Button variant="outline" onClick={() => setOpenProjectModal(false)}>
+                            <Button variant="outline" onClick={() => setProjectModalOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button onClick={handleCreateOrUpdate} disabled={updateProject.isPending || createProject.isPending}>
+                            <Button onClick={handleCreateOrUpdate} disabled={updateProjectMutation.isPending || createProjectMutation.isPending}>
                                 {editingProject ? 'Update Project' : 'Create Project'}
                             </Button>
                         </div>

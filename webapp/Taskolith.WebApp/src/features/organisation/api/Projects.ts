@@ -10,8 +10,13 @@ export const CreateProject = async (
     return data
 }
 
-export const GetProjects = async (organisationId: string): Promise<Project[]> => {
+export const GetAllProjects = async (organisationId: string): Promise<Project[]> => {
     const { data } = await apiClient.get(`/organisations/${organisationId}/projects`)
+    return data
+}
+
+export const GetMyProjects = async (organisationId: string): Promise<Project[]> => {
+    const { data } = await apiClient.get(`/organisations/${organisationId}/projects/me`)
     return data
 }
 
