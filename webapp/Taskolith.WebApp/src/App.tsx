@@ -15,7 +15,7 @@ import MembersPage from '@/features/organisation/components/MembersPage'
 import SchedulePage from '@/features/organisation/components/SchedulePage'
 import RolesPage from '@/features/organisation/components/RolesPage'
 import InvitesPage from '@/features/organisation/components/InvitesPage'
-import EditOrganisationPage from '@/features/organisation/components/EditOrganisationPage'
+import OrganisationSettingsPage from '@/features/organisation/components/OrganisationSettingsPage'
 import ProjectLayout from '@/features/project/layout/ProjectLayout'
 import Kanban from '@/features/project/components/Kanban'
 import AssignedMembersPage from '@/features/project/components/AssignedMembersPage'
@@ -42,7 +42,7 @@ function App() {
                     <Route path="schedule" element={<SchedulePage />} />
                     <Route path="roles" element={<RolesPage />} />
                     <Route path="invites" element={<InvitesPage />} />
-                    <Route path="settings" element={<EditOrganisationPage />} />
+                    <Route path="settings" element={<OrganisationSettingsPage />} />
                 </Route>
                 <Route path="/organisations/:organisationId/projects/:projectId" element={<ProjectLayout />}>
                     <Route path="kanban" element={<Kanban />} />
