@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 type AuthContextType = {
     user: string | null
@@ -22,6 +23,8 @@ export const AuthProvider = ({
     initialToken?: string | null
     initialUserId?: string | null
 }) => {
+    const queryClient = useQueryClient()
+
     const [userId, setUserId] = useState<string | null>(initialUserId)
     const [user, setUser] = useState<string | null>(initialUsername)
     const [token, setToken] = useState<string | null>(initialToken)
@@ -51,6 +54,8 @@ export const AuthProvider = ({
     }
 
     const logout = () => {
+        queryClient.clear()
+
         setUser(null)
         setToken(null)
         setUserId(null)

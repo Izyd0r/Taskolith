@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
-import { CreateProject, GetProjects, UpdateProject, DeleteProject, AssignMembersToProject, RemoveMemberFromProject } from '@/features/organisation/api/Projects'
+import { CreateProject, GetAllProjects, GetMyProjects, UpdateProject, DeleteProject, AssignMembersToProject, RemoveMemberFromProject } from '@/features/organisation/api/Projects'
 import { type CreateProjectRequest } from '@/features/organisation/types/CreateProjectRequest'
 import { type Project } from '@/features/organisation/types/Project'
 
@@ -9,11 +9,19 @@ export const useCreateProject = (organisationId: string) => {
     })
 }
 
-export const useGetProjects = (organisationId: string) => {
-    return useQuery<Project[], Error>({
-        queryKey: ['projects', organisationId],
-        queryFn: () => GetProjects(organisationId),
-        enabled: !!organisationId,
+export const useGetAllProjects = (organisationId: string, options: { enabled: boolean }) => {
+    return useQuery({
+        queryKey: ['projects', 'all', organisationId],
+        queryFn: () => GetAllProjects(organisationId),
+        enabled: !!organisationId && options.enabled,
+    })
+}
+
+export const useGetMyProjects = (organisationId: string, options: { enabled: boolean }) => {
+    return useQuery({
+        queryKey: ['projects', 'me', organisationId],
+        queryFn: () => GetMyProjects(organisationId),
+        enabled: !!organisationId && options.enabled,
     })
 }
 
