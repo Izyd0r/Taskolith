@@ -2,7 +2,6 @@ import {
     Home,
     FolderKanban,
     Users,
-    CalendarClock,
     ShieldCheck,
     Mail,
     Settings,
@@ -19,10 +18,9 @@ const OrganisationSidebar = () => {
         >
             <SidebarItem label="Projects" to="projects" icon={<FolderKanban size={24} />} delay={150} />
             <SidebarItem label="Members" to="members" icon={<Users size={24} />} delay={200} />
-            <SidebarItem label="Schedule" to="schedule" icon={<CalendarClock size={24} />} delay={250} />
             <SidebarItem label="Roles" to="roles" icon={<ShieldCheck size={24} />} delay={300} />
-            <SidebarItem label="Invites" to="invites" icon={<Mail size={24} />} delay={350} />
-            <SidebarItem label="Edit Org" to="settings" icon={<Settings size={24} />} delay={400} />
+            <SidebarItem label="Pending Invites" to="invites" icon={<Mail size={24} />} delay={350} />
+            <SidebarItem label="Organisation Settings" to="settings" icon={<Settings size={24} />} delay={400} />
         </SidebarLayout>
     );
 };
