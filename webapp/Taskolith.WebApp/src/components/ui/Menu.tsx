@@ -68,10 +68,17 @@ export const Menu: React.FC<{ children: ReactNode }> = ({ children }) => {
     )
 }
 
-export const MenuButton: React.FC<{ children: ReactNode, className?: string }> = ({ children, className }) => {
+export const MenuButton: React.FC<{
+    children: ReactNode
+    className?: string
+    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
+}> = ({ children, className, onClick }) => {
     const { toggle, setCoords, buttonRef } = useMenu()
 
-    const handleClick = () => {
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        if (onClick) {
+            onClick(event)
+        }
         if (buttonRef.current) {
             const rect = buttonRef.current.getBoundingClientRect()
             setCoords({
@@ -84,12 +91,7 @@ export const MenuButton: React.FC<{ children: ReactNode, className?: string }> =
     }
 
     return (
-        <button
-            ref={buttonRef}
-            type="button"
-            onClick={handleClick}
-            className={className}
-        >
+        <button ref={buttonRef} type="button" onClick={handleClick} className={className}>
             {children}
         </button>
     )
@@ -121,13 +123,16 @@ export const MenuItems: React.FC<{ children: ReactNode, className?: string }> = 
     )
 }
 
-export const MenuItem: React.FC<{ children: (props: { active: boolean }) => ReactNode, onClick?: () => void }> = ({ children, onClick }) => {
+export const MenuItem: React.FC<{
+    children: (props: { active: boolean }) => ReactNode
+    onClick?: (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => void
+}> = ({ children, onClick }) => {
     const { close } = useMenu()
     const [active, setActive] = useState(false)
 
-    const handleClick = () => {
+    const handleClick = (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
         if (onClick) {
-            onClick()
+            onClick(event)
         }
         close()
     }
@@ -139,7 +144,7 @@ export const MenuItem: React.FC<{ children: (props: { active: boolean }) => Reac
             onMouseEnter={() => setActive(true)}
             onMouseLeave={() => setActive(false)}
             onClick={handleClick}
-            onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+            onKeyDown={(e) => e.key === 'Enter' && handleClick(e)}
             className="block w-full text-left"
         >
             {children({ active })}

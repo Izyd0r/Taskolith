@@ -2,7 +2,7 @@ import { type Member } from '@/features/organisation/types/Member'
 import { type PriorityValue } from '@/features/project/types/Priority'
 
 export type Task = {
-    id: string
+    taskId: string
     title: string
     description: string
     order: number
@@ -11,4 +11,5 @@ export type Task = {
     completed: boolean
     assignedMembers: Member[]
     priority: PriorityValue 
+    kanbanColumnId: string
 }
