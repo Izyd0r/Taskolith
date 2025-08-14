@@ -15,11 +15,11 @@ const RenderWithClient = (
 
     return render(
         <MemoryRouter initialEntries={initialEntries}>
-            <AuthProvider initialUsername={user} initialToken={token}>
-                <QueryClientProvider client={queryClient}>
+            <QueryClientProvider client={queryClient}>
+                <AuthProvider initialUsername={user} initialToken={token}>
                     {ui}
-                </QueryClientProvider>
-            </AuthProvider>
+                </AuthProvider>
+            </QueryClientProvider>
         </MemoryRouter>
     )
 }
