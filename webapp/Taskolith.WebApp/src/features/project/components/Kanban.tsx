@@ -1,7 +1,9 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useGetKanbanColumns } from '@/features/project/hooks/useGetKanbanColumns'
 import { useCreateKanbanColumn } from '@/features/project/hooks/useCreateKanbanColumn'
+import { useUpdateKanbanColumn } from '@/features/project/hooks/useUpdateKanbanColumn'
+import { useDeleteKanbanColumn } from '@/features/project/hooks/useDeleteKanbanColumn'
 import { CreateTaskModal } from '@/features/project/components/CreateTaskModal'
 import { TaskDetailModal } from '@/features/project/components/TaskDetailModal'
 import { TaskCard } from '@/features/project/components/TaskCard'
@@ -15,6 +17,8 @@ const Kanban: React.FC = () => {
 
     const { data: rawColumns = [], refetch: refetchColumns } = useGetKanbanColumns(organisationId!, projectId!)
     const { mutate: createColumn } = useCreateKanbanColumn(organisationId!, projectId!)
+    const { mutate: updateColumn } = useUpdateKanbanColumn(organisationId!, projectId!)
+    const { mutate: deleteColumn } = useDeleteKanbanColumn(organisationId!, projectId!)
 
     const columns = useMemo(() => {
         return rawColumns.map(column => ({
@@ -28,6 +32,8 @@ const Kanban: React.FC = () => {
 
     const [isAddingColumn, setIsAddingColumn] = useState(false)
     const [newColumnTitle, setNewColumnTitle] = useState('')
+    const [editingColumnId, setEditingColumnId] = useState<string | null>(null)
+    const [updatedColumnName, setUpdatedColumnName] = useState('')
     const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false)
     const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null)
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
@@ -42,6 +48,35 @@ const Kanban: React.FC = () => {
                 refetchColumns()
             }
         })
+    }
+
+    const handleUpdateColumnName = () => {
+        if (!editingColumnId) return
+        updateColumn({ kanbanColumnId: editingColumnId, request: { name: updatedColumnName } }, {
+            onSuccess: () => {
+                setEditingColumnId(null)
+                setUpdatedColumnName('')
+                refetchColumns()
+            },
+            onError: () => {
+                setEditingColumnId(null)
+            }
+        })
+    }
+
+    const handleDeleteColumn = (columnId: string) => {
+        if (window.confirm('Are you sure you want to delete this column? All tasks within it will also be removed.')) {
+            deleteColumn(columnId, {
+                onSuccess: () => {
+                    refetchColumns()
+                }
+            })
+        }
+    }
+
+    const startEditing = (columnId: string, currentName: string) => {
+        setEditingColumnId(columnId)
+        setUpdatedColumnName(currentName)
     }
 
     const handleOpenCreateTaskModal = (columnId: string) => {
@@ -66,6 +101,18 @@ const Kanban: React.FC = () => {
         refetchColumns()
     }
 
+    useEffect(() => {
+        const handleOutsideClick = (event: MouseEvent) => {
+            if (editingColumnId && !(event.target as HTMLElement).closest('.column-header-input')) {
+                handleUpdateColumnName()
+            }
+        }
+        document.addEventListener('mousedown', handleOutsideClick)
+        return () => {
+            document.removeEventListener('mousedown', handleOutsideClick)
+        }
+    }, [editingColumnId, updatedColumnName])
+
     return (
         <div className="p-6 h-full flex flex-col bg-slate-100">
             <h1 className="text-2xl font-bold mb-6 text-gray-800 flex-shrink-0">Kanban Board</h1>
@@ -73,14 +120,47 @@ const Kanban: React.FC = () => {
                 {columns.map((column) => (
                     <div key={column.columnId} className="bg-white rounded-xl p-4 w-[300px] flex-shrink-0 flex flex-col">
                         <div className="flex justify-between items-center mb-4 px-1 flex-shrink-0">
-                            <h2 className="text-lg font-semibold text-gray-700">{column.columnName}</h2>
+                            {editingColumnId === column.columnId ? (
+                                <input
+                                    type="text"
+                                    value={updatedColumnName}
+                                    onChange={(e) => setUpdatedColumnName(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleUpdateColumnName()
+                                        if (e.key === 'Escape') setEditingColumnId(null)
+                                    }}
+                                    onBlur={handleUpdateColumnName}
+                                    className="w-full border-b-2 border-blue-500 focus:outline-none text-lg font-semibold column-header-input"
+                                    autoFocus
+                                />
+                            ) : (
+                                <h2 className="text-lg font-semibold text-gray-700">{column.columnName}</h2>
+                            )}
                             <Menu>
                                 <MenuButton className="p-1 rounded hover:bg-gray-200">
                                     <MoreHorizontal className="w-5 h-5 text-gray-500" />
                                 </MenuButton>
                                 <MenuItems className="absolute right-3 top-10 z-10 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg text-sm py-1">
                                     <MenuItem onClick={() => handleOpenCreateTaskModal(column.columnId)}>
-                                        {({ active }) => <div className={`px-4 py-2 ${active ? 'bg-gray-100' : ''} cursor-pointer`}>Add Task</div>}
+                                        {({ active }) => (
+                                            <span className={`block w-full px-4 py-2 cursor-pointer ${active ? 'bg-gray-100' : ''}`}>
+                                                Add Task
+                                            </span>
+                                        )}
+                                    </MenuItem>
+                                    <MenuItem onClick={() => startEditing(column.columnId, column.columnName)}>
+                                        {({ active }) => (
+                                            <span className={`block w-full px-4 py-2 cursor-pointer ${active ? 'bg-gray-100' : ''}`}>
+                                                Edit Name
+                                            </span>
+                                        )}
+                                    </MenuItem>
+                                    <MenuItem onClick={() => handleDeleteColumn(column.columnId)}>
+                                        {({ active }) => (
+                                            <span className={`block w-full px-4 py-2 cursor-pointer ${active ? 'bg-gray-100' : ''} text-red-600`}>
+                                                Delete Column
+                                            </span>
+                                        )}
                                     </MenuItem>
                                 </MenuItems>
                             </Menu>

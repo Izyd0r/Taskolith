@@ -55,7 +55,8 @@ export const Menu: React.FC<{ children: ReactNode }> = ({ children }) => {
     const toggle = () => setIsOpen(!isOpen)
     const close = () => setIsOpen(false)
 
-    useOnClickOutside(menuRef, close)
+    
+    //useOnClickOutside(menuRef, close)
 
     const contextValue = { isOpen, toggle, close, coords, setCoords, buttonRef }
 
