@@ -11,6 +11,7 @@ public class DeleteOrganisation : IEndPoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapDelete("/{organisationId:guid}", Handle)
+        .RequireAuthorization("DeleteOrganisation")
         .WithSummary("Deletes organisation");
 
     static async Task<IResult> Handle(

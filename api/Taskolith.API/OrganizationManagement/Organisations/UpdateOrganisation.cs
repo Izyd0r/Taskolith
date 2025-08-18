@@ -15,6 +15,7 @@ public class UpdateOrganisation : IEndPoint
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPut("/", Handle)
         .WithRequestValidation<UpdateOrganisationRequest>()
+        .RequireAuthorization("UpdateOrganisation")
         .WithSummary("Updates organisation name");
 
     private static async Task<IResult> Handle(

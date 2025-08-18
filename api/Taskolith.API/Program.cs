@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
                                 if (string.IsNullOrWhiteSpace(origin)) return false;
                                 var uri = new Uri(origin);
                                 return (uri.Host == "localhost" || uri.Host.StartsWith("172."))
-                                && (uri.Port == 5173 || uri.Port == 5174 || uri.Port == 5175);
+                                && (uri.Port == 5173 || uri.Port == 5174 || uri.Port == 5175 || uri.Port == 5271 || uri.Port == 5272);
                             })
                            .AllowAnyHeader()
                            .AllowAnyMethod();
