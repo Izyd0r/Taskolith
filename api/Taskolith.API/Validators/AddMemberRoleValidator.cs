@@ -1,6 +1,6 @@
 using FluentValidation;
 using Taskolith.API.Data.Types;
-using Taskolith.API.OrganizationManagement.Members.Requests;
+using Taskolith.API.Members.Requests;
 
 namespace Taskolith.API.Validators;
 

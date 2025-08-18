@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
-using Taskolith.API.OrganizationManagement.Organisations.Requests;
-using Taskolith.API.OrganizationManagement.Organisations.Responses;
+using Taskolith.API.Organisations.Requests;
+using Taskolith.API.Organisations.Responses;
 using Taskolith.API.Projects.Requests;
 using Taskolith.API.Projects.Responses;
 

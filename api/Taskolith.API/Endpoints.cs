@@ -1,16 +1,16 @@
 using Taskolith.API.Auth.Login;
 using Taskolith.API.Auth.SignUp;
 using Taskolith.API.Common;
+using Taskolith.API.InviteSystem;
 using Taskolith.API.Kanban;
-using Taskolith.API.OrganizationManagement.InviteSystem;
-using Taskolith.API.OrganizationManagement.InviteSystem.AcceptInvite;
-using Taskolith.API.OrganizationManagement.InviteSystem.GetInvites;
-using Taskolith.API.OrganizationManagement.InviteSystem.InviteMember;
-using Taskolith.API.OrganizationManagement.InviteSystem.RejectInvite;
-using Taskolith.API.OrganizationManagement.Members;
-using Taskolith.API.OrganizationManagement.Organisations;
-using Taskolith.API.OrganizationManagement.Roles;
+using Taskolith.API.Members;
+using Taskolith.API.Organisations;
+using Taskolith.API.InviteSystem;
+using Taskolith.API.Members;
+using Taskolith.API.Organisations;
+using Taskolith.API.Roles;
 using Taskolith.API.Projects;
+using Taskolith.API.Roles;
 using Taskolith.API.Tasks;
 
 namespace Taskolith.API;
