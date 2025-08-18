@@ -9,7 +9,7 @@ namespace Taskolith.API.Members;
 
 public class GetMemberRoles : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/{organisationId:guid}/members/{memberId:guid}/roles", Handle)
+        .MapGet("/members/{memberId:guid}/roles", Handle)
         .RequireAuthorization("Public")
         .WithSummary("Get member roles");
 

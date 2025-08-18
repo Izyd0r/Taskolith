@@ -44,7 +44,7 @@ public class UpdateTaskTests(IntegrationTestWebAppFactory factory, ITestOutputHe
             Title = "Updated Title",
             Description = "Updated Description",
             Priority = Priority.Critical,
-            DueDate = DateTime.Parse("2025-08-01T12:00:00Z"),
+            DueDate = DateTime.Parse("2030-08-01T12:00:00Z"), // change this to automatically set date in future
             Order = 2,
             IsCompleted = false
         };

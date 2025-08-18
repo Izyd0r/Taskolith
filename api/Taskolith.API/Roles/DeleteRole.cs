@@ -7,7 +7,7 @@ namespace Taskolith.API.Roles;
 
 public class DeleteRole : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapDelete("/{roleId:guid}", Handle)
+        .MapDelete("/roles/{roleId:guid}", Handle)
         .RequireAuthorization("DeleteRole")
         .WithSummary("Deletes a role");
 

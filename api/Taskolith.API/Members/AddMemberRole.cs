@@ -9,7 +9,7 @@ namespace Taskolith.API.Members;
 
 public class AddMemberRole : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{organisationId:guid}/members/{memberId:guid}/roles", Handle)
+        .MapPost("/members/{memberId:guid}/roles", Handle)
         .WithRequestValidation<AddMemberRoleRequest>()
         .RequireAuthorization("AddRole")
         .WithSummary("Add role to a member");

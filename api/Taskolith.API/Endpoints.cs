@@ -29,6 +29,8 @@ public static class Endpoints
         endpoints.MapInvitationEndpoints();
         endpoints.MapKanbanEndpoints();
         endpoints.MapTasksEndpoints();
+        endpoints.MapRolesEndpoints();
+
     }
 
     private static void MapAuthEndpoints(this IEndpointRouteBuilder app)
@@ -73,17 +75,7 @@ public static class Endpoints
             .MapEndpoint<InviteMember>()
             .MapEndpoint<KickMember>();
         endpoints.MapPrivateGroup()
-            .MapEndpoint<GetOrganisationMembers>()
-            .MapEndpoint<AddMemberRole>()
-            .MapEndpoint<RemoveMemberRole>()
-            .MapEndpoint<GetMemberRoles>();
-        
-        var rolesGroup = endpoints.MapGroup("/{organisationId:guid}/roles").WithTags("Roles");
-        rolesGroup.MapPrivateGroup()
-            .MapEndpoint<CreateRole>()
-            .MapEndpoint<DeleteRole>()
-            .MapEndpoint<GetRoles>()
-            .MapEndpoint<UpdateRole>();
+            .MapEndpoint<GetOrganisationMembers>();
     }
 
     private static void MapProjectEndpoints(this IEndpointRouteBuilder app) {
@@ -120,6 +112,20 @@ public static class Endpoints
             .MapEndpoint<GetInvites>()
             .MapEndpoint<AcceptInvite>()
             .MapEndpoint<RejectInvite>();
+    }
+
+    private static void MapRolesEndpoints(this IEndpointRouteBuilder app) {
+        var endpoints = app.MapGroup("/organisations/{organisationId:guid}")
+            .WithTags("Roles");
+        
+        endpoints.MapPrivateGroup()
+            .MapEndpoint<CreateRole>()
+            .MapEndpoint<DeleteRole>()
+            .MapEndpoint<GetRoles>()
+            .MapEndpoint<UpdateRole>()
+            .MapEndpoint<AddMemberRole>()
+            .MapEndpoint<RemoveMemberRole>()
+            .MapEndpoint<GetMemberRoles>();
     }
 
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)

@@ -9,7 +9,7 @@ namespace Taskolith.API.Roles;
 
 public class UpdateRole : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPut("/{roleId:guid}", Handle)
+        .MapPut("/roles/{roleId:guid}", Handle)
         .RequireAuthorization("UpdateRole")
         .WithRequestValidation<UpdateRoleRequest>()
         .WithSummary("Updates a role");
