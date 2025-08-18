@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
 using Taskolith.API.Data.Types;
@@ -33,10 +34,19 @@ public class CreateProject : IEndPoint {
         };
         
         await dbContext.Projects.AddAsync(project, ct);
-        await dbContext.SaveChangesAsync(ct);
 
-        var respone = new CreateProjectResponse(project.Id);
+        if (request.MembersIds != null && request.MembersIds.Any()) {
+            var members = await dbContext.OrganisationMembers
+                .Where(m => request.MembersIds != null && request.MembersIds.Contains(m.Id))
+                .ToListAsync(ct);
+
+            foreach (var member in members.Where(member => !project.Members.Contains(member))) {
+                project.Members.Add(member);
+            }
+        }
+        await dbContext.SaveChangesAsync(ct);
         
-        return Results.Created($"/api/organisations/{organisationId}/projects/{project.Id}", respone);
+        var response = new CreateProjectResponse(project.Id, project.Name, project.Description ?? string.Empty);
+        return Results.Created($"/api/organisations/{organisationId}/projects/{project.Id}", response);
     }
 }

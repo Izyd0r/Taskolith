@@ -10,11 +10,9 @@ public class CreateProjectValidator : AbstractValidator<CreateProjectRequest> {
             .MinimumLength(3).WithMessage("Name must be at least 3 characters long.")
             .MaximumLength(50).WithMessage("Name cannot exceed 50 characters.");
         RuleFor(x => x.Description)
-            .NotNull().NotEmpty().WithMessage("Description is required.")
             .MinimumLength(3).WithMessage("Description must be at least 3 characters long.")
             .MaximumLength(100).WithMessage("Description cannot exceed 100 characters.");
-        RuleForEach(x => x.Members)
-            .SetValidator(new MembershipValidator())
-            .When(x => x.Members is not null);
+        RuleForEach(x => x.MembersIds)
+            .NotEmpty().WithMessage("Members Ids are required.");
     }
 }

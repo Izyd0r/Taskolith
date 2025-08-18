@@ -4,6 +4,6 @@ namespace Taskolith.API.Projects.Requests;
 
 public record CreateProjectRequest(
     string Name,
-    string Description,
-    List<MembershipDto>? Members = null
+    string? Description,
+    List<Guid>? MembersIds = null
 );
