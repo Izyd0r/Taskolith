@@ -4,6 +4,7 @@ using Taskolith.API.Common;
 using Taskolith.API.Data;
 using Taskolith.API.Filters;
 using Taskolith.API.Projects.Requests;
+using Taskolith.API.Projects.Responses;
 
 namespace Taskolith.API.Projects;
 
@@ -34,6 +35,6 @@ public class UpdateProject : IEndPoint {
         project.Description = request.Description;
         await dbContext.SaveChangesAsync(ct);
         
-        return Results.NoContent();
+        return Results.Ok(new UpdateProjectResponse(project.Name, project.Description));
     }
 }

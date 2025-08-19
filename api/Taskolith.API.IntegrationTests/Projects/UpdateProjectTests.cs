@@ -13,17 +13,28 @@ public class UpdateProjectTests(IntegrationTestWebAppFactory factory) : Authoriz
    
     [Fact]
     public async Task Should_Update_Project_And_Return_No_Content() {
-        var test = await BuildAuthorizedTest(_factory);
-        var request = new CreateOrganisationRequest("Organisation");
-        var response = await test.AuthorizedHttpClient.PostAsJsonAsync("/api/organisations", request);
-        var content = await response.Content.ReadFromJsonAsync<CreateOrganisationResponse>();
-        var projectCreationRequest = new CreateProjectRequest("Backend API", "Project for XYZ firm");
-        var createProjectRequest = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects", projectCreationRequest);
-        var contentFromCreateProject = await createProjectRequest.Content.ReadFromJsonAsync<CreateProjectResponse>();
-        var updateRequest = new UpdateProjectRequest("Backend API 2", "Project for ABC firm");
-        var updateProjectResponse = await test.AuthorizedHttpClient.PutAsJsonAsync(
-            $"/api/organisations/{content?.OrganisationId}/projects/{contentFromCreateProject?.ProjectId}",updateRequest);
-        updateProjectResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
-        updateProjectResponse.Headers.Location?.OriginalString.Should().Be($"/api/organisations/{content?.OrganisationId}/projects/{contentFromCreateProject?.ProjectId}");
+        var testClient = await BuildAuthorizedTest(_factory);
+
+        var createOrgRequest = new CreateOrganisationRequest("Organisation");
+        var createOrgResponse = await testClient.AuthorizedHttpClient
+            .PostAsJsonAsync("/api/organisations", createOrgRequest);
+        var organisation = await createOrgResponse.Content.ReadFromJsonAsync<CreateOrganisationResponse>();
+
+        var createProjectRequest = new CreateProjectRequest("Backend API", "Project for XYZ firm");
+        var createProjectResponseMessage = await testClient.AuthorizedHttpClient
+            .PostAsJsonAsync($"/api/organisations/{organisation?.OrganisationId}/projects", createProjectRequest);
+        var project = await createProjectResponseMessage.Content.ReadFromJsonAsync<CreateProjectResponse>();
+
+        var updateProjectRequest = new UpdateProjectRequest("Backend API 2", "Project for ABC firm");
+        var updateProjectResponseMessage = await testClient.AuthorizedHttpClient
+            .PutAsJsonAsync($"/api/organisations/{organisation?.OrganisationId}/projects/{project?.ProjectId}", updateProjectRequest);
+
+        updateProjectResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
+        updateProjectResponseMessage.Headers.Location?.OriginalString
+            .Should().Be($"/api/organisations/{organisation?.OrganisationId}/projects/{project?.ProjectId}");
+
+        var updatedProject = await updateProjectResponseMessage.Content.ReadFromJsonAsync<UpdateProjectResponse>();
+        updatedProject.ProjectName.Should().Be(updateProjectRequest.Name);
+        updatedProject.ProjectDescription.Should().Be(updateProjectRequest.Description);
     } 
 }
