@@ -31,7 +31,8 @@ public class InviteMember : IEndPoint
             Id = Guid.NewGuid(),
             UserId = invitedUser.Id,
             OrganisationId = organisationId,
-            DueDate = request.DueDate
+            DueDate = request.DueDate,
+            Email = request.Email,
         };
         
         await dbContext.Invitations.AddAsync(invitation, token);

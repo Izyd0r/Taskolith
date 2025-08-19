@@ -7,7 +7,7 @@ namespace Taskolith.API.InviteSystem;
 
 public class RejectInvite : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{invitationId:guid}/reject", Handle)
+        .MapPost("/invitations/{invitationId:guid}/reject", Handle)
         .WithSummary("Reject invite");
     private static async Task<IResult> Handle(Guid invitationId, AppDbContext dbContext, ClaimsPrincipal claims ,CancellationToken token) {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;

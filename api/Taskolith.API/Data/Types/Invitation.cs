@@ -9,7 +9,8 @@ public enum InvitationStatus {
 public class Invitation {
     public Guid Id;
     public Guid OrganisationId;
-    public Guid UserId; 
+    public Guid UserId;
+    public required string Email;
     public InvitationStatus Status = InvitationStatus.Pending;
     
     private DateTime _dueDate;

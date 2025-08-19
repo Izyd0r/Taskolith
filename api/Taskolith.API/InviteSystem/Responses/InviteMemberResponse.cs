@@ -1,7 +1,7 @@
 namespace Taskolith.API.InviteSystem.Responses;
 
 public record InviteMemberResponse(
-    Guid InviteMemberId,
+    Guid InviteId,
     string Email,
     Guid OrganisationId,
     DateTime DueDate,

@@ -113,6 +113,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .IsRequired();
         builder.Property(i => i.DueDate)
             .IsRequired();
+        builder.Property(i => i.Email)
+            .IsRequired()
+            .HasMaxLength(256);
     }
     
     private static void ConfigureTasksTable(ModelBuilder modelBuilder)

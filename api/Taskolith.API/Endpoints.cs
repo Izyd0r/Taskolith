@@ -105,13 +105,14 @@ public static class Endpoints
     }
 
     private static void MapInvitationEndpoints(this IEndpointRouteBuilder app) {
-        var endpoints = app.MapGroup("/invitations")
+        var endpoints = app.MapGroup("")
             .WithTags("Invitations");
 
         endpoints.MapPrivateGroup()
             .MapEndpoint<GetInvites>()
             .MapEndpoint<AcceptInvite>()
-            .MapEndpoint<RejectInvite>();
+            .MapEndpoint<RejectInvite>()
+            .MapEndpoint<GetInvitesOrganisation>();
     }
 
     private static void MapRolesEndpoints(this IEndpointRouteBuilder app) {

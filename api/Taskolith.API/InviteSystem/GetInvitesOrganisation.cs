@@ -7,18 +7,22 @@ using Taskolith.API.InviteSystem.Responses;
 
 namespace Taskolith.API.InviteSystem;
 
-public class GetInvites : IEndPoint {
+public class GetInvitesOrganisation : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/invitations", Handle)
-        .WithSummary("Get all invites");
+        .MapGet("/organisations/{organisationId:guid}/invitations", Handle)
+        .RequireAuthorization("InviteMember") // need to think about this
+        .WithSummary("Gets all pending invites inside an organisation");
 
-    private static async Task<IResult> Handle(AppDbContext dbContext, ClaimsPrincipal claims, CancellationToken token) {
+    private static async Task<IResult> Handle(
+        Guid organisationId, 
+        AppDbContext db, 
+        ClaimsPrincipal claims, 
+        CancellationToken ct
+        ) {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if (userId == null) return Results.BadRequest();
-        if (!Guid.TryParse(userId, out var parsedUserId))
-            return Results.BadRequest("Invalid user ID.");
-        var invites = await dbContext.Invitations
-            .Where(i => i.UserId == parsedUserId)
+        var invites = await db.Invitations
+            .Where(i => i.OrganisationId == organisationId)
             .Select(i => new InvitationDto(
                     i.Id,
                     i.OrganisationId,
@@ -28,8 +32,8 @@ public class GetInvites : IEndPoint {
                     i.Email
                 )
             )
-            .ToListAsync(cancellationToken: token);
-        var response = new GetInvitesResponse(invites);
+            .ToListAsync(cancellationToken: ct);
+        var response = new GetInvitesOrganisationResponse(invites);
         return Results.Ok(response);
     }
 }

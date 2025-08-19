@@ -8,7 +8,7 @@ namespace Taskolith.API.InviteSystem;
 
 public class AcceptInvite : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{invitationId:guid}/accept", Handle)
+        .MapPost("/invitations/{invitationId:guid}/accept", Handle)
         .WithSummary("Accept invite");
     private static async Task<IResult> Handle(Guid invitationId, AppDbContext dbContext, ClaimsPrincipal claims ,CancellationToken token) {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -29,7 +29,7 @@ public class AcceptInvite : IEndPoint {
                 Id = Guid.Parse(userId),
                 OrganisationId = invitation.OrganisationId,
                 Name = "Member"
-            }]
+            }] // TODO: change this to not create new member role every time when user accepts invite
         };
 
         dbContext.Add(membership);
