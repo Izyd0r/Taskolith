@@ -34,7 +34,7 @@ public class AssignTask : IEndPoint {
             .Where(o => o.OrganisationId == organisationId && request.MemberIds.Contains(o.Id))
             .ToListAsync(ct);
         foreach (var membership in members) {
-            if (!task.AssignedMembers.Any(m => m.Id == membership.Id)) task.AssignedMembers.Add(membership);
+            if (task.AssignedMembers.All(m => m.Id != membership.Id)) task.AssignedMembers.Add(membership);
         }
         await dbContext.SaveChangesAsync(ct);
         

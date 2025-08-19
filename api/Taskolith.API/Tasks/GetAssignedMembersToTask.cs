@@ -3,38 +3,39 @@ using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
 using Taskolith.API.Data.Dtos;
-using Taskolith.API.Projects.Responses;
+using Taskolith.API.Tasks.Responses;
 
-namespace Taskolith.API.Projects;
+namespace Taskolith.API.Tasks;
 
-public class GetMembersInsideProject : IEndPoint {
+public class GetAssignedMembersToTask : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/{projectId:guid}/members", Handle)
+        .MapGet("/{taskId}/members", Handle)
         .RequireAuthorization("Public")
-        .WithSummary("Gets all members assigned to a project");
+        .WithSummary("Get assigned members to task");
 
     private static async Task<IResult> Handle(
         Guid organisationId,
         Guid projectId,
+        Guid taskId,
         AppDbContext db,
         ClaimsPrincipal claims,
         CancellationToken ct
         ) {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if (userId is null) return Results.BadRequest();
-
-        var members = await db.OrganisationMembers
-            .Where(m => m.OrganisationId == organisationId 
-                        && m.Projects.Any(p => p.Id == projectId))
+            
+        var members = await db.ToDoTasks
+            .Where(t => t.Id == taskId && t.ProjectId == projectId)
+            .SelectMany(t => t.AssignedMembers)
             .Select(m => new MembershipDto(
                 m.Id,
                 m.UserId,
                 m.OrganisationId,
-                m.User.Email,
-                m.User.Username
+                m.User.Username,
+                m.User.Email
             ))
             .ToListAsync(ct);
-         
-        return Results.Ok(new GetMembersInsideProjectReponse(members));
+        
+        return Results.Ok(new GetAssignedMembersToTaskResponse(members));
     }
 }

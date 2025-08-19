@@ -52,7 +52,8 @@ public static class Endpoints
         tasks.MapPrivateGroup()
             .MapEndpoint<GetTasks>()
             .MapEndpoint<AssignTask>()
-            .MapEndpoint<RemoveFromTask>();
+            .MapEndpoint<RemoveFromTask>()
+            .MapEndpoint<GetAssignedMembersToTask>();
 
         var kanbanTasks = endpoints.MapGroup("/columns/{kanbanColumnId:guid}/tasks");
         kanbanTasks.MapPrivateGroup()
