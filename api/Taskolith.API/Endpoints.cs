@@ -89,7 +89,8 @@ public static class Endpoints
             .MapEndpoint<GetAssignedProjects>()
             .MapEndpoint<AssignProject>()
             .MapEndpoint<RemoveFromProject>()
-            .MapEndpoint<DeleteProject>(); 
+            .MapEndpoint<DeleteProject>()
+            .MapEndpoint<GetMembersInsideProject>(); 
     }
 
     private static void MapKanbanEndpoints(this IEndpointRouteBuilder app) {

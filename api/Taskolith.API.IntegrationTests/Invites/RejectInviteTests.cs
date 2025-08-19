@@ -23,7 +23,7 @@ public class RejectInviteTests(IntegrationTestWebAppFactory factory) : Authorize
         var secondRequest = new InviteMemberRequest(userTwo.AuthorizedUser.Email, DateTime.UtcNow.AddDays(7));
         var responseFromInvite = await userOne.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{readResponse.Result.OrganisationId}/invitations",secondRequest);
         var readFromInviteResponse = responseFromInvite.Content.ReadFromJsonAsync<InviteMemberResponse>();
-        var responseFromAcceptingInvite = await userTwo.AuthorizedHttpClient.PostAsync($"/api/invitations/{readFromInviteResponse.Result.InviteMemberId}/reject", null);
+        var responseFromAcceptingInvite = await userTwo.AuthorizedHttpClient.PostAsync($"/api/invitations/{readFromInviteResponse.Result.InviteId}/reject", null);
         responseFromAcceptingInvite.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }
