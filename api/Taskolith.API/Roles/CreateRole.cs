@@ -17,8 +17,9 @@ public class CreateRole : IEndPoint {
 
     private static async Task<IResult> Handle(Guid organisationId, CreateRoleRequest request , AppDbContext dbContext, ClaimsPrincipal claims, CancellationToken ct) {
         var userId = claims.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-        if(userId == null || request.Name == "Admin") return Results.BadRequest();
-
+        if(userId == null) return Results.BadRequest();
+        if(request.Name is DefaultRoles.Admin or DefaultRoles.Member) return Results.BadRequest("This name is reserved for predefined roles");
+         
         var role = new Role {
             Id = Guid.NewGuid(),
             OrganisationId = organisationId,

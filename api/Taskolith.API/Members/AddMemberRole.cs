@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
+using Taskolith.API.Data.Types;
 using Taskolith.API.Filters;
 using Taskolith.API.Members.Requests;
 
@@ -31,6 +32,7 @@ public class AddMemberRole : IEndPoint {
         
         var role = dbContext.Roles.FirstOrDefault(r => r.Id == request.RoleId); 
         if (role is null) return Results.NotFound();
+        if (role.Name is DefaultRoles.Admin) return Results.BadRequest("Admin role is unassignable");
         
         dbContext.Entry(member).State = EntityState.Modified;
         if(member.Roles.Any(r=> r.Id == request.RoleId)) 

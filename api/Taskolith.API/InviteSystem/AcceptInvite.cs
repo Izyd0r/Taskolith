@@ -21,15 +21,15 @@ public class AcceptInvite : IEndPoint {
         invitation.Status = InvitationStatus.Accepted;
         await dbContext.SaveChangesAsync(token);
 
+        var memberRole = await dbContext.Roles
+            .SingleAsync(r => r.OrganisationId == invitation.OrganisationId && r.Name == DefaultRoles.Member,
+                cancellationToken: token);
+
         var membership = new Membership {
             UserId = Guid.Parse(userId),
             User = await dbContext.Users.SingleAsync(u => u.Id == Guid.Parse(userId), cancellationToken: token),
             OrganisationId = invitation.OrganisationId,
-            Roles = [new Role {
-                Id = Guid.Parse(userId),
-                OrganisationId = invitation.OrganisationId,
-                Name = "Member"
-            }] // TODO: change this to not create new member role every time when user accepts invite
+            Roles = [memberRole]
         };
 
         dbContext.Add(membership);

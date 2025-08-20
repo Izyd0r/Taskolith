@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
+using Taskolith.API.Data.Types;
 
 namespace Taskolith.API.Members;
 
@@ -30,7 +31,7 @@ public class RemoveMemberRole : IEndPoint {
         dbContext.Entry(member).State = EntityState.Modified;
         var roleToRemove = await dbContext.Roles.FirstOrDefaultAsync(r => r.Id == roleId, cancellationToken: ct);
         if (roleToRemove is null) return Results.NotFound();
-        if (roleToRemove.Name == "Admin") return Results.BadRequest(); // TODO: find better solution for admin role protection
+        if (roleToRemove.Name == DefaultRoles.Admin) return Results.BadRequest("You cannot remove admin role");
         
         member.Roles.Remove(roleToRemove);
         await dbContext.SaveChangesAsync(ct);

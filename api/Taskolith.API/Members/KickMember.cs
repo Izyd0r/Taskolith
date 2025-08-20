@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
+using Taskolith.API.Data.Types;
 
 namespace Taskolith.API.Members;
 
@@ -23,7 +24,7 @@ public class KickMember : IEndPoint {
        
         var member = dbContext.OrganisationMembers.Include(membership => membership.Roles).FirstOrDefault(m => m.Id == memberId);
         if(member is null) return Results.NotFound();
-        if(member.Roles.Any(r=> r.Name == "Admin")) return Results.BadRequest();
+        if(member.Roles.Any(r=> r.Name == DefaultRoles.Admin)) return Results.BadRequest("You can't kick admin");
         
         dbContext.Entry(member).State = EntityState.Deleted;
         await dbContext.SaveChangesAsync(ct);

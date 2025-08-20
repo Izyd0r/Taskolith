@@ -29,6 +29,20 @@ public class CreateOrganisation : IEndPoint {
         var allPermissions = Enum.GetValues(typeof(Permission))
             .Cast<Permission>()
             .Aggregate((current, next) => current | next);
+
+        var adminRole = new Role {
+            Id = Guid.NewGuid(),
+            Name = DefaultRoles.Admin,
+            OrganisationId = organisation.Id,
+            Permissions = allPermissions
+        };
+
+        var memberRole = new Role {
+            Id = Guid.NewGuid(),
+            Name = DefaultRoles.Member,
+            OrganisationId = organisation.Id,
+            Permissions = Permission.Public
+        };
         
         var membership = new Membership {
             Id = Guid.NewGuid(),
@@ -36,18 +50,13 @@ public class CreateOrganisation : IEndPoint {
             OrganisationId = organisation.Id,
             User = userInDb,
             Organisation = organisation,
-            Roles = new List<Role>() { new Role {
-                    Id = Guid.NewGuid(),
-                    Name = "Admin",
-                    OrganisationId = organisation.Id,
-                    Permissions = allPermissions 
-                }
-            }
+            Roles = [adminRole]
         };
  
         organisation.Members.Add(membership);
         db.Organisations.Add(organisation);
         db.OrganisationMembers.Add(membership);
+        db.Roles.AddRange(adminRole, memberRole);
         await db.SaveChangesAsync(cancellationToken);
 
         var response = new CreateOrganisationResponse(organisation.Id, organisation.Name);

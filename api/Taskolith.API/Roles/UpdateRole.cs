@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
+using Taskolith.API.Data.Types;
 using Taskolith.API.Filters;
 using Taskolith.API.Roles.Requests;
 
@@ -26,7 +27,7 @@ public class UpdateRole : IEndPoint {
         
         var role = await dbContext.Roles.FindAsync([roleId], cancellationToken: ct);
         if (role == null) return Results.NotFound();
-        if (role.Name=="Admin") return Results.BadRequest();
+        if (role.Name is DefaultRoles.Admin) return Results.BadRequest("You can't update admin role");
         dbContext.Entry(role).State = EntityState.Modified;
         role.Name=request.Name;
         role.Permissions=request.Permissions;

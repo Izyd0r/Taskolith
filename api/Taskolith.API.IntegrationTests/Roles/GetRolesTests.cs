@@ -26,7 +26,7 @@ public class GetRolesTests(IntegrationTestWebAppFactory factory) : AuthorizedInt
         var content = responseRoles.Content.ReadFromJsonAsync<GetRolesResponse>();
         content.Should().NotBeNull();
         var rolesContent = await content;
-        rolesContent!.Roles.Count.Should().Be(2);
+        rolesContent!.Roles.Count.Should().Be(3);
         foreach (var role in rolesContent!.Roles) {
             role.Should().NotBeNull();
         }
