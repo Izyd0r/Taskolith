@@ -14,24 +14,44 @@ public class GetKanbanColumnsTests(IntegrationTestWebAppFactory factory) : Autho
     private readonly IntegrationTestWebAppFactory _factory = factory;
 
     [Fact]
-    public async Task Should_Return_All_Kanban_Columns_Inside_A_Project_And_Ok() {
-        var test = await BuildAuthorizedTest(_factory);
-        var request = new CreateOrganisationRequest("Organisation");
-        var response = await test.AuthorizedHttpClient.PostAsJsonAsync("/api/organisations", request);
-        var content = await response.Content.ReadFromJsonAsync<CreateOrganisationResponse>();
-        var projectCreationRequest = new CreateProjectRequest("Backend API", "Project for XYZ firm");
-        var responseFromProjectCreation = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects", projectCreationRequest);
-        var contentProject = await responseFromProjectCreation.Content.ReadFromJsonAsync<CreateProjectResponse>();
-        var kanbanCreationRequest = new CreateKanbanColumnRequest("ToDo");
-        var responseFromKanbanCreation = await test.AuthorizedHttpClient.PostAsJsonAsync($"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/columns", kanbanCreationRequest);
-        responseFromKanbanCreation.Should().NotBeNull();
-        responseFromKanbanCreation.StatusCode.Should().Be(HttpStatusCode.Created);
-        var contentFromKanbanCreation = await responseFromKanbanCreation.Content.ReadFromJsonAsync<CreateKanbanColumnResponse>();
-        var responseFromGet = await test.AuthorizedHttpClient.GetAsync($"/api/organisations/{content?.OrganisationId}/projects/{contentProject!.ProjectId}/columns");
-        responseFromGet.Should().NotBeNull();
-        responseFromGet.StatusCode.Should().Be(HttpStatusCode.OK);
-        var contentFromGet = await responseFromGet.Content.ReadFromJsonAsync<List<GetKanbanColumnResponse>>();
-        contentFromGet.Should().NotBeNull();
-        contentFromGet[0].ColumnId.Should().Be(contentFromKanbanCreation!.KanbanColumnId);
-    } 
+    public async Task GetKanbanColumns_WhenColumnsExist_ShouldReturnAllColumnsInProject() {
+        var authContext = await BuildAuthorizedTest(_factory);
+        var client = authContext.AuthorizedHttpClient;
+
+        var organisation = await ApiHelper.CreateOrganisationAsync(client, "Test Organisation");
+        var project = await ApiHelper.CreateProjectAsync(client, organisation.OrganisationId, "My Awesome Project");
+        var createdColumn1 = await ApiHelper.CreateKanbanColumnAsync(client, organisation.OrganisationId, project.ProjectId, "To Do");
+        var createdColumn2 = await ApiHelper.CreateKanbanColumnAsync(client, organisation.OrganisationId, project.ProjectId, "Done");
+
+        var response = await client.GetAsync($"/api/organisations/{organisation.OrganisationId}/projects/{project.ProjectId}/columns");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var returnedColumns = await response.Content.ReadFromJsonAsync<List<GetKanbanColumnResponse>>();
+
+        returnedColumns.Should().NotBeNull();
+        returnedColumns.Should().HaveCount(2);
+        returnedColumns.Should().Contain(c => c.ColumnId == createdColumn1.KanbanColumnId);
+        returnedColumns.Should().Contain(c => c.ColumnId == createdColumn2.KanbanColumnId);
+    }
+
+    [Fact]
+    public async Task GetKanbanColumns_WhenUserIsOrgMemberButNotProjectMember_ShouldReturnForbidden() {
+        var projectOwnerContext = await AuthorizedIntegrationTest.BuildAuthorizedTest(_factory);
+        var projectOwnerClient = projectOwnerContext.AuthorizedHttpClient;
+
+        var orgMemberContext = await AuthorizedIntegrationTest.BuildAuthorizedTest(_factory);
+
+        var organisation = await ApiHelper.CreateOrganisationAsync(projectOwnerClient, "Project-Scoped Org");
+
+        var inviteId = await ApiHelper.InviteUserToOrganisationAsync(projectOwnerClient, organisation.OrganisationId, orgMemberContext.AuthorizedUser.Email);
+        await ApiHelper.AcceptOrganisationInviteAsync(orgMemberContext.AuthorizedHttpClient, inviteId);
+
+        var project = await ApiHelper.CreateProjectAsync(projectOwnerClient, organisation.OrganisationId, "A Private Project");
+        await ApiHelper.CreateKanbanColumnAsync(projectOwnerClient, organisation.OrganisationId, project.ProjectId, "Secret Column");
+
+        var response = await orgMemberContext.AuthorizedHttpClient.GetAsync($"/api/organisations/{organisation.OrganisationId}/projects/{project.ProjectId}/columns");
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
 }

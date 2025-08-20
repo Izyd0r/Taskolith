@@ -16,34 +16,44 @@ public class CreateProject : IEndPoint {
         .RequireAuthorization("CreateProject")
         .WithSummary("Creates a new project");
 
-    private static async Task<IResult> Handle(
+     private static async Task<IResult> Handle(
         Guid organisationId,
         CreateProjectRequest request,
         AppDbContext dbContext,
         ClaimsPrincipal claims,
-        CancellationToken ct
-        ) {
-        var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        CancellationToken ct) 
+     {
+        var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null) return Results.BadRequest();
+        
+        var creatorMember = await dbContext.OrganisationMembers
+            .SingleOrDefaultAsync(m => m.UserId == Guid.Parse(userId) && m.OrganisationId == organisationId, ct);
 
-        var project = new Project() {
+        if (creatorMember is null) {
+            return Results.Forbid(); 
+        }
+
+        var project = new Project {
             Id = Guid.NewGuid(),
             OrganisationId = organisationId,
             Name = request.Name,
             Description = request.Description,
+            Members = [creatorMember] 
         };
         
         await dbContext.Projects.AddAsync(project, ct);
 
         if (request.MembersIds != null && request.MembersIds.Any()) {
-            var members = await dbContext.OrganisationMembers
-                .Where(m => request.MembersIds != null && request.MembersIds.Contains(m.Id))
+            var membersToAdd = await dbContext.OrganisationMembers
+                .Where(m => request.MembersIds.Contains(m.Id))
+                .Where(m => m.Id != creatorMember.Id) 
                 .ToListAsync(ct);
 
-            foreach (var member in members.Where(member => !project.Members.Contains(member))) {
+            foreach (var member in membersToAdd) {
                 project.Members.Add(member);
             }
         }
+        
         await dbContext.SaveChangesAsync(ct);
         
         var response = new CreateProjectResponse(project.Id, project.Name, project.Description ?? string.Empty);

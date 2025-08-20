@@ -22,23 +22,25 @@ public class AssignProject : IEndPoint {
         ClaimsPrincipal claims,
         CancellationToken ct
     ) {
-        var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null) return Results.BadRequest();
         
-        var project = await dbContext.Projects.
-            FirstOrDefaultAsync(p => p.Id == projectId, cancellationToken: ct);
+        var project = await dbContext.Projects
+            .Include(p => p.Members)
+            .FirstOrDefaultAsync(p => p.Id == projectId && p.OrganisationId == organisationId, cancellationToken: ct);
+            
         if (project is null) return Results.NotFound();
-        
-        var members = await dbContext.OrganisationMembers
-            .Where(m => request.MembersId.Contains(m.Id))
+
+        var membersToAssign = await dbContext.OrganisationMembers
+            .Where(m => request.MembersId.Contains(m.Id) && m.OrganisationId == organisationId)
             .ToListAsync(cancellationToken: ct);
         
-        dbContext.Entry(project).State = EntityState.Modified;
-        foreach (var member in members) {
+        foreach (var member in membersToAssign.Where(member => !project.Members.Contains(member))) {
             project.Members.Add(member);
         }
+
         await dbContext.SaveChangesAsync(ct);
-        
+
         return Results.NoContent();
     }
 }

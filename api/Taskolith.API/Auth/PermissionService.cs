@@ -13,4 +13,11 @@ public class PermissionService(AppDbContext dbContext) {
             .Include(m => m.Roles)
             .AnyAsync(m => m.Roles.Any(r => (r.Permissions & permission) == permission));
     }
+
+    public async Task<bool> HasProjectAccessAsync(Guid userId, Guid organisationId, Guid projectId, Permission permission) {
+        return await _dbContext.OrganisationMembers
+            .Where(m => m.OrganisationId == organisationId && m.UserId == userId)
+            .Where(m => m.Projects.Any(p => p.Id == projectId))
+            .AnyAsync(m => m.Roles.Any(r => (r.Permissions & permission) == permission));
+    }
 }
