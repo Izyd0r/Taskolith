@@ -45,11 +45,15 @@ public static class Endpoints
 
     private static void MapTasksEndpoints(this IEndpointRouteBuilder app)
     {
-        var endpoints = app.MapGroup("/organisations/{organisationId:guid}/projects/{projectId:guid}")
-            .WithTags("Tasks");
+        var tasks = app.MapGroup("").WithTags("Tasks");
         
-        var tasks = endpoints.MapGroup("/tasks");
-        tasks.MapPrivateGroup()
+        var myTasks = tasks.MapGroup("/tasks/my-tasks");
+        myTasks.MapPrivateGroup().MapEndpoint<GetAllAssignedTasks>();
+        
+        var endpoints = tasks.MapGroup("/organisations/{organisationId:guid}/projects/{projectId:guid}");
+        
+        var tasksManagement = endpoints.MapGroup("/tasks");
+        tasksManagement.MapPrivateGroup()
             .MapEndpoint<GetTasks>()
             .MapEndpoint<AssignTask>()
             .MapEndpoint<RemoveFromTask>()
