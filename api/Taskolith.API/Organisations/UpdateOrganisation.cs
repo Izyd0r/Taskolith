@@ -30,9 +30,6 @@ public class UpdateOrganisation : IEndPoint
         var result = await dbContext.Organisations.SingleOrDefaultAsync(o => o.Id == request.OrganisationId, token);
         if (result == null) return Results.NotFound();
         
-        var hasPermission = await permissionService.HasPermission(Guid.Parse(userId), request.OrganisationId, Permission.UpdateOrganisation);
-        if(!hasPermission) return Results.Forbid();
-        
         result.Name = request.OrganisationName;
         await dbContext.SaveChangesAsync(token);
         
