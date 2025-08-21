@@ -33,6 +33,14 @@ public class InviteMember : IEndPoint
             OrganisationId = organisationId,
             DueDate = request.DueDate,
             Email = request.Email,
+            InitialRoles = (request.InitialRoles ?? [])
+                .Select(r => new Role {
+                    Id = r.Id,
+                    OrganisationId = r.OrganisationId,
+                    Name = r.Name,
+                    Permissions = r.Permissions
+                })
+                .ToList()
         };
         
         await dbContext.Invitations.AddAsync(invitation, token);

@@ -14,9 +14,10 @@ public class AcceptInvite : IEndPoint {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if(userId == null) return Results.BadRequest("Invalid user identifier");
         
-        var invitation = await dbContext.Invitations.FindAsync([invitationId], cancellationToken: token);
-        if(invitation == null) return Results.BadRequest("Invitation not found"); 
-       
+        var invitation = await dbContext.Invitations
+            .Include(i => i.InitialRoles)
+            .SingleAsync(i => i.Id == invitationId, cancellationToken: token);
+
         if(invitation.Expired) return Results.BadRequest("Invitation has expired");
         invitation.Status = InvitationStatus.Accepted;
         await dbContext.SaveChangesAsync(token);
@@ -29,7 +30,9 @@ public class AcceptInvite : IEndPoint {
             UserId = Guid.Parse(userId),
             User = await dbContext.Users.SingleAsync(u => u.Id == Guid.Parse(userId), cancellationToken: token),
             OrganisationId = invitation.OrganisationId,
-            Roles = [memberRole]
+            Roles = invitation.InitialRoles.Count != 0
+                ? invitation.InitialRoles
+                : new List<Role> { memberRole }
         };
 
         dbContext.Add(membership);

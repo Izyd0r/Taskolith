@@ -28,4 +28,5 @@ public class Invitation {
     public bool Expired => DueDate < DateTime.UtcNow;
     public Organisation Organisation { get; init; }
     public User User { get; init; }
+    public ICollection<Role> InitialRoles { get; init; } = new List<Role>();
 }

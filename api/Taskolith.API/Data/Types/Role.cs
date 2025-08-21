@@ -10,4 +10,5 @@ public class Role {
     public Organisation Organisation { get; init; } = null!;
     public ICollection<Membership> Members { get; set; } = new List<Membership>();
     public Permission Permissions { get; set; }
+    public ICollection<Invitation> Invites { get; set; } = new List<Invitation>();
 }
