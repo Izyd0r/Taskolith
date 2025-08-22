@@ -15,7 +15,7 @@ public class CreateTask : IEndPoint {
         .MapPost("", Handle)
         .WithRequestValidation<CreateTaskRequest>()
         .RequireAuthorization("CreateTask")
-        .WithSummary("Creates a new task");
+        .WithSummary("Create a new task");
 
     static async Task<IResult> Handle(
         Guid organisationId,

@@ -11,7 +11,7 @@ public class GetMembersInsideProject : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/{projectId:guid}/members", Handle)
         .RequireAuthorization("Public")
-        .WithSummary("Gets all members assigned to a project");
+        .WithSummary("Get all members assigned to a project");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

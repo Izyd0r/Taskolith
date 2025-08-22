@@ -11,7 +11,7 @@ public class LoginUser : IEndPoint
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/login", Handle)
         .WithRequestValidation<LoginRequest>()
-        .WithDisplayName("Login");
+        .WithSummary("Authenticate a user (login)");
 
     static async Task<IResult> Handle(LoginRequest request, AppDbContext dbContext, JwtTokenGenerator jwtTokenGenerator, CancellationToken token)
     {

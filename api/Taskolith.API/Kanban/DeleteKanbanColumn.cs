@@ -9,7 +9,7 @@ public class DeleteKanbanColumn : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapDelete("/{kanbanColumnId:guid}", Handle)
         .RequireAuthorization("DeleteKanbanColumn")
-        .WithSummary("Deletes a Kanban Column");
+        .WithSummary("Delete a Kanban column");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

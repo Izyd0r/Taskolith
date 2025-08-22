@@ -13,7 +13,7 @@ public class AddMemberRole : IEndPoint {
         .MapPost("/members/{memberId:guid}/roles", Handle)
         .WithRequestValidation<AddMemberRoleRequest>()
         .RequireAuthorization("AddRole")
-        .WithSummary("Add role to a member");
+        .WithSummary("Assign a role to a member");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

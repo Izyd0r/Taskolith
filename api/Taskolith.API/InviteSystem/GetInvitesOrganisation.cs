@@ -11,7 +11,7 @@ public class GetInvitesOrganisation : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/organisations/{organisationId:guid}/invitations", Handle)
         .RequireAuthorization("InviteMember") // need to think about this
-        .WithSummary("Gets all pending invites inside an organisation");
+        .WithSummary("Get all pending invitations for an organisation");
 
     private static async Task<IResult> Handle(
         Guid organisationId, 

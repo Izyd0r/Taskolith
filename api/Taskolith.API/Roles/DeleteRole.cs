@@ -10,7 +10,7 @@ public class DeleteRole : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapDelete("/roles/{roleId:guid}", Handle)
         .RequireAuthorization("DeleteRole")
-        .WithSummary("Deletes a role");
+        .WithSummary("Delete a role");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

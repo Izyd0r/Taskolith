@@ -9,7 +9,7 @@ public class DeleteTask : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapDelete("/{taskId:guid}", Handle)
         .RequireAuthorization("DeleteTask")
-        .WithSummary("Deletes a task");
+        .WithSummary("Delete a task");
 
     static async Task<IResult> Handle(
         Guid organisationId,

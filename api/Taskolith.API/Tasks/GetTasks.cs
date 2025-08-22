@@ -11,7 +11,7 @@ public class GetTasks : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("", Handle)
         .RequireAuthorization("Public")
-        .WithSummary("Get all tasks that are assigned to the member");
+        .WithSummary("Get all tasks assigned to members in a project");
 
     static async Task<IResult> Handle(
         Guid organisationId,

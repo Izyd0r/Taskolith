@@ -14,7 +14,7 @@ public class CreateKanbanColumn : IEndPoint
         .MapPost("", Handle)
         .WithRequestValidation<CreateKanbanColumnRequest>()
         .RequireAuthorization("CreateKanbanColumn")
-        .WithSummary("Creates a new Kanban Column");
+        .WithSummary("Create a new Kanban column");
 
     private static async Task<IResult> Handle(
         Guid organisationId, 

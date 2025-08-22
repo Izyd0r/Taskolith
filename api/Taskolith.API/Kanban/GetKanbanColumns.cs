@@ -11,7 +11,7 @@ public class GetKanbanColumns : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("",Handle)
         .RequireAuthorization("Public")
-        .WithSummary("Get kanban columns");
+        .WithSummary("Get Kanban columns");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

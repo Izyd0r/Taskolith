@@ -13,7 +13,7 @@ public class CreateRole : IEndPoint {
         .MapPost("/roles", Handle)
         .RequireAuthorization("CreateRole")
         .WithRequestValidation<CreateRoleRequest>()
-        .WithSummary("Creates a role");
+        .WithSummary("Create a new role");
 
     private static async Task<IResult> Handle(Guid organisationId, CreateRoleRequest request , AppDbContext dbContext, ClaimsPrincipal claims, CancellationToken ct) {
         var userId = claims.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;

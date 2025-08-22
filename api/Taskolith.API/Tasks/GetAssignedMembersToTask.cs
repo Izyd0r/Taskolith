@@ -11,7 +11,7 @@ public class GetAssignedMembersToTask : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/{taskId}/members", Handle)
         .RequireAuthorization("Public")
-        .WithSummary("Get assigned members to task");
+        .WithSummary("Get members assigned to a task");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

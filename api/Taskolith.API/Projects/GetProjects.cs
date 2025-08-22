@@ -10,7 +10,7 @@ public class GetProjects : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/", Handle)
         .RequireAuthorization("GetAllProjects")
-        .WithSummary("Gets all projects inside an organisation");
+        .WithSummary("Get all projects in an organisation");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

@@ -9,7 +9,7 @@ public class DeleteProject : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapDelete("/{projectId:guid}", Handle)
         .RequireAuthorization("DeleteProject")
-        .WithSummary("Deletes a project");
+        .WithSummary("Delete a project");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

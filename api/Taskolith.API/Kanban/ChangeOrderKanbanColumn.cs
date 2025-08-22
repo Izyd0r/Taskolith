@@ -12,7 +12,7 @@ public class ChangeOrderKanbanColumn : IEndPoint {
         .MapPut("/reorder", Handle)
         .WithRequestValidation<ChangeOrderKanbanColumnRequest>()
         .RequireAuthorization("UpdateKanbanColumn")
-        .WithSummary("Change order of kanban columns");
+        .WithSummary("Reorder Kanban columns");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

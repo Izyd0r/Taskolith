@@ -16,7 +16,7 @@ public class UpdateOrganisation : IEndPoint
         .MapPut("/", Handle)
         .WithRequestValidation<UpdateOrganisationRequest>()
         .RequireAuthorization("UpdateOrganisation")
-        .WithSummary("Updates organisation name");
+        .WithSummary("Update organisation name");
 
     private static async Task<IResult> Handle(
         UpdateOrganisationRequest request,

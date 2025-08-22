@@ -10,7 +10,7 @@ namespace Taskolith.API.InviteSystem;
 public class GetInvites : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/invitations", Handle)
-        .WithSummary("Get all invites");
+        .WithSummary("Get all invitations");
 
     private static async Task<IResult> Handle(AppDbContext dbContext, ClaimsPrincipal claims, CancellationToken token) {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;

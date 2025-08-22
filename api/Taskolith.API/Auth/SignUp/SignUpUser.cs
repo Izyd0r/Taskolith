@@ -11,7 +11,7 @@ public abstract class SignUpUser : IEndPoint
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/register", Handle)
         .WithRequestValidation<SignUpRequest>()
-        .WithDisplayName("Register User");
+        .WithSummary("Register a new user");
     
     static async Task<IResult> Handle(SignUpRequest request, AppDbContext dbContext, JwtTokenGenerator jwtTokenGenerator)
     {

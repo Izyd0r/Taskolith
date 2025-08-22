@@ -11,7 +11,7 @@ public class GetRoles : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/roles", Handle)
         .RequireAuthorization("Public")
-        .WithSummary("Get all roles inside organisation");
+        .WithSummary("Get all roles in an organisation");
 
     private static async Task<IResult> Handle(
         Guid organisationId, 

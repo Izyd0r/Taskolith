@@ -15,7 +15,7 @@ public class InviteMember : IEndPoint
         .MapPost("/{organisationId:guid}/invitations", Handle)
         .WithRequestValidation<InviteMemberRequest>()
         .RequireAuthorization("InviteMember")
-        .WithSummary("Invites a user to join the organisation");
+        .WithSummary("Invite a user to join an organisation");
 
     private static async Task<IResult> Handle(Guid organisationId, InviteMemberRequest request, AppDbContext dbContext,
         ClaimsPrincipal claims, CancellationToken token) {

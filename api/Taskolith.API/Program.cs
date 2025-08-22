@@ -39,9 +39,19 @@ builder.Services.AddSwaggerGen(options =>
     {
         Version = "v1",
         Title = "Taskolith API",
-        Description = "An API for Taskolith"
-    });
+        Description = @"
+Taskolith is a collaborative platform for managing tasks, projects, and team members across organisations.
 
+This API provides endpoints for:
+- Managing organisations and members
+- Creating projects, tasks, and Kanban boards
+- Assigning roles and permissions
+- Handling invitations and memberships
+- Tracking tasks assigned to users
+
+Use this API to build custom clients, dashboards, or integrations with Taskolith."
+    });
+    
     var securityScheme = new OpenApiSecurityScheme
     {
         Name = "Authorization",

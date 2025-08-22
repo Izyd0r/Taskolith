@@ -10,7 +10,7 @@ public class KickMember : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapDelete("/{organisationId:guid}/members/{memberId:guid}", Handle)
         .RequireAuthorization("KickMember")
-        .WithSummary("Kicks a member out of organisation");
+        .WithSummary("Remove a member from an organisation");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

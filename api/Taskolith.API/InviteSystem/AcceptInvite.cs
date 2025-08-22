@@ -9,7 +9,7 @@ namespace Taskolith.API.InviteSystem;
 public class AcceptInvite : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/invitations/{invitationId:guid}/accept", Handle)
-        .WithSummary("Accept invite");
+        .WithSummary("Accept an invitation");
     private static async Task<IResult> Handle(Guid invitationId, AppDbContext dbContext, ClaimsPrincipal claims ,CancellationToken token) {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if(userId == null) return Results.BadRequest("Invalid user identifier");

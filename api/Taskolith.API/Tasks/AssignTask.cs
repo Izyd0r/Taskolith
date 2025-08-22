@@ -12,7 +12,7 @@ public class AssignTask : IEndPoint {
         .MapPut("/{taskId}/members", Handle)
         .RequireAuthorization("AssignTask")
         .WithRequestValidation<AssignTaskRequest>()
-        .WithSummary("Assigns task to a member");
+        .WithSummary("Assign a task to a member");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

@@ -12,7 +12,7 @@ public class CreateOrganisation : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("", Handle)
         .WithRequestValidation<CreateOrganisationRequest>()
-        .WithSummary("Creates a new organization");
+        .WithSummary("Create a new organisation");
 
     static async Task<IResult> Handle(CreateOrganisationRequest request, AppDbContext db, ClaimsPrincipal user,
         CancellationToken cancellationToken) {

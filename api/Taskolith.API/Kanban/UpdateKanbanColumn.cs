@@ -12,7 +12,7 @@ public class UpdateKanbanColumn : IEndPoint {
         .MapPut("/{kanbanColumnId:guid}", Handle)
         .WithRequestValidation<UpdateKanbanColumnRequest>()
         .RequireAuthorization("UpdateKanbanColumn")
-        .WithSummary("Updates a Kanban Column");
+        .WithSummary("Update a Kanban column");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

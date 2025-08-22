@@ -10,7 +10,7 @@ namespace Taskolith.API.Tasks;
 public class GetAllAssignedTasks : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("", Handle)
-        .WithSummary("Gets all assigned tasks through organisations");
+        .WithSummary("Get all tasks assigned to the current user");
     private static async Task<IResult> Handle(AppDbContext db, ClaimsPrincipal claims, CancellationToken ct) {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if(userId is null) return Results.BadRequest();

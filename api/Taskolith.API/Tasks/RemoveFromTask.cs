@@ -9,7 +9,7 @@ public class RemoveFromTask : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapDelete("/{taskId}/members/{memberId:guid}", Handle)
         .RequireAuthorization("RemoveFromTask")
-        .WithSummary("Removes a member from the task");
+        .WithSummary("Remove a member from a task");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

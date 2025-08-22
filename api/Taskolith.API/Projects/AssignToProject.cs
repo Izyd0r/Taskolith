@@ -12,7 +12,7 @@ public class AssignProject : IEndPoint {
         .MapPost("/{projectId:guid}/members", Handle)
         .WithRequestValidation<AssignProjectRequest>()
         .RequireAuthorization("AssignProject")
-        .WithSummary("Assigns member to a project");
+        .WithSummary("Assign a member to a project");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

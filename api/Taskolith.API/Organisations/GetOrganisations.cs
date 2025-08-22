@@ -9,7 +9,7 @@ namespace Taskolith.API.Organisations;
 public class GetUserOrganisations : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/user", Handle)
-        .WithSummary("Gets organisations the user belongs to");
+        .WithSummary("Get organisations the user belongs to");
 
     private static async Task<IResult> Handle(AppDbContext dbContext, ClaimsPrincipal claims, CancellationToken ct) {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;

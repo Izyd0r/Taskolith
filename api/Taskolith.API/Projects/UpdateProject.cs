@@ -13,7 +13,7 @@ public class UpdateProject : IEndPoint {
         .MapPut("/{projectId:guid}", Handle)
         .WithRequestValidation<UpdateProjectRequest>()
         .RequireAuthorization("UpdateProject")
-        .WithSummary("Updates a project");
+        .WithSummary("Update a project");
 
     private static async Task<IResult> Handle(
         Guid organisationId,

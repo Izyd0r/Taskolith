@@ -14,7 +14,7 @@ public class CreateProject : IEndPoint {
         .MapPost("/", Handle)
         .WithRequestValidation<CreateProjectRequest>()
         .RequireAuthorization("CreateProject")
-        .WithSummary("Creates a new project");
+        .WithSummary("Create a new project");
 
      private static async Task<IResult> Handle(
         Guid organisationId,

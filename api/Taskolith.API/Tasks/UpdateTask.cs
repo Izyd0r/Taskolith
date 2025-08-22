@@ -10,7 +10,7 @@ namespace Taskolith.API.Tasks;
 public class UpdateTask : IEndPoint {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPut("/{taskId:guid}", Handle)
-        .WithSummary("Updates a task")
+        .WithSummary("Update a task")
         .RequireAuthorization("UpdateTask")
         .WithRequestValidation<UpdateTaskRequest>();
 

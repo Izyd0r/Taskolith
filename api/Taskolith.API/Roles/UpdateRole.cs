@@ -13,7 +13,7 @@ public class UpdateRole : IEndPoint {
         .MapPut("/roles/{roleId:guid}", Handle)
         .RequireAuthorization("UpdateRole")
         .WithRequestValidation<UpdateRoleRequest>()
-        .WithSummary("Updates a role");
+        .WithSummary("Update a role");
 
     private static async Task<IResult> Handle(
         Guid organisationId, 
