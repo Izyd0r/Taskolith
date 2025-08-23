@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Taskolith.API.Common;
 using Taskolith.API.Data;
+using Taskolith.API.Data.Types;
 using Taskolith.API.Filters;
 
 namespace Taskolith.API.Auth.Login;
@@ -13,17 +15,52 @@ public class LoginUser : IEndPoint
         .WithRequestValidation<LoginRequest>()
         .WithSummary("Authenticate a user (login)");
 
-    static async Task<IResult> Handle(LoginRequest request, AppDbContext dbContext, JwtTokenGenerator jwtTokenGenerator, CancellationToken token)
+    static async Task<IResult> Handle(
+        LoginRequest request,
+        AppDbContext dbContext,
+        JwtTokenGenerator jwtTokenGenerator,
+        HttpResponse response,
+        IOptions<JwtOptions> jwtOptions,
+        CancellationToken token)
     {
         // TODO: Add passwordHasher
        var user = await dbContext.Users
            .FirstOrDefaultAsync(u=>u.Username == request.Username && u.Password == request.Password, cancellationToken: token);
-       if (user is null || user.Password != request.Password)
+       if (user is null || user.Password != request.Password) // use hash here also
        {
            return Results.Unauthorized();
        }
 
-       var loginResponse = new LoginResponse(jwtTokenGenerator.GenerateToken(user), user.Username, user.Id);
+       var jwt = jwtTokenGenerator.GenerateToken(user);
+
+       var refreshToken = new RefreshToken {
+           Id = Guid.NewGuid(),
+           UserId = user.Id,
+           Token = JwtTokenGenerator.GenerateRefreshToken(),
+           IsActive = true,
+           Created = DateTime.UtcNow,
+           Expires = DateTime.UtcNow.AddDays(7)
+       };
+       
+       dbContext.RefreshTokens.Add(refreshToken);
+       await dbContext.SaveChangesAsync(token);
+           
+       response.Cookies.Append("access_token", jwt, new CookieOptions {
+           HttpOnly = true,
+           Secure = false,
+           // Secure = true, add this when we will use https
+           SameSite = SameSiteMode.Strict,
+           Expires = DateTimeOffset.UtcNow.AddMinutes(jwtOptions.Value.ExpiryMinutes)
+       });
+       
+       response.Cookies.Append("refresh_token", refreshToken.Token, new CookieOptions {
+           HttpOnly = true,
+           Secure = false,
+           SameSite = SameSiteMode.Strict,
+           Expires = DateTime.UtcNow.AddDays(7)
+       });
+
+       var loginResponse = new LoginResponse(user.Username, user.Id);
        
        return Results.Ok(loginResponse);
     }

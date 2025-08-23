@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Taskolith.API.Data;
 using Testcontainers.PostgreSql;
@@ -33,6 +35,16 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
                 options
                     .UseNpgsql(_dbContainer.GetConnectionString());
             });
+        });
+
+        builder.ConfigureAppConfiguration(configBuilder => {
+            var appSettings = configBuilder.Sources.FirstOrDefault(
+                source => source is JsonConfigurationSource { Path: "appsettings.json" });
+            if (appSettings != null) {
+                configBuilder.Sources.Remove(appSettings);
+            }
+            configBuilder.SetBasePath(AppContext.BaseDirectory);
+            configBuilder.AddJsonFile("appsettings.Testing.json", optional: false);
         });
     }
 

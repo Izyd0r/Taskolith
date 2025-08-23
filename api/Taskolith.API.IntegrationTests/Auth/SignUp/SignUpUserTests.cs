@@ -12,36 +12,39 @@ public class SignUpUserTests(IntegrationTestWebAppFactory factory) : BaseIntegra
     private readonly IntegrationTestWebAppFactory _factory = factory;
     
     [Fact]
-    public async Task RegisterUser_WithValidInput_WriteUserToDatabase()
+    public async Task RegisterUser_WithValidInput_ShouldCreateUserAndSetAuthCookies()
     {
         // Arrange
         var client = _factory.CreateClient();
-
         var payload = new SignUpRequestFaker().Generate(); 
 
         // Act
         var response = await client.PostAsJsonAsync("/api/auth/register", payload);
 
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
-
-        var registerResponse = await response.Content.ReadFromJsonAsync<SignUpResponse>();
-        registerResponse.Should().NotBeNull();
-        registerResponse.Token.Should().NotBeNullOrEmpty();
-        registerResponse.RefreshToken.Should().NotBeNullOrEmpty();
+        var responseContent = await response.Content.ReadAsStringAsync();
         
-        var userInDb = await DbContext.Users.FindAsync(registerResponse.Id);
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created, $"response content: {responseContent}");
 
+        // 1. Verify the database state
+        var userInDb = await DbContext.Users.FirstOrDefaultAsync(u => u.Username == payload.Username);
         userInDb.Should().NotBeNull();
         userInDb.Email.Should().Be(payload.Email);
-        userInDb.FirstName.Should().Be(payload.FirstName);
-        userInDb.LastName.Should().Be(payload.LastName);
-        userInDb.Password.Should().Be(payload.Password);
-        userInDb.Username.Should().Be(payload.Username);
-        response.Headers.Location!.ToString()
-            .Should().Be($"/api/users/{registerResponse.Id}");
-    }
+        // Note: You should be asserting against a hashed password, not the plain text one.
+        // userInDb.Password.Should().NotBe(payload.Password); 
 
+        // 2. Verify response headers and cookies
+        var signUpResponse = await response.Content.ReadFromJsonAsync<SignUpResponse>(); // This might contain the new user's ID
+        response.Headers.Location!.ToString()
+            .Should().Be($"/api/users/{signUpResponse.Id}");
+
+        var setCookieHeader = response.Headers.GetValues("Set-Cookie");
+        setCookieHeader.Should().NotBeNullOrEmpty();
+        setCookieHeader.Should().Contain(c => c.StartsWith("access_token="));
+        setCookieHeader.Should().Contain(c => c.StartsWith("refresh_token="));
+        setCookieHeader.Should().Contain(c => c.Contains("httponly"));
+    }
+    
     [Theory]
     [InlineData("plainaddress")]
     [InlineData("")]

@@ -11,4 +11,5 @@ public class RefreshToken
     public required bool IsActive { get; set; } = true;
     public required DateTime Created { get; init; }
     public required DateTime Expires { get; init; }
+    public User User { get; set; }
 }

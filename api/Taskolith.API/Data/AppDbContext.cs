@@ -151,7 +151,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         builder.Property(t => t.IsActive).IsRequired();
         builder.Property(t => t.Created).IsRequired();
         builder.Property(t => t.Expires).IsRequired();
-        builder.HasOne<User>()
+        builder.HasOne(t => t.User) 
             .WithMany(u => u.RefreshTokens)
             .HasForeignKey(t => t.UserId)
             .OnDelete(DeleteBehavior.Cascade);

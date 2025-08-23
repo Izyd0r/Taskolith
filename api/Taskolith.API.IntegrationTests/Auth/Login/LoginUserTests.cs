@@ -20,9 +20,11 @@ public class LoginUserTests(IntegrationTestWebAppFactory factory, ITestOutputHel
     private readonly IConfiguration _configuration = factory.Services.GetRequiredService<IConfiguration>();
     
     [Fact]
-    public async Task LoginUser_ThatExists_ShouldReturnJWTAndSuccess()
+    public async Task LoginUser_ThatExists_ShouldReturnSuccessAndSetAuthCookie()
     {
-        var client = _factory.CreateClient();
+        // Arrange
+        // The factory client is configured to handle cookies automatically.
+        var client = _factory.CreateClient(); 
         var user = new User {
             Username = "testusername",
             Password = "PasswordExample123!",
@@ -35,53 +37,24 @@ public class LoginUserTests(IntegrationTestWebAppFactory factory, ITestOutputHel
         await DbContext.Users.AddAsync(user);
         await DbContext.SaveChangesAsync();
         
+        // Act: Log the user in
         var response = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
         var responseContent = await response.Content.ReadAsStringAsync();
+    
+        // Assert: Check for a successful response and the presence of cookies
         response.StatusCode.Should().Be(HttpStatusCode.OK, $"response content: {responseContent}");
         
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
+        // 1. Verify the authentication cookies were set
+        var setCookieHeader = response.Headers.GetValues("Set-Cookie");
+        setCookieHeader.Should().NotBeNullOrEmpty();
+        setCookieHeader.Should().Contain(c => c.StartsWith("access_token=")); // Or whatever you name your access token cookie
+        setCookieHeader.Should().Contain(c => c.Contains("httponly"));
+        setCookieHeader.Should().Contain(c => c.Contains("samesite=strict")); // Or Lax, depending on your setup
+    
+        // The response body might now contain user info without tokens
+        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>(); // Assuming you return some user data
         loginResponse.Should().NotBeNull();
-        loginResponse.Token.Should().NotBeNullOrEmpty();
         loginResponse.Username.Should().BeEquivalentTo(user.Username);
-        
-        var key = _configuration["Jwt:Key"];
-        var issuer = _configuration["Jwt:Issuer"];
-        var audience = _configuration["Jwt:Audiences:0"];
-
-        var validationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-            ValidateIssuer = true,
-            ValidIssuer = issuer,
-            ValidateAudience = true,
-            ValidAudience = audience,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
-
-        var handler = new JwtSecurityTokenHandler();
-        var principal = handler.ValidateToken(loginResponse.Token, validationParameters, out var validatedToken);
-
-        var jwtToken = handler.ReadJwtToken(loginResponse.Token);
-
-        foreach (var claim in jwtToken.Claims)
-        {
-            _testOutputHelper.WriteLine($"Claim Type: {claim.Type}, Value: {claim.Value}");
-        }
-        
-        var audienceClaims = principal.Claims
-            .Where(c => c.Type == JwtRegisteredClaimNames.Aud)
-            .Select(c => c.Value)
-            .ToList();
-        audienceClaims.Should().Contain(audience);
-        
-        var userIdClaim = principal.Claims
-            .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        userIdClaim.Should().Be(user.Id.ToString());
-
-        validatedToken.Issuer.Should().Be(issuer);
-        validatedToken.ValidTo.Should().BeAfter(DateTime.UtcNow); 
     }
     
     [Theory]

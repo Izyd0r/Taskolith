@@ -8,16 +8,20 @@ using Taskolith.API.Data.Types;
 
 namespace Taskolith.API.IntegrationTests;
 
-public class AuthorizedIntegrationTest : BaseIntegrationTest {
+public class AuthorizedIntegrationTest : BaseIntegrationTest
+{
     public required User AuthorizedUser { get; init; }
     public required HttpClient AuthorizedHttpClient { get; init; }
+
     protected AuthorizedIntegrationTest(IntegrationTestWebAppFactory factory) : base(factory) { }
-    
-    public static async Task<AuthorizedIntegrationTest> BuildAuthorizedTest(IntegrationTestWebAppFactory factory) {
+
+    public static async Task<AuthorizedIntegrationTest> BuildAuthorizedTest(IntegrationTestWebAppFactory factory)
+    {
         var client = factory.CreateClient();
         var user = GenerateFakeUser();
 
-        using (var scope = factory.Services.CreateScope()) {
+        using (var scope = factory.Services.CreateScope())
+        {
             var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
             dbContext.Users.Add(user);
@@ -28,21 +32,18 @@ public class AuthorizedIntegrationTest : BaseIntegrationTest {
         var response = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
         response.EnsureSuccessStatusCode();
 
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", loginResponse?.Token);
-
-        return new AuthorizedIntegrationTest(factory) {
+        return new AuthorizedIntegrationTest(factory)
+        {
             AuthorizedHttpClient = client,
             AuthorizedUser = user
         };
     }
 
-    private static User GenerateFakeUser() {
+    private static User GenerateFakeUser()
+    {
         return new Faker<User>()
             .RuleFor(u => u.Username, f => f.Internet.UserName(f.Name.FirstName(), f.Name.LastName()))
-            .RuleFor(u => u.Password, "Password123!") 
+            .RuleFor(u => u.Password, "Password123!")
             .RuleFor(u => u.Email, f => f.Internet.Email())
             .RuleFor(u => u.FirstName, f => f.Name.FirstName())
             .RuleFor(u => u.LastName, f => f.Name.LastName())

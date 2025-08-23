@@ -36,4 +36,10 @@
     <ProjectReference Include="..\Taskolith.API\Taskolith.API.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.Testing.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

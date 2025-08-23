@@ -10,26 +10,31 @@ using Microsoft.OpenApi.Models;
 using Taskolith.API.Auth;
 using Taskolith.API.Data.Types;
 
-const string WebAppCorsPolicy = "_webAppCorsPolicy";
+const string productionCors = "ProdCors";
+const string developCors = "DevCors";
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: WebAppCorsPolicy,
-                      policy =>
-                      {
-                            // This still needs to change
-                            policy.SetIsOriginAllowed(origin =>
-                            {
-                                if (string.IsNullOrWhiteSpace(origin)) return false;
-                                var uri = new Uri(origin);
-                                return (uri.Host == "localhost" || uri.Host.StartsWith("172."))
-                                && (uri.Port == 5173 || uri.Port == 5174 || uri.Port == 5175 || uri.Port == 5271 || uri.Port == 5272);
-                            })
-                           .AllowAnyHeader()
-                           .AllowAnyMethod();
+    options.AddPolicy(name: developCors,
+                      policy => {
+                          policy.SetIsOriginAllowed(origin => {
+                                  if (string.IsNullOrEmpty(origin)) return false;
+                                  var uri = new Uri(origin);
+                                  return uri.Host == "localhost" || uri.Host.StartsWith("172.");
+                              })
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials();
                       });
+    options.AddPolicy(name: productionCors,
+        policy => {
+            policy.WithOrigins("https://Taskolith.com")
+                .WithMethods("GET", "POST", "PUT", "DELETE")
+                .WithHeaders("Content-Type", "Content-Language", "Authorization")
+                .AllowCredentials();
+        });
 });
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
@@ -94,6 +99,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
                 )
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                if (context.Request.Cookies.TryGetValue("access_token", out var token))
+                {
+                    context.Token = token;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
     });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
@@ -117,9 +135,14 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
         options.RoutePrefix = string.Empty;
     });
+    app.UseCors(developCors);
+}
+else
+{
+    app.UseCors(productionCors);
 }
 app.UseRouting();
-app.UseCors(WebAppCorsPolicy);
+app.UseCors(developCors);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
