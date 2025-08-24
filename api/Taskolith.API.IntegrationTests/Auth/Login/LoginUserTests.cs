@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
 using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -27,12 +28,14 @@ public class LoginUserTests(IntegrationTestWebAppFactory factory, ITestOutputHel
         var client = _factory.CreateClient(); 
         var user = new User {
             Username = "testusername",
-            Password = "PasswordExample123!",
             Email = "example@email.com",
             FirstName = "Firstname",
             LastName = "Lastname"
         };
-        var loginRequest = new LoginRequest(user.Username, user.Password);
+        PasswordHasher<User> passwordHasher = new();
+        user.Password = passwordHasher.HashPassword(user, "PasswordExample123!");
+        
+        var loginRequest = new LoginRequest(user.Username, "PasswordExample123!");
         
         await DbContext.Users.AddAsync(user);
         await DbContext.SaveChangesAsync();

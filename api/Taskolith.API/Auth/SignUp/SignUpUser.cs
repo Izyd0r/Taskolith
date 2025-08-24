@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Taskolith.API.Common;
@@ -20,7 +21,8 @@ public abstract class SignUpUser : IEndPoint
         AppDbContext dbContext,
         JwtTokenGenerator jwtTokenGenerator,
         IOptions<JwtOptions> jwtOptions,
-        CancellationToken ct
+        CancellationToken ct,
+        IPasswordHasher<User> passwordHasher
         ) {
         if (await dbContext.Users.AnyAsync(u => u.Email == request.Email, cancellationToken: ct))
         {
@@ -36,11 +38,11 @@ public abstract class SignUpUser : IEndPoint
         {
             Id = Guid.NewGuid(),
             Username = request.Username,
-            Password = request.Password, // TODO: add bcrypt hash password
             Email = request.Email,
             FirstName = request.FirstName,
             LastName = request.LastName
         };
+        user.Password = passwordHasher.HashPassword(user, request.Password);
        
         var jwt = jwtTokenGenerator.GenerateToken(user);
 

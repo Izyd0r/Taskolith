@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -21,47 +22,50 @@ public class LoginUser : IEndPoint
         JwtTokenGenerator jwtTokenGenerator,
         HttpResponse response,
         IOptions<JwtOptions> jwtOptions,
-        CancellationToken token)
-    {
-        // TODO: Add passwordHasher
-       var user = await dbContext.Users
-           .FirstOrDefaultAsync(u=>u.Username == request.Username && u.Password == request.Password, cancellationToken: token);
-       if (user is null || user.Password != request.Password) // use hash here also
-       {
-           return Results.Unauthorized();
-       }
-
-       var jwt = jwtTokenGenerator.GenerateToken(user);
-
-       var refreshToken = new RefreshToken {
-           Id = Guid.NewGuid(),
-           UserId = user.Id,
-           Token = JwtTokenGenerator.GenerateRefreshToken(),
-           IsActive = true,
-           Created = DateTime.UtcNow,
-           Expires = DateTime.UtcNow.AddDays(7)
-       };
-       
-       dbContext.RefreshTokens.Add(refreshToken);
-       await dbContext.SaveChangesAsync(token);
-           
-       response.Cookies.Append("access_token", jwt, new CookieOptions {
-           HttpOnly = true,
-           Secure = false,
-           // Secure = true, add this when we will use https
-           SameSite = SameSiteMode.Strict,
-           Expires = DateTimeOffset.UtcNow.AddMinutes(jwtOptions.Value.ExpiryMinutes)
-       });
-       
-       response.Cookies.Append("refresh_token", refreshToken.Token, new CookieOptions {
-           HttpOnly = true,
-           Secure = false,
-           SameSite = SameSiteMode.Strict,
-           Expires = DateTime.UtcNow.AddDays(7)
-       });
-
-       var loginResponse = new LoginResponse(user.Username, user.Id);
-       
-       return Results.Ok(loginResponse);
+        CancellationToken token,
+        IPasswordHasher<User> passwordHasher
+        ) {
+        var user = await dbContext.Users
+            .FirstOrDefaultAsync(u=>u.Username == request.Username, cancellationToken: token);
+        if (user is null)
+        {
+            return Results.Unauthorized();
+        }
+        
+        var result = passwordHasher.VerifyHashedPassword(user, user.Password, request.Password);
+        if (result == PasswordVerificationResult.Failed) return Results.Unauthorized();
+    
+        var jwt = jwtTokenGenerator.GenerateToken(user);
+    
+        var refreshToken = new RefreshToken {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Token = JwtTokenGenerator.GenerateRefreshToken(),
+            IsActive = true,
+            Created = DateTime.UtcNow,
+            Expires = DateTime.UtcNow.AddDays(7)
+        };
+        
+        dbContext.RefreshTokens.Add(refreshToken);
+        await dbContext.SaveChangesAsync(token);
+            
+        response.Cookies.Append("access_token", jwt, new CookieOptions {
+            HttpOnly = true,
+            Secure = false,
+            // Secure = true, add this when we will use https
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTimeOffset.UtcNow.AddMinutes(jwtOptions.Value.ExpiryMinutes)
+        });
+        
+        response.Cookies.Append("refresh_token", refreshToken.Token, new CookieOptions {
+            HttpOnly = true,
+            Secure = false,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7)
+        });
+    
+        var loginResponse = new LoginResponse(user.Username, user.Id);
+        
+        return Results.Ok(loginResponse);
     }
 }

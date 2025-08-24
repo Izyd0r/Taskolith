@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Bogus;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Taskolith.API.Auth.Login;
 using Taskolith.API.Data;
@@ -19,7 +20,10 @@ public class AuthorizedIntegrationTest : BaseIntegrationTest
     {
         var client = factory.CreateClient();
         var user = GenerateFakeUser();
-
+        PasswordHasher<User> passwordHasher = new();
+        string passwordRequest = user.Password;
+        user.Password = passwordHasher.HashPassword(user, user.Password);
+        
         using (var scope = factory.Services.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -28,7 +32,7 @@ public class AuthorizedIntegrationTest : BaseIntegrationTest
             await dbContext.SaveChangesAsync();
         }
 
-        var loginRequest = new LoginRequest(user.Username, user.Password);
+        var loginRequest = new LoginRequest(user.Username, passwordRequest);
         var response = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
         response.EnsureSuccessStatusCode();
 

@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Auth.Login;
 using Taskolith.API.Data.Types;
@@ -14,6 +15,7 @@ public class LogoutUserTests(IntegrationTestWebAppFactory factory) : BaseIntegra
     [Fact]
     public async Task Logout_WhenUserIsLoggedIn_ShouldDeactivateRefreshTokenAndClearCookies()
     {
+        PasswordHasher<User> passwordHasher = new();
         var client = _factory.CreateClient();
         var user = new User
         {
@@ -23,10 +25,12 @@ public class LogoutUserTests(IntegrationTestWebAppFactory factory) : BaseIntegra
             FirstName = "Test",
             LastName = "User"
         };
+        var passwordRequest = user.Password;
+        user.Password = passwordHasher.HashPassword(user, user.Password);
         await DbContext.Users.AddAsync(user);
         await DbContext.SaveChangesAsync();
     
-        var loginRequest = new LoginRequest(user.Username, user.Password);
+        var loginRequest = new LoginRequest(user.Username, passwordRequest);
         var loginResponse = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
         loginResponse.EnsureSuccessStatusCode();
     

@@ -7,7 +7,7 @@ public class User {
     [MaxLength(20)]
     public required string Username { get; init; } = null!;
     [MaxLength(100)]
-    public required string Password { get; init; } = null!;
+    public string Password { get; set; } = null!;
     [MaxLength(256)]
     public required string Email { get; init; } = null!;
     [MaxLength(20)]

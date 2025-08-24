@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Taskolith.API.Auth.Login;
@@ -15,19 +16,22 @@ public class RefreshTokenTests(IntegrationTestWebAppFactory factory) : BaseInteg
     [Fact]
     public async Task Refresh_WithValidToken_ShouldRotateTokensAndReturnNewCookies()
     {
+        PasswordHasher<User> passwordHasher = new();
         var client = _factory.CreateClient();
         var user = new User
         {
-            Username = "refresh-test",
+            Username = "reuse-test",
             Password = "Password123!",
-            Email = "refresh@test.com",
+            Email = "reuse@test.com",
             FirstName = "Test",
             LastName = "User"
         };
+        var passwordRequest = user.Password;
+        user.Password = passwordHasher.HashPassword(user, user.Password);
         await DbContext.Users.AddAsync(user);
         await DbContext.SaveChangesAsync();
 
-        var loginRequest = new LoginRequest(user.Username, user.Password);
+        var loginRequest = new LoginRequest(user.Username, passwordRequest);
         var loginResponse = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
         loginResponse.EnsureSuccessStatusCode();
 
@@ -65,6 +69,7 @@ public class RefreshTokenTests(IntegrationTestWebAppFactory factory) : BaseInteg
     [Fact]
     public async Task Refresh_WithReusedDeactivatedToken_ShouldReturnUnauthorized()
     {
+        PasswordHasher<User> passwordHasher = new();
         var standardClient = _factory.CreateClient();
         var user = new User
         {
@@ -74,10 +79,12 @@ public class RefreshTokenTests(IntegrationTestWebAppFactory factory) : BaseInteg
             FirstName = "Test",
             LastName = "User"
         };
+        var passwordRequest = user.Password;
+        user.Password = passwordHasher.HashPassword(user, user.Password);
         await DbContext.Users.AddAsync(user);
         await DbContext.SaveChangesAsync();
     
-        await standardClient.PostAsJsonAsync("/api/auth/login", new LoginRequest(user.Username, user.Password));
+        await standardClient.PostAsJsonAsync("/api/auth/login", new LoginRequest(user.Username, passwordRequest));
         
         var originalToken = await DbContext.RefreshTokens.AsNoTracking().FirstAsync(rt => rt.UserId == user.Id);
         originalToken.Should().NotBeNull();
