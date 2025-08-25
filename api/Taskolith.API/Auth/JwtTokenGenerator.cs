@@ -21,11 +21,13 @@ public class JwtTokenGenerator(IOptions<JwtOptions> options)
    public string GenerateToken(User user)
    {
       var tokenHandler = new JwtSecurityTokenHandler();
-      SymmetricSecurityKey key = new(Encoding.ASCII.GetBytes(options.Value.Key));
+      SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(options.Value.Key));
 
       var claims = new List<Claim>
       {
-         new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+         new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+         new(ClaimTypes.Email, user.Email),
+         new(ClaimTypes.Name, user.Username)
       };
       claims.AddRange(options.Value.Audiences.Select(x => new Claim(JwtRegisteredClaimNames.Aud, x)));
 

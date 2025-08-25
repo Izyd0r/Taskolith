@@ -4,7 +4,7 @@ using Taskolith.API.Common;
 using Taskolith.API.Data;
 using Taskolith.API.Data.Types;
 
-namespace Taskolith.API.Auth.Refresh.cs;
+namespace Taskolith.API.Auth.Refresh;
 
 public class Refresh : IEndPoint
 {

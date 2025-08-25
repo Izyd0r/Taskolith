@@ -1,7 +1,8 @@
 using Taskolith.API.Auth.Login;
 using Taskolith.API.Auth.Logout;
-using Taskolith.API.Auth.Refresh.cs;
+using Taskolith.API.Auth.Refresh;
 using Taskolith.API.Auth.SignUp;
+using Taskolith.API.Auth.Status;
 using Taskolith.API.Common;
 using Taskolith.API.Data.Types;
 using Taskolith.API.InviteSystem;
@@ -46,6 +47,8 @@ public static class Endpoints
             .MapEndpoint<LoginUser>()
             .MapEndpoint<Logout>()
             .MapEndpoint<Refresh>();
+        endpoints.MapPrivateGroup()
+            .MapEndpoint<GetStatus>();
     }
 
     private static void MapTasksEndpoints(this IEndpointRouteBuilder app)

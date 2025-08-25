@@ -1,7 +1,7 @@
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Bogus;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Taskolith.API.Auth.Login;
 using Taskolith.API.Data;
@@ -18,7 +18,11 @@ public class AuthorizedIntegrationTest : BaseIntegrationTest
 
     public static async Task<AuthorizedIntegrationTest> BuildAuthorizedTest(IntegrationTestWebAppFactory factory)
     {
-        var client = factory.CreateClient();
+        var clientOptions = new WebApplicationFactoryClientOptions
+        {
+            HandleCookies = true
+        };
+        var client = factory.CreateClient(clientOptions);
         var user = GenerateFakeUser();
         PasswordHasher<User> passwordHasher = new();
         string passwordRequest = user.Password;

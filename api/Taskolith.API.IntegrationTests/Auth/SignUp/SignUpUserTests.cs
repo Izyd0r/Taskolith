@@ -26,15 +26,11 @@ public class SignUpUserTests(IntegrationTestWebAppFactory factory) : BaseIntegra
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created, $"response content: {responseContent}");
 
-        // 1. Verify the database state
         var userInDb = await DbContext.Users.FirstOrDefaultAsync(u => u.Username == payload.Username);
         userInDb.Should().NotBeNull();
         userInDb.Email.Should().Be(payload.Email);
-        // Note: You should be asserting against a hashed password, not the plain text one.
-        // userInDb.Password.Should().NotBe(payload.Password); 
 
-        // 2. Verify response headers and cookies
-        var signUpResponse = await response.Content.ReadFromJsonAsync<SignUpResponse>(); // This might contain the new user's ID
+        var signUpResponse = await response.Content.ReadFromJsonAsync<SignUpResponse>(); 
         response.Headers.Location!.ToString()
             .Should().Be($"/api/users/{signUpResponse.Id}");
 
