@@ -111,6 +111,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 }
 
                 return Task.CompletedTask;
+            },
+            
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine("Authentication failed: " + context.Exception.Message);
+                return Task.CompletedTask;
             }
         };
     });
@@ -144,7 +150,6 @@ else
     app.UseCors(productionCors);
 }
 app.UseRouting();
-app.UseCors(developCors);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();

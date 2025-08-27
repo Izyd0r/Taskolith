@@ -20,7 +20,8 @@ public class AuthorizedIntegrationTest : BaseIntegrationTest
     {
         var clientOptions = new WebApplicationFactoryClientOptions
         {
-            HandleCookies = true
+            HandleCookies = true,
+            BaseAddress = new Uri("https://localhost")
         };
         var client = factory.CreateClient(clientOptions);
         var user = GenerateFakeUser();

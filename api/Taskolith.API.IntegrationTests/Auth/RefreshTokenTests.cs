@@ -9,39 +9,21 @@ using Taskolith.API.Data.Types;
 
 namespace Taskolith.API.IntegrationTests.Auth;
 
-public class RefreshTokenTests(IntegrationTestWebAppFactory factory) : BaseIntegrationTest(factory)
+public class RefreshTokenTests(IntegrationTestWebAppFactory factory) : AuthorizedIntegrationTest(factory)
 {
     private readonly IntegrationTestWebAppFactory _factory = factory;
     
     [Fact]
     public async Task Refresh_WithValidToken_ShouldRotateTokensAndReturnNewCookies()
     {
-        PasswordHasher<User> passwordHasher = new();
-        var client = _factory.CreateClient();
-        var user = new User
-        {
-            Username = "reuse-test",
-            Password = "Password123!",
-            Email = "reuse@test.com",
-            FirstName = "Test",
-            LastName = "User"
-        };
-        var passwordRequest = user.Password;
-        user.Password = passwordHasher.HashPassword(user, user.Password);
-        await DbContext.Users.AddAsync(user);
-        await DbContext.SaveChangesAsync();
-
-        var loginRequest = new LoginRequest(user.Username, passwordRequest);
-        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", loginRequest);
-        loginResponse.EnsureSuccessStatusCode();
-
+        var client = await BuildAuthorizedTest(_factory);
         var originalRefreshToken = await DbContext.RefreshTokens
             .AsNoTracking()
-            .FirstOrDefaultAsync(rt => rt.UserId == user.Id);
+            .FirstOrDefaultAsync(rt => rt.UserId == client.AuthorizedUser.Id);
         
         originalRefreshToken.Should().NotBeNull();
 
-        var refreshResponse = await client.PostAsync("/api/auth/refresh", null);
+        var refreshResponse = await client.AuthorizedHttpClient.PostAsync("/api/auth/refresh", null);
 
         refreshResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
@@ -49,7 +31,7 @@ public class RefreshTokenTests(IntegrationTestWebAppFactory factory) : BaseInteg
         usedRefreshToken.IsActive.Should().BeFalse();
 
         var newRefreshToken = await DbContext.RefreshTokens
-            .FirstOrDefaultAsync(rt => rt.UserId == user.Id && rt.IsActive);
+            .FirstOrDefaultAsync(rt => rt.UserId == client.AuthorizedUser.Id && rt.IsActive);
         newRefreshToken.Should().NotBeNull();
         newRefreshToken.Token.Should().NotBe(originalRefreshToken.Token);
 
@@ -69,27 +51,11 @@ public class RefreshTokenTests(IntegrationTestWebAppFactory factory) : BaseInteg
     [Fact]
     public async Task Refresh_WithReusedDeactivatedToken_ShouldReturnUnauthorized()
     {
-        PasswordHasher<User> passwordHasher = new();
-        var standardClient = _factory.CreateClient();
-        var user = new User
-        {
-            Username = "reuse-test",
-            Password = "Password123!",
-            Email = "reuse@test.com",
-            FirstName = "Test",
-            LastName = "User"
-        };
-        var passwordRequest = user.Password;
-        user.Password = passwordHasher.HashPassword(user, user.Password);
-        await DbContext.Users.AddAsync(user);
-        await DbContext.SaveChangesAsync();
-    
-        await standardClient.PostAsJsonAsync("/api/auth/login", new LoginRequest(user.Username, passwordRequest));
-        
-        var originalToken = await DbContext.RefreshTokens.AsNoTracking().FirstAsync(rt => rt.UserId == user.Id);
+        var standardClient = await BuildAuthorizedTest(_factory); 
+        var originalToken = await DbContext.RefreshTokens.AsNoTracking().FirstAsync(rt => rt.UserId == standardClient.AuthorizedUser.Id);
         originalToken.Should().NotBeNull();
     
-        var firstRefreshResponse = await standardClient.PostAsync("/api/auth/refresh", null);
+        var firstRefreshResponse = await standardClient.AuthorizedHttpClient.PostAsync("/api/auth/refresh", null);
         firstRefreshResponse.EnsureSuccessStatusCode();
     
         var originalTokenInDb = await DbContext.RefreshTokens.FindAsync(originalToken.Id);

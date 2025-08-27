@@ -76,15 +76,15 @@ public class Refresh : IEndPoint
            
             response.Cookies.Append("access_token", newAccessToken, new CookieOptions {
                 HttpOnly = true,
-                Secure = false, // TODO: Set to true in production with HTTPS
-                SameSite = SameSiteMode.Strict,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTimeOffset.UtcNow.AddMinutes(jwtOptions.Value.ExpiryMinutes)
             });
            
             response.Cookies.Append("refresh_token", newRefreshToken.Token, new CookieOptions {
                 HttpOnly = true,
-                Secure = false, // TODO: Set to true in production with HTTPS
-                SameSite = SameSiteMode.Strict,
+                Secure = true, 
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTime.UtcNow.AddDays(7)
             });
             

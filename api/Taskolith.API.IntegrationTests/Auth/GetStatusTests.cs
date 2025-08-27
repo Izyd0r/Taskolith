@@ -14,12 +14,9 @@ public class GetStatusTests(IntegrationTestWebAppFactory factory) : AuthorizedIn
     {
         var testUser = await BuildAuthorizedTest(_factory);
         var response = await testUser.AuthorizedHttpClient.GetAsync("/api/auth/status");
-        if (response.StatusCode != HttpStatusCode.OK)
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            error.Should().BeNull("because the request should be successful"); 
-        }
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.OK, 
+            $"because the request should be successful. Server response: {await response.Content.ReadAsStringAsync()}");
+        
         var statusResponse = await response.Content.ReadFromJsonAsync<GetStatusResponse>();
         statusResponse.Should().NotBeNull();
         statusResponse.UserId.Should().Be(testUser.AuthorizedUser.Id);

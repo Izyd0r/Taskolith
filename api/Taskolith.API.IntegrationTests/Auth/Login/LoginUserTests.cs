@@ -47,7 +47,7 @@ public class LoginUserTests(IntegrationTestWebAppFactory factory, ITestOutputHel
         setCookieHeader.Should().NotBeNullOrEmpty();
         setCookieHeader.Should().Contain(c => c.StartsWith("access_token="));
         setCookieHeader.Should().Contain(c => c.Contains("httponly"));
-        setCookieHeader.Should().Contain(c => c.Contains("samesite=strict"));
+        setCookieHeader.Should().Contain(c => c.Contains("samesite=lax"));
 
         var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
         loginResponse.Should().NotBeNull();

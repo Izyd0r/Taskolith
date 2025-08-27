@@ -51,16 +51,15 @@ public class LoginUser : IEndPoint
             
         response.Cookies.Append("access_token", jwt, new CookieOptions {
             HttpOnly = true,
-            Secure = false,
-            // Secure = true, add this when we will use https
-            SameSite = SameSiteMode.Strict,
+            Secure = true,
+            SameSite = SameSiteMode.Lax,
             Expires = DateTimeOffset.UtcNow.AddMinutes(jwtOptions.Value.ExpiryMinutes)
         });
         
         response.Cookies.Append("refresh_token", refreshToken.Token, new CookieOptions {
             HttpOnly = true,
-            Secure = false,
-            SameSite = SameSiteMode.Strict,
+            Secure = true,
+            SameSite = SameSiteMode.Lax,
             Expires = DateTime.UtcNow.AddDays(7)
         });
     

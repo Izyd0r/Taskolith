@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Taskolith.API.Data;
 using Testcontainers.PostgreSql;
 
@@ -18,7 +19,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         .WithUsername("postgres")
         .WithPassword("postgres")
         .Build();
-
+    
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureTestServices(services =>
@@ -36,7 +37,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
                     .UseNpgsql(_dbContainer.GetConnectionString());
             });
         });
-
+        builder.UseEnvironment("Development");
         builder.ConfigureAppConfiguration(configBuilder => {
             var appSettings = configBuilder.Sources.FirstOrDefault(
                 source => source is JsonConfigurationSource { Path: "appsettings.json" });
