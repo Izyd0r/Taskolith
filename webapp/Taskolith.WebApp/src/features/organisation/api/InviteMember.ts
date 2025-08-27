@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios'
+import apiClient from '@/lib/axios'
 import { type InviteMemberRequest } from '@/features/organisation/types/InviteMemberRequest'
 
 export const InviteMember = async (

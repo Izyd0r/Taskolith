@@ -4,12 +4,12 @@ import { useAuth } from '@/features/auth/context/AuthContext'
 import { type LoginCredentials, type LoginResponse } from '@/features/auth/types/auth'
 
 export const useLogin = () => {
-    const { login } = useAuth();
+    const { login } = useAuth()
 
     return useMutation<LoginResponse, Error, LoginCredentials>({
         mutationFn: authService.login,
         onSuccess: (data) => {
-            login(data.username, data.token, data.userId);
-        },
-    });
-};
+            login(data.user)
+        }
+    })
+}

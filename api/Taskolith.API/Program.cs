@@ -10,12 +10,20 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Taskolith.API.Auth;
 using Taskolith.API.Data.Types;
+using Microsoft.AspNetCore.HttpOverrides;
 
 const string productionCors = "ProdCors";
 const string developCors = "DevCors";
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear(); // trust all, its ok for docker network
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: developCors,
@@ -134,6 +142,7 @@ builder.Services.AddTransient<JwtTokenGenerator>();
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -148,6 +157,7 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseCors(productionCors);
+    app.UseHsts();
 }
 app.UseRouting();
 app.UseAuthentication();

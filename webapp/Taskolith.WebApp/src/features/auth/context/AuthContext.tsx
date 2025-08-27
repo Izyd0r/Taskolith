@@ -1,79 +1,72 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import api from '@/lib/axios'
 
 type AuthContextType = {
-    user: string | null
-    userId: string | null
-    token: string | null
-    login: (username: string, token: string, userId: string) => void
+    user: User | null
+    login: (userData: User) => void
     logout: () => void
     isAuthenticated: boolean
-};
+    isLoading: boolean
+}
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+type User = {
+    userId: string
+    username: string
+    email: string
+}
 
-export const AuthProvider = ({
-    children,
-    initialUsername = null,
-    initialToken = null,
-    initialUserId = null
-}: {
-    children: React.ReactNode
-    initialUsername?: string | null
-    initialToken?: string | null
-    initialUserId?: string | null
-}) => {
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const queryClient = useQueryClient()
 
-    const [userId, setUserId] = useState<string | null>(initialUserId)
-    const [user, setUser] = useState<string | null>(initialUsername)
-    const [token, setToken] = useState<string | null>(initialToken)
+    const [user, setUser] = useState<User | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        if (!initialUsername || !initialToken || !initialUserId) {
-            const storedUser = localStorage.getItem('user')
-            const storedToken = localStorage.getItem('token')
-            const storedUserId = localStorage.getItem('userId')
+        const checkUserStatus = async () => {
+            try {
+                const response = await api.get<{ user: User }>('/auth/status')
 
-            if (storedUser && storedToken && storedUserId) {
-                setUser(storedUser)
-                setToken(storedToken)
-                setUserId(storedUserId)
+                setUser(response.data.user);
+            } catch (error) {
+                setUser(null)
+            } finally {
+                setIsLoading(false)
             }
-        }
+        };
+
+        checkUserStatus();
     }, [])
 
-    const login = (username: string, jwt: string, userId: string) => {
-        setUser(username)
-        setToken(jwt)
-        setUserId(userId)
-
-        localStorage.setItem('user', username)
-        localStorage.setItem('token', jwt)
-        localStorage.setItem('userId', userId)
+    const login = (userData: User) => {
+        setUser(userData);
     }
 
-    const logout = () => {
+    const logout = async () => {
         queryClient.clear()
 
-        setUser(null)
-        setToken(null)
-        setUserId(null)
-
-        localStorage.removeItem('user')
-        localStorage.removeItem('token')
-        localStorage.removeItem('userId')
+        try {
+            await api.post('/auth/logout')
+        } catch (error) {
+            console.error("Logout failed", error)
+        } finally {
+            setUser(null)
+        }
     }
 
     return (
-        <AuthContext.Provider value={{ user, token, userId, login, logout, isAuthenticated: !!token }}>
+        <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, isLoading }}>
             {children}
         </AuthContext.Provider>
-    );
+    )
 }
 
 export const useAuth = () => {
-    const context = useContext(AuthContext)
-    if (!context) throw new Error("useAuth must be used within an AuthProvider")
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used within an AuthProvider");
+    }
     return context
 }

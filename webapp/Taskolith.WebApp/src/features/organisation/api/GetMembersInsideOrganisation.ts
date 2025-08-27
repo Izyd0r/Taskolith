@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios'
+import apiClient from '@/lib/axios'
 import { type GetOrganisationMembersResponse } from '@/features/organisation/types/GetOrganisationMembersResponse'
 
 export const GetMembersInsideOrganisation = async (organisationId: string): Promise<GetOrganisationMembersResponse[]> => {

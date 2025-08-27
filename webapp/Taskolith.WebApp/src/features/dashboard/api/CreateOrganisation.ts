@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios'
+import apiClient from '@/lib/axios'
 import { type CreateOrganisationRequest } from '@/features/dashboard/types/CreateOrganisationRequest'
 
 export const CreateOrganisation = async (request: CreateOrganisationRequest) => {

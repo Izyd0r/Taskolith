@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios'
+import apiClient from '@/lib/axios'
 import { type CreateProjectRequest } from '@/features/organisation/types/CreateProjectRequest'
 import { type Project } from '@/features/organisation/types/Project'
 

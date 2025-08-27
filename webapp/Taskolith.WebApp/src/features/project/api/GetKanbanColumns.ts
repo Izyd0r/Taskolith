@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios'
+import apiClient from '@/lib/axios'
 
 export const GetKanbanColumns = async (
     organisationId: string,

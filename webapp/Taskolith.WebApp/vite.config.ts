@@ -8,6 +8,15 @@ export default defineConfig({
         react(),
         tailwindcss(),
     ],
+    server: {
+        proxy: {
+            '/api': {
+                target: 'https://localhost',
+                changeOrigin: true,
+                secure: false, // for self-signed cert
+            }
+        }
+    },
     test: {
         globals: true,
         environment: 'jsdom',

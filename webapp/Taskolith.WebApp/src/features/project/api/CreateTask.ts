@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios'
+import apiClient from '@/lib/axios'
 import { type CreateTaskRequest } from '@/features/project/types/CreateTaskRequest'
 
 export const CreateTask = async (

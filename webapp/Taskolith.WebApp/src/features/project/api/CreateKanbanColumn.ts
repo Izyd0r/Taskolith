@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios'
+import apiClient from '@/lib/axios'
 import { type CreateKanbanColumnRequest } from '@/features/project/types/CreateKanbanColumnRequest'
 
 export const CreateKanbanColumn = async (

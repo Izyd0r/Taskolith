@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios'
+import apiClient from '@/lib/axios'
 import { type Role } from '@/features/organisation/types/Role'
 
 export const getMemberRoles = async (

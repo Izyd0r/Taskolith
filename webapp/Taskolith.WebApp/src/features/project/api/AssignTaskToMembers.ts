@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios'
+import apiClient from '@/lib/axios'
 import { type AssignMembersRequest } from '@/features/project/types/AssignMembersSchema'
 
 export const AssignTaskToMembers = async (

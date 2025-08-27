@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios'
+import apiClient from '@/lib/axios'
 import { type RoleRequest } from '@/features/organisation/types/RoleRequest'
 import { type GetRolesResponse } from '@/features/organisation/types/Role'
 

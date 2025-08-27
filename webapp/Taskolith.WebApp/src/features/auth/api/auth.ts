@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios';
+import apiClient from '@/lib/axios';
 import { type LoginCredentials, type SignupCredentials, type LoginResponse, type SignupResponse } from '@/features/auth/types/auth';
 
 export const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {

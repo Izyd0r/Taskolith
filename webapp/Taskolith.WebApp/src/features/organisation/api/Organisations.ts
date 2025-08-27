@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/axios'
+import apiClient from '@/lib/axios'
 
 export const UpdateOrganisation = async (payload: { organisationId: string, organisationName: string }) => {
     const { data } = await apiClient.put(`/organisations/`, {
