@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using Taskolith.API.Auth;
 using Taskolith.API.Data.Types;
 using Microsoft.AspNetCore.HttpOverrides;
+using Taskolith.API.Auth.Refresh;
 
 const string productionCors = "ProdCors";
 const string developCors = "DevCors";
@@ -87,6 +88,7 @@ Use this API to build custom clients, dashboards, or integrations with Taskolith
         { securityScheme, new List<string>() }
     });
 });
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -160,6 +162,7 @@ else
     app.UseHsts();
 }
 app.UseRouting();
+app.UseMiddleware<JwtRefreshMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
