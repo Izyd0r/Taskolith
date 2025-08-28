@@ -27,8 +27,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         const checkStatus = async () => {
             try {
-                const res = await api.get<{ user: User }>("/auth/status")
-                setUser(res.data.user)
+                const res = await api.get<User>("/auth/status")
+                setUser(res.data)
             } catch {
                 setUser(null)
             } finally {
