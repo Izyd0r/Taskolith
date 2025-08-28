@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { PrivateRoute } from '@/features/auth/components/PrivateRoute'
-import { PublicOnlyRoute } from '@/features/auth/components/PublicOnlyRoute'
+import { PublicRoute } from '@/features/auth/components/PublicRoute'
 import LandingPage from '@/features/landing-page/pages/LandingPage';
 import LoginPage from '@/features/auth/pages/LoginPage';
 import SignupPage from '@/features/auth/pages/SignupPage';
@@ -24,7 +24,7 @@ import EditProjectPage from '@/features/project/components/EditProjectPage'
 function App() {
     return (
         <Routes>
-            <Route element={<PublicOnlyRoute />}>
+            <Route element={<PublicRoute />}>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />

@@ -1,7 +1,7 @@
-import { useMutation } from '@tanstack/react-query'
-import * as authService from '@/features/auth/api/auth'
-import { type SignupCredentials, type SignupResponse } from '@/features/auth/types/auth'
-import { useAuth } from '@/features/auth/context/AuthContext'
+import { useMutation } from "@tanstack/react-query"
+import * as authService from "@/features/auth/api/Auth"
+import { useAuth } from "@/features/auth/context/AuthContext"
+import { type SignupCredentials, type SignupResponse } from "@/features/auth/types"
 
 export const useSignup = () => {
     const { login } = useAuth()
@@ -9,7 +9,7 @@ export const useSignup = () => {
     return useMutation<SignupResponse, Error, SignupCredentials>({
         mutationFn: authService.signup,
         onSuccess: (data) => {
-            login(data.user)
-        }
+            login({ userId: data.userId, username: data.username, email: data.email })
+        },
     })
 }
