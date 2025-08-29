@@ -4,12 +4,7 @@ import { useAcceptInvite } from '@/features/dashboard/hooks/useAcceptInvite'
 import { useRejectInvite } from '@/features/dashboard/hooks/useRejectInvite'
 import { type Invitation } from '@/features/dashboard/types/GetInvitationResponse'
 import { Mail, Clock, Check, X } from 'lucide-react'
-
-const LoadingSpinner: React.FC = () => (
-    <div className="flex justify-center items-center p-10">
-        <div className="w-10 h-10 border-4 border-dashed rounded-full animate-spin border-blue-500"></div>
-    </div>
-)
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 const InviteCard: React.FC<{
     invite: Invitation
@@ -39,9 +34,8 @@ const InviteCard: React.FC<{
 
                 <div className="flex items-center justify-end gap-3 flex-shrink-0">
                     {isExpired || invite.status !== 'Pending' ? (
-                        <span className={`text-sm font-medium px-3 py-1 rounded-full ${
-                            isExpired ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
-                        }`}>
+                        <span className={`text-sm font-medium px-3 py-1 rounded-full ${isExpired ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                            }`}>
                             {isExpired ? 'Expired' : invite.status}
                         </span>
                     ) : (
@@ -91,7 +85,7 @@ const MyInvites: React.FC = () => {
             const otherInvites = invites.filter(inv => inv.status !== 'Pending' || new Date(inv.dueDate) < new Date())
 
             return (
-                 <div className="space-y-4">
+                <div className="space-y-4">
                     {pendingInvites.map((invite) => (
                         <InviteCard
                             key={invite.id}
@@ -101,9 +95,9 @@ const MyInvites: React.FC = () => {
                             isProcessing={isProcessing}
                         />
                     ))}
-                    {pendingInvites.length > 0 && otherInvites.length > 0 && <hr className="my-6"/>}
+                    {pendingInvites.length > 0 && otherInvites.length > 0 && <hr className="my-6" />}
                     {otherInvites.map((invite) => (
-                         <InviteCard
+                        <InviteCard
                             key={invite.id}
                             invite={invite}
                             onAccept={acceptInvite}

@@ -35,7 +35,7 @@ export function ContentPage({ title, topContent, children }: ContentPageProps) {
     }, [children, handleScroll])
 
     return (
-        <div className="p-6 h-full flex flex-col bg-gray-50">
+        <div className="p-4 sm:p-6 h-full flex flex-col bg-gray-50">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 flex-shrink-0 gap-4">
                 <h1 className="text-2xl font-bold flex-shrink-0">{title}</h1>
                 {topContent}

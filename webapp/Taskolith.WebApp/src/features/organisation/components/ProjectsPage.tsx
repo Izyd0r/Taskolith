@@ -11,6 +11,7 @@ import { ProjectTile } from '@/features/organisation/components/ProjectTile'
 import { ManageMembersModal } from '@/features/organisation/components/ManageMembersModal'
 import { ProjectFormModal } from '@/features/organisation/components/ProjectFormModal'
 import { DeleteConfirmationModal } from '@/features/organisation/components/DeleteConfirmationModal'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 import { useGetMembersInsideOrganisation } from '@/features/organisation/hooks/useGetMembersInsideOrganisation'
 import { useGetAllProjects, useGetMyProjects, useCreateProject, useUpdateProject, useDeleteProject } from '@/features/organisation/hooks/useProjects'
@@ -94,7 +95,7 @@ export default function ProjectsPage() {
     }
 
     if (isLoading) {
-        return <div className="p-6 text-gray-500">Loading...</div>
+        return <LoadingSpinner />
     }
 
     return (
