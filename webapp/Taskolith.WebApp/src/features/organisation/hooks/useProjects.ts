@@ -1,17 +1,30 @@
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
-import { CreateProject, GetAllProjects, GetMyProjects, UpdateProject, DeleteProject, AssignMembersToProject, RemoveMemberFromProject } from '@/features/organisation/api/Projects'
+import {
+    CreateProject,
+    GetAllProjects,
+    GetMyProjects,
+    UpdateProject,
+    DeleteProject,
+    AssignMembersToProject,
+    RemoveMemberFromProject
+} from '@/features/organisation/api/Projects'
 import { type CreateProjectRequest } from '@/features/organisation/types/CreateProjectRequest'
-import { type Project } from '@/features/organisation/types/Project'
+
+const getProjectsQueryKey = (organisationId: string) => ['projects', organisationId]
 
 export const useCreateProject = (organisationId: string) => {
-    return useMutation<void, Error, CreateProjectRequest>({
-        mutationFn: (request) => CreateProject(organisationId, request),
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (request: CreateProjectRequest) => CreateProject(organisationId, request),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: getProjectsQueryKey(organisationId) })
+        },
     })
 }
 
 export const useGetAllProjects = (organisationId: string, options: { enabled: boolean }) => {
     return useQuery({
-        queryKey: ['projects', 'all', organisationId],
+        queryKey: [...getProjectsQueryKey(organisationId), 'all'],
         queryFn: () => GetAllProjects(organisationId),
         enabled: !!organisationId && options.enabled,
     })
@@ -19,7 +32,7 @@ export const useGetAllProjects = (organisationId: string, options: { enabled: bo
 
 export const useGetMyProjects = (organisationId: string, options: { enabled: boolean }) => {
     return useQuery({
-        queryKey: ['projects', 'me', organisationId],
+        queryKey: [...getProjectsQueryKey(organisationId), 'me'],
         queryFn: () => GetMyProjects(organisationId),
         enabled: !!organisationId && options.enabled,
     })
@@ -31,7 +44,7 @@ export const useUpdateProject = (organisationId: string) => {
         mutationFn: ({ projectId, payload }: { projectId: string; payload: { name?: string; description?: string } }) =>
             UpdateProject(organisationId, projectId, payload),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['projects', organisationId] })
+            queryClient.invalidateQueries({ queryKey: getProjectsQueryKey(organisationId) })
         },
     })
 }
@@ -41,10 +54,12 @@ export const useDeleteProject = (organisationId: string) => {
     return useMutation({
         mutationFn: (projectId: string) => DeleteProject(organisationId, projectId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['projects', organisationId] })
+            queryClient.invalidateQueries({ queryKey: getProjectsQueryKey(organisationId) })
         },
     })
 }
+
+
 
 export const useAssignMembersToProject = (organisationId: string) => {
     const queryClient = useQueryClient()

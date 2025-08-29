@@ -22,13 +22,6 @@ export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) 
                 aria-labelledby="dialog-title"
                 className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative"
             >
-                <button
-                    onClick={() => onOpenChange(false)}
-                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl"
-                    aria-label="Close"
-                >
-                    ×
-                </button>
                 {children}
             </div>
         </div>,

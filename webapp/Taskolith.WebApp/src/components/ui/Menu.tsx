@@ -11,9 +11,9 @@ interface MenuContextType {
     isOpen: boolean
     toggle: () => void
     close: () => void
-    coords: Coords
-    setCoords: (coords: Coords) => void
     buttonRef: React.RefObject<HTMLButtonElement | null>
+    menuItemsRef: React.RefObject<HTMLDivElement | null>
+    coords: Coords
 }
 
 const MenuContext = createContext<MenuContextType | null>(null)
@@ -49,20 +49,43 @@ const useOnClickOutside = (
 export const Menu: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [coords, setCoords] = useState<Coords>({ top: 0, left: 0, width: 0 })
-    const menuRef = useRef<HTMLDivElement>(null)
+
     const buttonRef = useRef<HTMLButtonElement>(null)
+    const menuItemsRef = useRef<HTMLDivElement>(null)
 
     const toggle = () => setIsOpen(!isOpen)
     const close = () => setIsOpen(false)
 
-    
-    //useOnClickOutside(menuRef, close)
+    useEffect(() => {
+        if (isOpen && buttonRef.current && menuItemsRef.current) {
+            const buttonRect = buttonRef.current.getBoundingClientRect()
+            const menuRect = menuItemsRef.current.getBoundingClientRect()
+            const { innerWidth, innerHeight } = window
 
-    const contextValue = { isOpen, toggle, close, coords, setCoords, buttonRef }
+            let finalTop = buttonRect.bottom + window.scrollY
+            let finalLeft = buttonRect.left + window.scrollX
+
+            if (finalTop + menuRect.height > innerHeight + window.scrollY) {
+                finalTop = buttonRect.top + window.scrollY - menuRect.height
+            }
+
+            if (finalLeft + menuRect.width > innerWidth + window.scrollX) {
+                finalLeft = buttonRect.right + window.scrollX - menuRect.width
+            }
+
+            setCoords({
+                top: finalTop,
+                left: finalLeft,
+                width: buttonRect.width,
+            })
+        }
+    }, [isOpen])
+
+    const contextValue = { isOpen, toggle, close, buttonRef, menuItemsRef, coords }
 
     return (
         <MenuContext.Provider value={contextValue}>
-            <div ref={menuRef} className="relative inline-block text-left">
+            <div className="relative inline-block text-left">
                 {children}
             </div>
         </MenuContext.Provider>
@@ -74,19 +97,11 @@ export const MenuButton: React.FC<{
     className?: string
     onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }> = ({ children, className, onClick }) => {
-    const { toggle, setCoords, buttonRef } = useMenu()
+    const { toggle, buttonRef } = useMenu()
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         if (onClick) {
             onClick(event)
-        }
-        if (buttonRef.current) {
-            const rect = buttonRef.current.getBoundingClientRect()
-            setCoords({
-                top: rect.bottom + window.scrollY,
-                left: rect.left + window.scrollX,
-                width: rect.width
-            })
         }
         toggle()
     }
@@ -99,8 +114,7 @@ export const MenuButton: React.FC<{
 }
 
 export const MenuItems: React.FC<{ children: ReactNode, className?: string }> = ({ children, className }) => {
-    const { isOpen, coords, close } = useMenu()
-    const menuItemsRef = useRef<HTMLDivElement>(null)
+    const { isOpen, close, menuItemsRef, coords } = useMenu()
 
     useOnClickOutside(menuItemsRef, close)
 
