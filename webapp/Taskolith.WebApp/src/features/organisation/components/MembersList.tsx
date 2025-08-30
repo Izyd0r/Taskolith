@@ -46,38 +46,41 @@ export function MemberList({
 
     return (
         <div className="bg-white rounded-lg shadow max-h-full flex flex-col">
-            <div className="overflow-y-auto">
+            <div className="overflow-y-auto rounded-lg">
                 <table className="min-w-full divide-y divide-gray-200 hidden md:table">
                     <thead className="bg-gray-50 sticky top-0 z-10">
                         <tr>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">User</th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">Roles</th>
-                            <th scope="col" className="relative px-6 py-3 w-1/S5"><span className="sr-only">Actions</span></th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">User</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">Roles</th>
+                            <th className="relative px-6 py-3 w-1/5"><span className="sr-only">Actions</span></th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {members.map((member) => (
+                        {members.map(member => (
                             <MemberRow
                                 key={member.memberId}
                                 member={member}
                                 canKick={canKick}
-                                isCurrentUser={member.userId === currentUserId}
+                                isCurrentUser={member.userId.toLowerCase() === currentUserId}
                                 canManageRoles={canManageRoles}
-                                onManageRoles={() => onManageRoles(member)} displayAs="row" />
+                                onManageRoles={() => onManageRoles(member)}
+                                displayAs="row"
+                            />
                         ))}
                     </tbody>
                 </table>
 
                 <div className="md:hidden space-y-3">
-                    {members.map((member) => (
+                    {members.map(member => (
                         <MemberRow
                             key={member.memberId}
                             member={member}
                             canKick={canKick}
-                            isCurrentUser={member.userId === currentUserId}
+                            isCurrentUser={member.userId.toLowerCase() === currentUserId}
                             canManageRoles={canManageRoles}
                             onManageRoles={() => onManageRoles(member)}
-                            displayAs="card" />
+                            displayAs="card"
+                        />
                     ))}
                 </div>
             </div>

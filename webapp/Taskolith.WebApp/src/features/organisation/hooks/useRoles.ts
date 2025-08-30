@@ -3,10 +3,11 @@ import { GetRoles, CreateRole, UpdateRole, DeleteRole } from '@/features/organis
 import { type RoleRequest } from '@/features/organisation/types/RoleRequest'
 import { type GetRolesResponse } from '@/features/organisation/types/Role'
 
-export const useGetRoles = (organisationId: string) =>
+export const useGetRoles = (organisationId: string, options?: { enabled?: boolean }) =>
     useQuery<GetRolesResponse>({
         queryKey: ['organisation', organisationId, 'roles'],
-        queryFn: () => GetRoles(organisationId)
+        queryFn: () => GetRoles(organisationId),
+        ...options, 
     })
 
 export const useCreateRole = (organisationId: string) => {

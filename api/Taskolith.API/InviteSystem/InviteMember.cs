@@ -26,21 +26,30 @@ public class InviteMember : IEndPoint
             .Where(u => u.Email == request.Email)
             .SingleOrDefaultAsync(token);
         if (invitedUser == null || invitedUser.Id == Guid.Parse(userId)) return Results.BadRequest();
-        
+       
+        var rolesToAssign = new List<Role>();
+
+        if(request.InitialRoles != null && request.InitialRoles.Any())
+        {
+            var requestedRoleIds = request.InitialRoles.Select(r => r.Id).ToList();
+
+            rolesToAssign = await dbContext.Roles
+                .Where(r => r.OrganisationId == organisationId && requestedRoleIds.Contains(r.Id))
+                .ToListAsync(token);
+            
+            if (rolesToAssign.Count != requestedRoleIds.Count)
+            {
+                return Results.BadRequest("One or more provided roles are invalid or do not belong to this organisation.");
+            }
+        }
+
         var invitation = new Invitation {
             Id = Guid.NewGuid(),
             UserId = invitedUser.Id,
             OrganisationId = organisationId,
             DueDate = request.DueDate,
             Email = request.Email,
-            InitialRoles = (request.InitialRoles ?? [])
-                .Select(r => new Role {
-                    Id = r.Id,
-                    OrganisationId = r.OrganisationId,
-                    Name = r.Name,
-                    Permissions = r.Permissions
-                })
-                .ToList()
+            InitialRoles = rolesToAssign
         };
         
         await dbContext.Invitations.AddAsync(invitation, token);

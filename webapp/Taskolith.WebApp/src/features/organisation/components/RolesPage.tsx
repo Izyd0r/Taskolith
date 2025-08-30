@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAuth } from '@/features/auth/context/AuthContext'
-import { useGetMembersInsideOrganisation } from '@/features/organisation/hooks/useGetMembersInsideOrganisation'
+import { useGetMembersInsideOrganisation } from '@/features/organisation/hooks/useMembers'
 import { Permission } from '@/features/organisation/types/Permission'
 import { useGetRoles, useCreateRole, useUpdateRole, useDeleteRole } from '@/features/organisation/hooks/useRoles'
 import RoleModal from '@/features/organisation/components/RoleModal'
@@ -12,7 +12,8 @@ import { RoleSchema } from '@/features/organisation/types/RoleRequest'
 
 const RolesPage: React.FC = () => {
     const { organisationId } = useParams<{ organisationId: string }>()
-    const { userId: currentUserId } = useAuth()
+    const { user: currentUser } = useAuth()
+    const currentUserId = currentUser?.userId
 
     const { data: rolesResponse, isLoading: isRolesLoading, isError: isRolesError } = useGetRoles(organisationId!)
     const { data: members } = useGetMembersInsideOrganisation(organisationId!)

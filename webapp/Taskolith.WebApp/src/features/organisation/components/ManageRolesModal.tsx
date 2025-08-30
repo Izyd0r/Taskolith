@@ -8,7 +8,7 @@ import { useGetRoles } from '@/features/organisation/hooks/useRoles'
 import { type Member } from '@/features/organisation/types/Member'
 import { Dialog, DialogContent } from '@/components/ui/Dialog'
 import { Button } from '@/components/ui/Button'
-import { AlertCircle } from 'lucide-react'
+import { RoleSelectionList } from './RoleSelectionList'
 
 interface ManageRolesModalProps {
     member: Member | null
@@ -28,7 +28,7 @@ export const ManageRolesModal: React.FC<ManageRolesModalProps> = ({
     canRemoveRole,
 }) => {
     const queryClient = useQueryClient()
-    const { data: allRoles, isLoading: isLoadingRoles } = useGetRoles(organisationId)
+    const { data: rolesResponse, isLoading: isLoadingRoles } = useGetRoles(organisationId, { enabled: open })
 
     const { mutate: addRole, isPending: isAddingRole } = useAddRoleToMember(
         organisationId,
@@ -41,31 +41,25 @@ export const ManageRolesModal: React.FC<ManageRolesModalProps> = ({
 
     if (!member) return null
 
-    const handleRoleToggle = (roleId: string, hasRole: boolean) => {
-        const queryKey = ['organisation', organisationId, 'members']
-        const roleToUpdate = allRoles?.roles.find((r) => r.id === roleId)
-        if (!roleToUpdate) return
+    const handleRoleToggle = (role: { id: string }) => {
+        const hasRole = member.roles?.some((r) => r.id === role.id) ?? false
 
         const mutationOptions = {
             onSuccess: () => {
-                queryClient.setQueryData<Member[]>(queryKey, (oldData = []) =>
-                    oldData.map((m) => {
-                        if (m.memberId === member.memberId) {
-                            const newRoles = hasRole
-                                ? m.roles?.filter((r) => r.id !== roleId)
-                                : [...(m.roles || []), roleToUpdate]
-                            return { ...m, roles: newRoles }
-                        }
-                        return m
-                    })
-                )
+                queryClient.invalidateQueries({ queryKey: ['organisation', organisationId, 'members'] })
             },
+            onError: (error: any) => {
+                alert(`Failed to update role: ${error.message}`)
+                queryClient.invalidateQueries({ queryKey: ['organisation', organisationId, 'members'] })
+            }
         }
 
         if (hasRole) {
-            removeRole(roleId, mutationOptions)
+            if (!canRemoveRole) return
+            removeRole(role.id, mutationOptions)
         } else {
-            addRole(roleId, mutationOptions)
+            if (!canAddRole) return
+            addRole(role.id, mutationOptions)
         }
     }
 
@@ -74,54 +68,29 @@ export const ManageRolesModal: React.FC<ManageRolesModalProps> = ({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
-                <div className="mb-4">
-                    <h3 className="text-lg font-semibold leading-6 text-gray-900">
-                        Manage Roles for {member.username}
-                    </h3>
-                </div>
-
-                {isLoadingRoles ? (
-                    <p>Loading roles...</p>
-                ) : !allRoles || allRoles.roles.length === 0 ? (
-                    <div className="flex items-center gap-2 text-gray-500">
-                        <AlertCircle size={16} />
-                        <span>No roles available in this organisation.</span>
+                <div className="space-y-4">
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                            Manage Roles for {member.username}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                            Select the roles this member should have.
+                        </p>
                     </div>
-                ) : (
-                    <div className="space-y-4 py-4">
-                        {allRoles.roles.map((role) => {
-                            const hasRole = member.roles?.some((r) => r.id === role.id) ?? false
-                            const canChange = (hasRole && canRemoveRole) || (!hasRole && canAddRole)
 
-                            return (
-                                <div key={role.id} className="flex items-center space-x-3">
-                                    <input
-                                        type="checkbox"
-                                        id={`role-${role.id}`}
-                                        checked={hasRole}
-                                        onChange={() => handleRoleToggle(role.id, hasRole)}
-                                        disabled={!canChange || isPending}
-                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
-                                    />
-                                    <label
-                                        htmlFor={`role-${role.id}`}
-                                        className={`text-sm font-medium leading-none ${!canChange || isPending
-                                            ? 'text-gray-400 cursor-not-allowed'
-                                            : 'text-gray-700'
-                                            }`}
-                                    >
-                                        {role.name}
-                                    </label>
-                                </div>
-                            )
-                        })}
+                    <RoleSelectionList
+                        availableRoles={rolesResponse?.roles ?? []}
+                        isLoading={isLoadingRoles}
+                        isDisabled={isPending}
+                        activeRoles={member.roles ?? []}
+                        onRoleChange={handleRoleToggle}
+                    />
+
+                    <div className="flex justify-end pt-4">
+                        <Button onClick={() => onOpenChange(false)} disabled={isPending}>
+                            Done
+                        </Button>
                     </div>
-                )}
-
-                <div className="flex justify-end pt-4 mt-4 border-t">
-                    <Button onClick={() => onOpenChange(false)} disabled={isPending}>
-                        Done
-                    </Button>
                 </div>
             </DialogContent>
         </Dialog>

@@ -59,7 +59,6 @@ const RoleModal: React.FC<RoleModalProps> = ({ open, onOpenChange, onSubmit, ini
 
                     <div>
                         <h4 className="text-sm font-medium mb-3">Permissions</h4>
-                        {/* Scrollable permissions list */}
                         <div className="max-h-64 overflow-y-auto border border-gray-200 bg-white rounded-md divide-y divide-gray-200">
                             {permissionEntries.map(([key, value]) => {
                                 const meta = PermissionDescriptions[value] ?? { title: key, description: '' }

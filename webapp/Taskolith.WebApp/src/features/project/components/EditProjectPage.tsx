@@ -5,7 +5,7 @@ import { InputField } from '@/components/ui/InputField'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/features/auth/context/AuthContext'
 import { useUpdateProject, useDeleteProject, useAssignMembersToProject, useRemoveMemberFromProject } from '@/features/organisation/hooks/useProjects'
-import { useGetMembersInsideOrganisation } from '@/features/organisation/hooks/useGetMembersInsideOrganisation'
+import { useGetMembersInsideOrganisation } from '@/features/organisation/hooks/useMembers'
 import { type Project } from '@/features/organisation/types/Project'
 import { Permission, type TPermission } from '@/features/organisation/types/Permission'
 

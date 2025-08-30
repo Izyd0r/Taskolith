@@ -13,7 +13,7 @@ import { ProjectFormModal } from '@/features/organisation/components/ProjectForm
 import { DeleteConfirmationModal } from '@/features/organisation/components/DeleteConfirmationModal'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
-import { useGetMembersInsideOrganisation } from '@/features/organisation/hooks/useGetMembersInsideOrganisation'
+import { useGetMembersInsideOrganisation } from '@/features/organisation/hooks/useMembers'
 import { useGetAllProjects, useGetMyProjects, useCreateProject, useUpdateProject, useDeleteProject } from '@/features/organisation/hooks/useProjects'
 
 export default function ProjectsPage() {

@@ -1,3 +1,5 @@
+using Taskolith.API.OrganizationManagement.Roles.Responses;
+
 namespace Taskolith.API.Data.Dtos;
 
 public record InvitationDto(
@@ -6,5 +8,6 @@ public record InvitationDto(
     String Status,
     DateTime DueDate,
     bool Expired,
-    String InvitedUserEmail
+    String InvitedUserEmail,
+    List<RoleDto> InitialRoles
 );

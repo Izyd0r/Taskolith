@@ -3,7 +3,6 @@ import {
     FolderKanban,
     Users,
     ShieldCheck,
-    Mail,
     Settings,
 } from 'lucide-react'
 import SidebarLayout from '@/components/sidebar/SidebarLayout'
@@ -17,9 +16,8 @@ const OrganisationSidebar = () => {
             }
         >
             <SidebarItem label="Projects" to="projects" icon={<FolderKanban size={24} />} delay={150} />
-            <SidebarItem label="Members" to="members" icon={<Users size={24} />} delay={200} />
+            <SidebarItem label="Access Management" to="access" icon={<Users size={24} />} delay={200} />
             <SidebarItem label="Roles" to="roles" icon={<ShieldCheck size={24} />} delay={300} />
-            <SidebarItem label="Pending Invites" to="invites" icon={<Mail size={24} />} delay={350} />
             <SidebarItem label="Organisation Settings" to="settings" icon={<Settings size={24} />} delay={400} />
         </SidebarLayout>
     );
