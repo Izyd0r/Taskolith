@@ -70,7 +70,8 @@ export function MemberList({
                     </tbody>
                 </table>
 
-                <div className="md:hidden space-y-3">
+                {/* Mobile view */}
+                <div className="md:hidden space-y-3 p-4">
                     {members.map(member => (
                         <MemberRow
                             key={member.memberId}

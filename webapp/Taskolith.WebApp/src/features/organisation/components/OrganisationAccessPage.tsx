@@ -36,42 +36,47 @@ export default function OrganisationAccessPage() {
                     )
                 }
             >
-                <div className="flex items-center rounded-lg bg-gray-200 p-1 text-sm self-start mb-4">
-                    <button
-                        onClick={() => setView('members')}
-                        className={`px-3 py-1 rounded-md transition-colors duration-200 ${view === 'members' ? 'bg-white shadow-sm font-semibold text-gray-800' : 'bg-transparent text-gray-500 hover:text-gray-700'}`}
-                    >
-                        Members
-                    </button>
-                    {permissions.canManageInvites && (
+                <div className="flex flex-col flex-1 min-h-0 h-full pt-6">
+                    <div className="flex items-center rounded-lg bg-gray-200 p-1 text-sm w-full mb-4">
                         <button
-                            onClick={() => setView('invites')}
-                            className={`px-3 py-1 rounded-md transition-colors duration-200 ${view === 'invites' ? 'bg-white shadow-sm font-semibold text-gray-800' : 'bg-transparent text-gray-500 hover:text-gray-700'}`}
+                            onClick={() => setView('members')}
+                            className={`px-3 py-1 rounded-md transition-colors duration-200 ${view === 'members' ? 'bg-white shadow-sm font-semibold text-gray-800' : 'bg-transparent text-gray-500 hover:text-gray-700'}`}
                         >
-                            Pending Invites
+                            Members
                         </button>
-                    )}
+                        {permissions.canManageInvites && (
+                            <button
+                                onClick={() => setView('invites')}
+                                className={`px-3 py-1 rounded-md transition-colors duration-200 ${view === 'invites' ? 'bg-white shadow-sm font-semibold text-gray-800' : 'bg-transparent text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Pending Invites
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="flex-1 min-h-0">
+                        {view === 'members' && (
+                            <MemberList
+                                members={filteredMembers} isLoading={isLoadingMembers} isError={isErrorMembers}
+                                currentUserId={currentUserId} canKick={permissions.canKick}
+                                canManageRoles={permissions.canAddRole || permissions.canRemoveRole}
+                                onManageRoles={setMemberToEditRoles}
+                            />
+                        )}
+
+                        {view === 'invites' && (
+                            <InvitesList
+                                isLoading={isLoadingInvites}
+                                isError={isErrorInvites}
+                                filteredInvites={filteredInvites}
+                                isSearchActive={query.length > 0}
+                                onRevokeInvite={revokeInvite.mutate}
+                                isRevoking={revokeInvite.isPending}
+                            />
+                        )}
+                    </div>
                 </div>
 
-                {view === 'members' && (
-                    <MemberList
-                        members={filteredMembers} isLoading={isLoadingMembers} isError={isErrorMembers}
-                        currentUserId={currentUserId} canKick={permissions.canKick}
-                        canManageRoles={permissions.canAddRole || permissions.canRemoveRole}
-                        onManageRoles={setMemberToEditRoles}
-                    />
-                )}
-
-                {view === 'invites' && (
-                    <InvitesList
-                        isLoading={isLoadingInvites}
-                        isError={isErrorInvites}
-                        filteredInvites={filteredInvites}
-                        isSearchActive={query.length > 0}
-                        onRevokeInvite={revokeInvite.mutate}
-                        isRevoking={revokeInvite.isPending}
-                    />
-                )}
             </ListPageLayout>
 
             <InviteMemberModal open={isInviteModalOpen} onOpenChange={setInviteModalOpen} organisationId={organisationId} />
