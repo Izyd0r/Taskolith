@@ -8,11 +8,7 @@ export const useUpdateOrganisation = () => {
         mutationFn: UpdateOrganisation,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['organisations'] })
-            alert('Organisation updated successfully!')
         },
-        onError: (error: any) => {
-            alert(`Failed to update organisation: ${error.message}`)
-        }
     })
 }
 
@@ -23,11 +19,7 @@ export const useDeleteOrganisation = () => {
         mutationFn: DeleteOrganisation,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['organisations'] })
-            alert('Organisation deleted successfully.')
             navigate('/dashboard')
         },
-        onError: (error: any) => {
-            alert(`Failed to delete organisation: ${error.message}`)
-        }
     })
 }

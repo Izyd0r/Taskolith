@@ -15,7 +15,6 @@ public class UpdateOrganisation : IEndPoint
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPut("/", Handle)
         .WithRequestValidation<UpdateOrganisationRequest>()
-        .RequireAuthorization("UpdateOrganisation")
         .WithSummary("Update organisation name");
 
     private static async Task<IResult> Handle(
@@ -29,6 +28,9 @@ public class UpdateOrganisation : IEndPoint
        
         var result = await dbContext.Organisations.SingleOrDefaultAsync(o => o.Id == request.OrganisationId, token);
         if (result == null) return Results.NotFound();
+ 
+        var hasPermission = await permissionService.HasPermission(Guid.Parse(userId), request.OrganisationId, Permission.UpdateOrganisation);
+        if(!hasPermission) return Results.Forbid();
         
         result.Name = request.OrganisationName;
         await dbContext.SaveChangesAsync(token);

@@ -5,6 +5,13 @@ import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react'
 
 type NotificationVariant = 'success' | 'error' | 'warning'
 
+export type Notification = {
+    open: boolean
+    variant: NotificationVariant
+    title: string
+    description: string
+}
+
 interface NotificationModalProps {
     open: boolean
     onOpenChange: (open: boolean) => void

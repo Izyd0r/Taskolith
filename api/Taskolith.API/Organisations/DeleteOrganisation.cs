@@ -11,7 +11,6 @@ public class DeleteOrganisation : IEndPoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapDelete("/{organisationId:guid}", Handle)
-        .RequireAuthorization("DeleteOrganisation")
         .WithSummary("Delete an organisation");
 
     static async Task<IResult> Handle(
@@ -25,6 +24,9 @@ public class DeleteOrganisation : IEndPoint
 
         var org = await db.Organisations.FindAsync([organisationId], cancellationToken: token);
         if (org is null) return Results.NotFound();
+ 
+        var hasPermission = await permissionService.HasPermission(Guid.Parse(userId), organisationId, Permission.DeleteOrganisation); 
+        if (!hasPermission) return Results.Forbid();
         
         var deletedRows = await db.Organisations.Where(o => o.Id == organisationId).ExecuteDeleteAsync(cancellationToken: token);
         return deletedRows == 1 ? Results.NoContent() : Results.NotFound();

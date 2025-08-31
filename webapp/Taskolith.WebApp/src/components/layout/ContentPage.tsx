@@ -4,9 +4,10 @@ type ContentPageProps = {
     title: string
     topContent?: React.ReactNode
     children: React.ReactNode
+    titleAlignment?: 'left' | 'center'
 }
 
-export function ContentPage({ title, topContent, children }: ContentPageProps) {
+export function ContentPage({ title, topContent, children, titleAlignment = 'left' }: ContentPageProps) {
     const scrollContainerRef = useRef<HTMLDivElement>(null)
     const [showTopFade, setShowTopFade] = useState(false)
     const [showBottomFade, setShowBottomFade] = useState(false)
@@ -36,10 +37,21 @@ export function ContentPage({ title, topContent, children }: ContentPageProps) {
 
     return (
         <div className="p-4 sm:p-6 h-full flex flex-col bg-gray-50">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 flex-shrink-0 gap-4">
-                <h1 className="text-2xl font-bold flex-shrink-0">{title}</h1>
-                {topContent}
-            </div>
+            {titleAlignment === 'left' ? (
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 flex-shrink-0 gap-4">
+                    <h1 className="text-2xl font-bold flex-shrink-0">{title}</h1>
+                    {topContent}
+                </div>
+            ) : (
+                <div className="relative flex justify-center items-center mb-4 flex-shrink-0 h-9">
+                    <h1 className="text-2xl font-bold text-center">{title}</h1>
+                    {topContent && (
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                            {topContent}
+                        </div>
+                    )}
+                </div>
+            )}
             <div className="flex-grow min-h-0 relative">
 
                 <div
