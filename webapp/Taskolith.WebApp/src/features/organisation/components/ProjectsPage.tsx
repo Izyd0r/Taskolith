@@ -11,6 +11,7 @@ import { ProjectTile } from '@/features/organisation/components/ProjectTile'
 import { ManageMembersModal } from '@/features/organisation/components/ManageMembersModal'
 import { ProjectFormModal } from '@/features/organisation/components/ProjectFormModal'
 import { DeleteConfirmationModal } from '@/features/organisation/components/DeleteConfirmationModal'
+import { NotificationModal, type Notification } from '@/components/ui/NotificationModal'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 import { useGetMembersInsideOrganisation } from '@/features/organisation/hooks/useMembers'
@@ -29,6 +30,13 @@ export default function ProjectsPage() {
     const [projectIdToDelete, setProjectIdToDelete] = useState<string | null>(null)
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
     const [editingProject, setEditingProject] = useState<Project | null>(null)
+
+    const [notification, setNotification] = useState<Notification>({
+        open: false,
+        variant: 'success',
+        title: '',
+        description: '',
+    })
 
     const { data: members, isLoading: isLoadingMembers } = useGetMembersInsideOrganisation(organisationId!)
 
@@ -66,32 +74,56 @@ export default function ProjectsPage() {
     const updateProjectMutation = useUpdateProject(organisationId!)
     const deleteProjectMutation = useDeleteProject(organisationId!)
 
-    const handleCreateOrUpdate = async (form: { name: string, description: string }) => {
-        try {
-            if (editingProject) {
-                await updateProjectMutation.mutateAsync({ projectId: editingProject.projectId, payload: form })
-            } else {
-                await createProjectMutation.mutateAsync(form)
-            }
-            setProjectModalOpen(false)
-            setEditingProject(null)
-        } catch (error) {
-            console.error("Failed to save project:", error)
-            alert("Failed to save project. Please try again.")
+    const handleCreateOrUpdate = (form: { name: string, description: string }) => {
+        const commonOptions = {
+            onSuccess: (successMessage: string) => {
+                setNotification({ open: true, variant: 'success', title: 'Success', description: successMessage })
+                setProjectModalOpen(false)
+                setEditingProject(null)
+            },
+            onError: (error: Error) => {
+                setNotification({ open: true, variant: 'error', title: 'Error', description: error.message || "An unexpected error occurred." })
+            },
+        }
+
+        if (editingProject) {
+            updateProjectMutation.mutate({ projectId: editingProject.projectId, payload: form }, {
+                onSuccess: () => commonOptions.onSuccess('The project was updated successfully.'),
+                onError: commonOptions.onError,
+            })
+        } else {
+            createProjectMutation.mutate(form, {
+                onSuccess: () => commonOptions.onSuccess('The project was created successfully.'),
+                onError: commonOptions.onError,
+            })
         }
     }
 
-    const handleConfirmDelete = async () => {
+    const handleConfirmDelete = () => {
         if (!projectIdToDelete) return
 
-        try {
-            await deleteProjectMutation.mutateAsync(projectIdToDelete)
-            setDeleteModalOpen(false)
-            setProjectIdToDelete(null)
-        } catch (error) {
-            console.error("Failed to delete project:", error)
-            alert("Failed to delete project. Please try again.")
-        }
+        deleteProjectMutation.mutate(projectIdToDelete, {
+            onSuccess: () => {
+                setNotification({
+                    open: true,
+                    variant: 'success',
+                    title: 'Project Deleted',
+                    description: 'The project has been successfully deleted.',
+                })
+            },
+            onError: (error: Error) => {
+                setNotification({
+                    open: true,
+                    variant: 'error',
+                    title: 'Deletion Failed',
+                    description: error.message || 'The project could not be deleted.',
+                })
+            },
+            onSettled: () => {
+                setDeleteModalOpen(false)
+                setProjectIdToDelete(null)
+            },
+        })
     }
 
     if (isLoading) {
@@ -184,6 +216,14 @@ export default function ProjectsPage() {
                 isDeleting={deleteProjectMutation.isPending}
                 title="Delete Project"
                 description="Are you sure you want to delete this project? All associated tasks and data will be permanently removed. This action cannot be undone."
+            />
+
+            <NotificationModal
+                open={notification.open}
+                onOpenChange={() => setNotification({ ...notification, open: false })}
+                variant={notification.variant}
+                title={notification.title}
+                description={notification.description}
             />
         </>
     )
