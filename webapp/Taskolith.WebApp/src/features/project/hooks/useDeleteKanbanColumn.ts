@@ -8,7 +8,7 @@ export const useDeleteKanbanColumn = (organisationId: string, projectId: string)
         mutationFn: (kanbanColumnId: string) =>
             DeleteKanbanColumn(organisationId, projectId, kanbanColumnId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['kanbanColumns', organisationId, projectId] })
+            queryClient.invalidateQueries({ queryKey: ['kanban-columns', organisationId, projectId] })
         }
     })
 }

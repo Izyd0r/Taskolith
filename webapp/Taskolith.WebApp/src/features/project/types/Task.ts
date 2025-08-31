@@ -1,4 +1,4 @@
-import { type Member } from '@/features/organisation/types/Member'
+import { type TaskMember } from '@/features/project/types/TaskMember'
 import { type PriorityValue } from '@/features/project/types/Priority'
 
 export type Task = {
@@ -9,7 +9,7 @@ export type Task = {
     dueDate: string
     createdDate: string
     completed: boolean
-    assignedMembers: Member[]
+    assignedMembers: TaskMember[]
     priority: PriorityValue 
     kanbanColumnId: string
 }

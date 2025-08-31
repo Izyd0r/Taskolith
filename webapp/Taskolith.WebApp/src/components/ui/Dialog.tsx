@@ -5,10 +5,14 @@ interface DialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     children: React.ReactNode
+    className?: string
 }
 
-export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) => {
+export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children, className }) => {
     if (!open) return null
+
+    const baseDialogClasses = "bg-white rounded-lg shadow-xl p-6 w-full relative"
+    const finalDialogClasses = `${baseDialogClasses} ${className || 'max-w-md'}`
 
     return createPortal(
         <div
@@ -20,7 +24,7 @@ export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) 
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="dialog-title"
-                className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative"
+                className={finalDialogClasses}
             >
                 {children}
             </div>

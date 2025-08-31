@@ -8,7 +8,7 @@ export const useUpdateKanbanColumn = (organisationId: string, projectId: string)
         mutationFn: (variables: { kanbanColumnId: string, request: UpdateKanbanColumnRequest }) =>
             UpdateKanbanColumn(organisationId, projectId, variables.kanbanColumnId, variables.request),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['kanbanColumns', organisationId, projectId] })
+            queryClient.invalidateQueries({ queryKey: ['kanban-columns', organisationId, projectId] })
         }
     })
 }
