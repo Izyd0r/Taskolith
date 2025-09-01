@@ -18,7 +18,7 @@ const ProjectSidebar = () => {
             }
         >
             <SidebarItem label="Kanban" to="kanban" icon={<Kanban size={24} />} delay={150} />
-            <SidebarItem label="Assigned Members" to="members" icon={<Users size={24} />} delay={200} />
+            <SidebarItem label="Project Members" to="members" icon={<Users size={24} />} delay={200} />
             <SidebarItem label="Project Settings" to="settings" icon={<Settings size={24} />} delay={400} />
         </SidebarLayout>
     );

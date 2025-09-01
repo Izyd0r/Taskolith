@@ -13,3 +13,7 @@ export type Task = {
     priority: PriorityValue 
     kanbanColumnId: string
 }
+
+export type GetTasksResponse = {
+    tasks: Task[]
+}

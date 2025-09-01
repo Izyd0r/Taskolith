@@ -8,9 +8,12 @@ export const useAssignTaskToMembers = (organisationId: string, projectId: string
         mutationFn: (variables: { taskId: string, request: AssignMembersRequest }) =>
             AssignTaskToMembers(organisationId, projectId, variables.taskId, variables.request),
         onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['kanbanColumns', organisationId, projectId] })
+            queryClient.invalidateQueries({
+                queryKey: ['organisations', organisationId, 'projects', projectId, 'tasks']
+            })
             queryClient.invalidateQueries({ queryKey: ['organisations', organisationId, 'projects', projectId, 'tasks', variables.taskId, 'members'] })
             queryClient.invalidateQueries({ queryKey: ['tasks', variables.taskId] })
-            queryClient.invalidateQueries({ queryKey: ['kanbanColumns', organisationId, projectId] })
         }
     })
 }

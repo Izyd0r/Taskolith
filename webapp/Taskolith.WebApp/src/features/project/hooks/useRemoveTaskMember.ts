@@ -7,9 +7,12 @@ export const useRemoveTaskMember = (organisationId: string, projectId: string) =
         mutationFn: (variables: { taskId: string, memberId: string }) =>
             RemoveTaskMember(organisationId, projectId, variables.taskId, variables.memberId),
         onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: ['organisations', organisationId, 'projects', projectId, 'tasks']
+            })
+            queryClient.invalidateQueries({ queryKey: ['kanbanColumns', organisationId, projectId] })
             queryClient.invalidateQueries({ queryKey: ['organisations', organisationId, 'projects', projectId, 'tasks', variables.taskId, 'members'] })
             queryClient.invalidateQueries({ queryKey: ['tasks', variables.taskId] })
-            queryClient.invalidateQueries({ queryKey: ['kanbanColumns', organisationId, projectId] })
         }
     })
 }

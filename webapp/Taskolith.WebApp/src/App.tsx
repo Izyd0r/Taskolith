@@ -16,7 +16,7 @@ import RolesPage from '@/features/organisation/components/RolesPage'
 import OrganisationSettingsPage from '@/features/organisation/components/OrganisationSettingsPage'
 import ProjectLayout from '@/features/project/layout/ProjectLayout'
 import Kanban from '@/features/project/components/Kanban'
-import AssignedMembersPage from '@/features/project/components/AssignedMembersPage'
+import ProjectMembersPage from '@/features/project/components/ProjectMembersPage'
 import EditProjectPage from '@/features/project/components/EditProjectPage'
 import OrganisationAccessPage from '@/features/organisation/components/OrganisationAccessPage'
 
@@ -44,7 +44,7 @@ function App() {
                 </Route>
                 <Route path="/organisations/:organisationId/projects/:projectId" element={<ProjectLayout />}>
                     <Route path="kanban" element={<Kanban />} />
-                    <Route path="members" element={<AssignedMembersPage />} />
+                    <Route path="members" element={<ProjectMembersPage />} />
                     <Route path="schedule" element={<SchedulePage />} />
                     <Route path="settings" element={<EditProjectPage />} />
                 </Route>
