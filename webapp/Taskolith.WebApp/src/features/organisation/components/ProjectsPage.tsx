@@ -16,35 +16,33 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 import { useGetMembersInsideOrganisation } from '@/features/organisation/hooks/useMembers'
 import { useGetAllProjects, useGetMyProjects, useCreateProject, useUpdateProject, useDeleteProject } from '@/features/organisation/hooks/useProjects'
+import { useGetProjectMembers } from '@/features/project/hooks/useGetProjectMembers'
 
 export default function ProjectsPage() {
     const { organisationId } = useParams<{ organisationId: string }>()
     const { user } = useAuth()
-    const currentUserId = user?.userId
     const navigate = useNavigate()
 
     const [view, setView] = useState<'all' | 'my'>('my')
     const [isProjectModalOpen, setProjectModalOpen] = useState(false)
     const [isMemberModalOpen, setMemberModalOpen] = useState(false)
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false)
+
     const [projectIdToDelete, setProjectIdToDelete] = useState<string | null>(null)
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
     const [editingProject, setEditingProject] = useState<Project | null>(null)
 
     const [notification, setNotification] = useState<Notification>({
-        open: false,
-        variant: 'success',
-        title: '',
-        description: '',
+        open: false, variant: 'success', title: '', description: ''
     })
 
     const { data: members, isLoading: isLoadingMembers } = useGetMembersInsideOrganisation(organisationId!)
 
     const permissions = useMemo(() => {
         const defaultPermissions = { canGetAllProjects: false, canCreate: false, canUpdate: false, canDelete: false, canAssign: false, canRemove: false }
-        if (!members || !currentUserId) return defaultPermissions
+        if (!members || !user?.userId) return defaultPermissions
 
-        const currentUserAsMember = members.find(m => m.userId === currentUserId)
+        const currentUserAsMember = members.find(m => m.userId === user.userId)
         const userPermissions = currentUserAsMember?.roles.reduce((acc, role) => acc | role.permissions, 0) ?? 0
         const has = (p: TPermission) => (userPermissions & p) === p
 
@@ -56,7 +54,7 @@ export default function ProjectsPage() {
             canAssign: has(Permission.AssignProject),
             canRemove: has(Permission.RemoveFromProject),
         }
-    }, [members, currentUserId])
+    }, [members, user?.userId])
 
     useEffect(() => {
         if (!isLoadingMembers) {
@@ -64,15 +62,20 @@ export default function ProjectsPage() {
         }
     }, [isLoadingMembers, permissions.canGetAllProjects])
 
-    const { data: allProjects, isLoading: isLoadingAll } = useGetAllProjects(organisationId!, { enabled: view === 'all' })
+    const { data: allProjects, isLoading: isLoadingAll } = useGetAllProjects(organisationId!, { enabled: permissions.canGetAllProjects && view === 'all' })
     const { data: myProjects, isLoading: isLoadingMy } = useGetMyProjects(organisationId!, { enabled: view === 'my' })
 
-    const projects = view === 'all' ? allProjects : myProjects
-    const isLoading = isLoadingMembers || isLoadingAll || isLoadingMy
+    const {
+        data: currentProjectMembers,
+        isLoading: isLoadingProjectMembers
+    } = useGetProjectMembers(organisationId, selectedProjectId ?? undefined)
 
     const createProjectMutation = useCreateProject(organisationId!)
     const updateProjectMutation = useUpdateProject(organisationId!)
     const deleteProjectMutation = useDeleteProject(organisationId!)
+
+    const projects = view === 'all' ? allProjects : myProjects
+    const isLoading = isLoadingMembers || isLoadingAll || isLoadingMy
 
     const handleCreateOrUpdate = (form: { name: string, description: string }) => {
         const commonOptions = {
@@ -101,7 +104,6 @@ export default function ProjectsPage() {
 
     const handleConfirmDelete = () => {
         if (!projectIdToDelete) return
-
         deleteProjectMutation.mutate(projectIdToDelete, {
             onSuccess: () => {
                 setNotification({
@@ -124,6 +126,16 @@ export default function ProjectsPage() {
                 setProjectIdToDelete(null)
             },
         })
+    }
+
+    const handleOpenMemberModal = (projectId: string) => {
+        setSelectedProjectId(projectId)
+        setMemberModalOpen(true)
+    }
+
+    const handleCloseMemberModal = () => {
+        setMemberModalOpen(false)
+        setSelectedProjectId(null)
     }
 
     if (isLoading) {
@@ -173,11 +185,8 @@ export default function ProjectsPage() {
                                 key={project.projectId}
                                 project={project}
                                 onEdit={() => { setEditingProject(project); setProjectModalOpen(true); }}
-                                onDelete={() => {
-                                    setProjectIdToDelete(project.projectId)
-                                    setDeleteModalOpen(true)
-                                }}
-                                onManageMembers={() => { setSelectedProjectId(project.projectId); setMemberModalOpen(true); }}
+                                onDelete={() => { setProjectIdToDelete(project.projectId); setDeleteModalOpen(true); }}
+                                onManageMembers={() => handleOpenMemberModal(project.projectId)}
                                 onGoToKanban={() => navigate(`/organisations/${organisationId}/projects/${project.projectId}`)}
                                 canUpdate={permissions.canUpdate}
                                 canDelete={permissions.canDelete}
@@ -200,12 +209,12 @@ export default function ProjectsPage() {
 
             {selectedProjectId && (
                 <ManageMembersModal
-                    open={isMemberModalOpen}
-                    onOpenChange={setMemberModalOpen}
+                    isOpen={isMemberModalOpen}
+                    onClose={handleCloseMemberModal}
                     organisationId={organisationId!}
                     projectId={selectedProjectId}
-                    canAssign={permissions.canAssign}
-                    canRemove={permissions.canRemove}
+                    currentProjectMembers={currentProjectMembers ?? []}
+                    isLoadingProjectMembers={isLoadingProjectMembers}
                 />
             )}
 
@@ -220,7 +229,7 @@ export default function ProjectsPage() {
 
             <NotificationModal
                 open={notification.open}
-                onOpenChange={() => setNotification({ ...notification, open: false })}
+                onOpenChange={(open) => setNotification({ ...notification, open })}
                 variant={notification.variant}
                 title={notification.title}
                 description={notification.description}
