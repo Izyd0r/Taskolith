@@ -209,7 +209,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
                             )}
                             {activeTab === 'assignments' && (
                                 <div>
-                                    <AssigneesManager allMembers={allProjectMembers} isLoading={isLoadingProjectMembers} control={control} register={register} />
+                                    <AssigneesManager allMembers={allProjectMembers} isLoading={isLoadingProjectMembers} control={control} />
                                 </div>
                             )}
                         </div>
@@ -240,9 +240,14 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ isOpen, onClos
     )
 }
 
-const AssigneesManager = ({ allMembers, isLoading, control, register }: any) => {
+const AssigneesManager = ({ allMembers, isLoading, control }: {
+    allMembers: ProjectMember[] | undefined,
+    isLoading: boolean,
+    control: any
+}) => {
     const [activeTab, setActiveTab] = useState<AssigneeTab>('view')
     const [searchQuery, setSearchQuery] = useState('')
+
     const assignedMemberIds = useWatch({ control, name: 'assignedMembers' }) || []
     const assignedIdsSet = useMemo(() => new Set(assignedMemberIds), [assignedMemberIds])
 
@@ -286,21 +291,38 @@ const AssigneesManager = ({ allMembers, isLoading, control, register }: any) => 
                 <input type="text" placeholder="Search members..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500" />
             </div>
             <div className="mt-2 p-2 border border-gray-200 bg-white rounded-md max-h-56 overflow-y-auto space-y-2">
-                {isLoading ? <LoadingSpinner /> : displayedMembers.length > 0 ? (
-                    displayedMembers.map((member: ProjectMember) => (
-                        <div key={member.memberId} className="flex items-center">
-                            <input
-                                id={`detail-member-${member.memberId}`}
-                                type="checkbox"
-                                value={member.memberId}
-                                {...register('assignedMembers')}
-                                defaultChecked={assignedIdsSet.has(member.memberId)}
-                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                            />
-                            <label htmlFor={`detail-member-${member.memberId}`} className="ml-3 block text-sm text-gray-900">{member.username}</label>
-                        </div>
-                    ))
-                ) : <p className="text-sm text-gray-500 text-center py-2">{activeTab === 'view' ? 'No members assigned.' : 'No available members.'}</p>}
+                {isLoading ? <LoadingSpinner /> : (
+                    <Controller
+                        name="assignedMembers"
+                        control={control}
+                        render={({ field: { onChange, value = [] } }) => (
+                            <>
+                                {displayedMembers.length > 0 ? (
+                                    displayedMembers.map((member: ProjectMember) => {
+                                        const isChecked = value.includes(member.memberId);
+                                        return (
+                                            <div key={member.memberId} className="flex items-center">
+                                                <input
+                                                    id={`detail-member-${member.memberId}`}
+                                                    type="checkbox"
+                                                    checked={isChecked}
+                                                    onChange={() => {
+                                                        const newValue = isChecked
+                                                            ? value.filter((id: string) => id !== member.memberId)
+                                                            : [...value, member.memberId];
+                                                        onChange(newValue);
+                                                    }}
+                                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                />
+                                                <label htmlFor={`detail-member-${member.memberId}`} className="ml-3 block text-sm text-gray-900">{member.username}</label>
+                                            </div>
+                                        );
+                                    })
+                                ) : <p className="text-sm text-gray-500 text-center py-2">{activeTab === 'view' ? 'No members assigned.' : 'No available members.'}</p>}
+                            </>
+                        )}
+                    />
+                )}
             </div>
         </div>
     )
