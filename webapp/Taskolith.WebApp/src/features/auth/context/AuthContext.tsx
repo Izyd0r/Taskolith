@@ -24,22 +24,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
-    useEffect(() => {
-        const checkStatus = async () => {
-            try {
-                const res = await api.get<User>("/auth/status")
-                setUser(res.data)
-            } catch {
-                setUser(null)
-            } finally {
+    const checkAuthStatus = async () => {
+        try {
+            const res = await api.get<User>("/auth/status")
+            setUser(res.data) // Set the full user object with email
+        } catch {
+            setUser(null)
+        } finally {
+            if (isLoading) {
                 setIsLoading(false)
             }
         }
-        checkStatus()
+    }
+
+    useEffect(() => {
+        checkAuthStatus()
     }, [])
 
     const login = (user: User) => {
         setUser(user)
+        checkAuthStatus()
     }
 
     const logout = async () => {

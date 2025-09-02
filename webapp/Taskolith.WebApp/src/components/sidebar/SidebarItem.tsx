@@ -1,46 +1,71 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 import { type SidebarItemProps } from '@/components/sidebar/types'
 
 const SidebarItem: React.FC<SidebarItemProps> = ({
     label,
     to,
     icon,
-    delay = 100,
     isCollapsed = false,
     onClick,
+    variant = 'default',
 }) => {
-    const classes = `flex flex-col items-center justify-center py-3 rounded-lg text-blue-600 hover:bg-blue-50`;
+    const isBreadcrumb = variant === 'breadcrumb'
+
+    const baseClasses = 'flex w-full rounded-lg transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2'
+    let dynamicClasses = ''
+
+    if (isBreadcrumb) {
+        dynamicClasses = 'flex-row items-center h-8 px-2 text-sm text-gray-600 hover:bg-gray-100'
+    } else {
+        if (isCollapsed) {
+            dynamicClasses = 'items-center justify-center h-14 text-gray-700 hover:bg-gray-100'
+        } else {
+            dynamicClasses = 'flex-row items-center h-11 px-3 text-gray-700 hover:bg-gray-100'
+        }
+    }
 
     const content = (
         <>
-            {icon}
-            <span
-                className={`mt-1 text-xs whitespace-nowrap transition-all duration-200 ease-in-out ${isCollapsed ? 'opacity-0 h-0' : `opacity-100 h-auto delay-${delay}`
-                    }`}
-            >
-                {label}
-            </span>
+            <div className="flex-shrink-0">{icon}</div>
+            <div className={`overflow-hidden transition-all duration-200 ease-in-out ${isCollapsed ? 'w-0' : 'w-full ml-3'}`}>
+                <span
+                    className={`whitespace-nowrap transition-transform transition-opacity duration-200 ease-in-out origin-left
+                        ${isCollapsed ? 'opacity-0 scale-x-0' : 'opacity-100 scale-x-100'}
+                        ${isBreadcrumb ? 'font-medium' : 'font-semibold'}
+                    `}
+                >
+                    {label}
+                </span>
+            </div>
         </>
     )
 
+    const fullClasses = `${baseClasses} ${dynamicClasses}`
+
     if (to) {
+        if (variant === 'default') {
+            return (
+                <NavLink to={to} end className={({ isActive }) =>
+                    `${fullClasses} 
+                     ${isActive && !isCollapsed ? 'bg-blue-100 font-bold text-blue-700' : ''}
+                     ${isActive && isCollapsed ? 'bg-blue-100 text-blue-700' : ''}`
+                }>
+                    {content}
+                </NavLink>
+            )
+        }
         return (
-            <NavLink to={to} end className={({ isActive }) =>
-                `${classes} ${isActive ? 'bg-blue-100 font-bold text-blue-800' : 'font-medium'}`
-            }>
+            <Link to={to} className={fullClasses}>
                 {content}
-            </NavLink>
+            </Link>
         )
     }
 
     return (
-        <button
-            onClick={onClick}
-            className={`${classes} font-medium w-full text-left`}
-        >
+        <button onClick={onClick} className={fullClasses}>
             {content}
-        </button>
+        </button>   
     )
 }
 

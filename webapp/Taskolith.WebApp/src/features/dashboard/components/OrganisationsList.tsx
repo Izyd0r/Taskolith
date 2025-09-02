@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/Button'
 import { useGetOrganisations } from '@/features/dashboard/hooks/useGetOrganisations'
 import { useCreateOrganisation } from '@/features/dashboard/hooks/useCreateOrganisation'
@@ -8,6 +9,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { Plus, ArrowRight, Building } from 'lucide-react'
 
 const OrganisationsList: React.FC = () => {
+    const queryClient = useQueryClient() // 2. Get the Query Client instance
     const { data: orgs, isLoading, isError, error } = useGetOrganisations()
     const { mutate: createOrganisation, isPending, error: createError } = useCreateOrganisation()
     const [name, setOrganisationName] = useState('')
@@ -16,8 +18,13 @@ const OrganisationsList: React.FC = () => {
     const handleCreate = (e: React.FormEvent) => {
         e.preventDefault()
         if (!name.trim()) return
+
         createOrganisation({ name }, {
-            onSuccess: () => { setOrganisationName('') },
+            onSuccess: () => {
+                queryClient.invalidateQueries({ queryKey: ['organisations'] })
+
+                setOrganisationName('')
+            },
         })
     }
 
@@ -80,7 +87,6 @@ const OrganisationsList: React.FC = () => {
                     {createError && <p className="text-red-500 text-sm mt-2">{(createError as Error).message}</p>}
                 </form>
             </div>
-
             <div className="relative flex-grow min-h-0">
                 <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-gray-50 to-transparent z-10 pointer-events-none" />
                 <div className="h-full overflow-y-auto pr-1 pt-2 pb-2">

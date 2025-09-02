@@ -1,11 +1,11 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
-import OrganisationSidebar from '@/features/organisation/components/OrganisationSidebar'
+import AppSidebar from '@/components/sidebar/AppSidebar'
 
 const OrganisationLayout = () => {
     return (
         <div className="flex bg-gray-100 h-screen">
-            <OrganisationSidebar />
+            <AppSidebar />
 
             <main className="flex-1 flex flex-col overflow-hidden">
                 <Outlet />

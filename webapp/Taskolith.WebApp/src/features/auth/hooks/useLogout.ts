@@ -1,17 +1,19 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/context/AuthContext'
-import { useNavigate } from 'react-router-dom'
 
 export const useLogout = () => {
-    const { logout } = useAuth()
-    const navigate = useNavigate()
+    const { logout: contextLogout } = useAuth()
+    const queryClient = useQueryClient()
 
-    return useMutation({
+    const { mutate, isPending } = useMutation({
         mutationFn: async () => {
-            logout()
+            
+            await contextLogout()
         },
         onSuccess: () => {
-            navigate("/login")
-        }
-    });
-};
+            queryClient.clear()
+        },
+    })
+
+    return { mutate, isPending }
+}

@@ -18,6 +18,7 @@ import Kanban from '@/features/project/components/Kanban'
 import ProjectMembersPage from '@/features/project/components/ProjectMembersPage'
 import EditProjectPage from '@/features/project/components/EditProjectPage'
 import OrganisationAccessPage from '@/features/organisation/components/OrganisationAccessPage'
+import ProfilePage from '@/features/dashboard/components/ProfilePage'
 
 function App() {
     return (
@@ -27,27 +28,34 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
             </Route>
+
             <Route element={<PrivateRoute />}>
                 <Route path="/dashboard" element={<DashboardLayout />}>
                     <Route index element={<DashboardHome />} />
                     <Route path="tasks" element={<DashboardTasks />} />
                     <Route path="invites" element={<DashboardMyInvites />} />
+                    <Route path="profile" element={<ProfilePage />} />
                 </Route>
+
                 <Route path="/organisations/:organisationId" element={<OrganisationLayout />}>
+                    <Route index element={<ProjectsPage />} />
                     <Route path="projects" element={<ProjectsPage />} />
                     <Route path="schedule" element={<SchedulePage />} />
                     <Route path="roles" element={<RolesPage />} />
                     <Route path="settings" element={<OrganisationSettingsPage />} />
                     <Route path="access" element={<OrganisationAccessPage />} />
+                    <Route path="profile" element={<ProfilePage />} />
                 </Route>
+
                 <Route path="/organisations/:organisationId/projects/:projectId" element={<ProjectLayout />}>
+                    <Route index element={<Kanban />} />
                     <Route path="kanban" element={<Kanban />} />
                     <Route path="members" element={<ProjectMembersPage />} />
                     <Route path="schedule" element={<SchedulePage />} />
                     <Route path="settings" element={<EditProjectPage />} />
+                    <Route path="profile" element={<ProfilePage />} />
                 </Route>
             </Route>
-            {/*other routes*/}
         </Routes>
     )
 }

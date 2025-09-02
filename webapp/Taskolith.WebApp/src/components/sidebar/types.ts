@@ -7,4 +7,5 @@ export interface SidebarItemProps {
   delay?: number
   isCollapsed?: boolean
   onClick?: () => void
+  variant?: 'default' | 'breadcrumb'
 }

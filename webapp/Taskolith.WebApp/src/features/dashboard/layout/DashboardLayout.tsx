@@ -1,11 +1,11 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
-import DashboardSidebar from '@/features/dashboard/components/Sidebar'
+import AppSidebar from '@/components/sidebar/AppSidebar'
 
 const DashboardLayout: React.FC = () => {
     return (
         <div className="flex h-screen bg-gray-100 font-sans">
-            <DashboardSidebar />
+            <AppSidebar />
             <main className="flex-1 overflow-hidden">
                 <Outlet />
             </main>
