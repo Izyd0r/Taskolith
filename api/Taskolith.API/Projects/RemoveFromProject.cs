@@ -24,12 +24,12 @@ public class RemoveFromProject : IEndPoint {
         
         var project = await dbContext.Projects
             .Include(p => p.Members)
-            .FirstOrDefaultAsync(p => p.Id == projectId, ct);
+            .FirstOrDefaultAsync(p => p.Id == projectId && p.Organisation.Id == organisationId, ct);
         if (project is null) return Results.NotFound();
         var memberToRemove = project?.Members.FirstOrDefault(m => m.Id == memberId);
         if (memberToRemove is null) return Results.NotFound();
-        
-        dbContext.Entry(memberToRemove).State = EntityState.Deleted;
+       
+        project.Members.Remove(memberToRemove);
         await dbContext.SaveChangesAsync(ct);
         
         return Results.NoContent();
