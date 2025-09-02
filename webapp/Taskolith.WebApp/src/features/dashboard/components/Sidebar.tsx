@@ -1,7 +1,6 @@
 import {
     LayoutDashboard,
     CheckSquare,
-    Building,
     Mail,
     LogOut
 } from 'lucide-react'
@@ -19,7 +18,6 @@ const DashboardSidebar = () => {
         >
             <SidebarItem label="Dashboard" to="/dashboard" icon={<LayoutDashboard size={24} />} delay={100} />
             <SidebarItem label="My Tasks" to="/dashboard/tasks" icon={<CheckSquare size={24} />} delay={150} />
-            <SidebarItem label="Create Org" to="/dashboard/create-organisation" icon={<Building size={24} />} delay={200} />
             <SidebarItem label="My Invites" to="/dashboard/invites" icon={<Mail size={24} />} delay={250} />
         </SidebarLayout>
     );

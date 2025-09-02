@@ -28,3 +28,20 @@ public record TaskDtoWithOrganisation(
     Guid OrganisationId,
     string OrganisationName
 );
+
+public record OrganisationDto(
+    Guid OrganisationId,
+    string OrganisationName
+);
+
+public record ProjectDto(
+    Guid ProjectId,
+    string ProjectName,
+    string ProjectDescription
+);
+
+public record AssignedTask(
+    TaskDtoCore Task,
+    OrganisationDto Organisation,
+    ProjectDto Project
+);

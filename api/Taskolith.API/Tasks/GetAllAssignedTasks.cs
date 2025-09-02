@@ -19,7 +19,7 @@ public class GetAllAssignedTasks : IEndPoint {
             .Include(t => t.Project)
             .ThenInclude(p => p.Organisation)
             .Where(t => t.AssignedMembers.Any(m => m.UserId == Guid.Parse(userId)))
-            .Select(t => new TaskDtoWithOrganisation(
+            .Select(t => new AssignedTask(
                 new TaskDtoCore(
                     t.Id,
                     t.Title,
@@ -28,8 +28,15 @@ public class GetAllAssignedTasks : IEndPoint {
                     t.CreatedDate,
                     t.Priority
                 ),
-                t.Project!.Organisation!.Id,
-                t.Project.Organisation.Name
+                new OrganisationDto(
+                    t.Project!.Organisation!.Id,
+                    t.Project.Organisation.Name                     
+                ),
+                new ProjectDto(
+                    t.Project.Id,
+                    t.Project.Name,
+                    t.Project.Description
+                )
             ))
             .ToListAsync(ct);
         
