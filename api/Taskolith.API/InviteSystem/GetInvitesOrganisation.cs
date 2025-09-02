@@ -24,10 +24,12 @@ public class GetInvitesOrganisation : IEndPoint {
         var userId = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if (userId == null) return Results.BadRequest();
         var invites = await db.Invitations
+            .Include(i => i.Organisation)
             .Where(i => i.OrganisationId == organisationId && i.Status == InvitationStatus.Pending)
             .Select(i => new InvitationDto(
                     i.Id,
                     i.OrganisationId,
+                    i.Organisation.Name,
                     Enum.GetName(i.Status) ?? string.Empty,
                     i.DueDate,
                     i.Expired,

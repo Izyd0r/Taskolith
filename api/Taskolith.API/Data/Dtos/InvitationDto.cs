@@ -5,6 +5,7 @@ namespace Taskolith.API.Data.Dtos;
 public record InvitationDto(
     Guid Id,
     Guid OrganisationId, 
+    String OrganisationName,
     String Status,
     DateTime DueDate,
     bool Expired,

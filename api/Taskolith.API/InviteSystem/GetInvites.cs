@@ -20,10 +20,12 @@ public class GetInvites : IEndPoint {
         if (!Guid.TryParse(userId, out var parsedUserId))
             return Results.BadRequest("Invalid user ID.");
         var invites = await dbContext.Invitations
+            .Include(i => i.Organisation)
             .Where(i => i.UserId == parsedUserId && i.Status == InvitationStatus.Pending)
             .Select(i => new InvitationDto(
                     i.Id,
                     i.OrganisationId,
+                    i.Organisation.Name,
                     Enum.GetName(i.Status) ?? string.Empty,
                     i.DueDate,
                     i.Expired,
