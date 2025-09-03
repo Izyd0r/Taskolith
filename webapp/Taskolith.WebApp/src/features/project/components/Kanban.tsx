@@ -131,8 +131,8 @@ const Kanban: React.FC = () => {
         <div className="flex h-full flex-col bg-gray-50 p-6">
             <h1 className="flex-shrink-0 text-2xl font-bold mb-6">Kanban Board</h1>
             <div className="flex flex-grow items-start gap-6 overflow-x-auto pb-4">
-                {columns.map((column) => (
-                    <div key={column.columnId} className="flex h-full w-[300px] flex-shrink-0 flex-col rounded-xl bg-white p-4">
+                {columns.map((column, index) => (
+                    <div key={column.columnId} className={`flex h-full w-[300px] flex-shrink-0 flex-col rounded-xl border border-gray-200 p-4 bg-white ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
                         <div className="mb-4 flex flex-shrink-0 items-center justify-between px-1">
                             {editingColumnId === column.columnId ? (
                                 <input
