@@ -9,10 +9,12 @@ import { Button } from "@/components/ui/Button"
 import { useLogin } from "@/features/auth/hooks/useLogin"
 import { type LoginCredentials } from "@/features/auth/types"
 import { loginScheme } from "@/features/auth/validators/loginSchema"
+import { useAuth } from "@/features/auth/context/AuthContext"
 
 export function LoginForm() {
     const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
+    const { login } = useAuth()
 
     const { register, handleSubmit, formState: { errors } } = useForm<LoginCredentials>({
         resolver: zodResolver(loginScheme),
@@ -22,7 +24,8 @@ export function LoginForm() {
 
     const onSubmit: SubmitHandler<LoginCredentials> = (data) => {
         loginMutate(data, {
-            onSuccess: () => {
+            onSuccess: async () => {
+                await login()
                 navigate("/dashboard")
             },
         })

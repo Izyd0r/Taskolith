@@ -18,7 +18,7 @@ import Kanban from '@/features/project/components/Kanban'
 import ProjectMembersPage from '@/features/project/components/ProjectMembersPage'
 import EditProjectPage from '@/features/project/components/EditProjectPage'
 import OrganisationAccessPage from '@/features/organisation/components/OrganisationAccessPage'
-import ProfilePage from '@/features/dashboard/components/ProfilePage'
+import ProfilePage from '@/features/profile/components/ProfilePage'
 
 function App() {
     return (

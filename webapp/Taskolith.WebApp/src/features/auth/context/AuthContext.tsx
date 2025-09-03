@@ -1,66 +1,65 @@
-import { createContext, useContext, useState, useEffect } from "react"
-import { useQueryClient } from "@tanstack/react-query"
-import api from "@/lib/axios"
+import React, { createContext, useContext } from "react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import apiClient from "@/lib/axios"
 
 type User = {
     userId: string
     username: string
-    email?: string
+    email: string
 }
 
 type AuthContextType = {
     user: User | null
-    login: (user: User) => void
+    login: () => Promise<void>
     logout: () => Promise<void>
     isAuthenticated: boolean
     isLoading: boolean
 }
 
+export const authQueryKey = ['auth-status']
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+const getAuthStatus = async (): Promise<User> => {
+    const response = await apiClient.get<User>("/auth/status")
+    return response.data
+}
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const queryClient = useQueryClient()
 
-    const [user, setUser] = useState<User | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
+    const { data: user, isLoading, isError } = useQuery<User>({
+        queryKey: authQueryKey,
+        queryFn: getAuthStatus,
+        retry: false,
+        refetchOnWindowFocus: false,
+    })
 
-    const checkAuthStatus = async () => {
-        try {
-            const res = await api.get<User>("/auth/status")
-            setUser(res.data) // Set the full user object with email
-        } catch {
-            setUser(null)
-        } finally {
-            if (isLoading) {
-                setIsLoading(false)
-            }
-        }
-    }
-
-    useEffect(() => {
-        checkAuthStatus()
-    }, [])
-
-    const login = (user: User) => {
-        setUser(user)
-        checkAuthStatus()
+    const login = async () => {
+        await queryClient.invalidateQueries({ queryKey: authQueryKey })
     }
 
     const logout = async () => {
-        queryClient.clear()
         try {
-            await api.post("/auth/logout")
+            await apiClient.post("/auth/logout")
         } catch (e) {
-            console.error("Logout failed", e)
+            console.error("Logout API failed", e)
         } finally {
-            setUser(null)
+            queryClient.setQueryData(authQueryKey, null)
+            await queryClient.invalidateQueries({ queryKey: authQueryKey })
         }
     }
 
+    const contextValue = {
+        user: isError ? null : user || null,
+        login,
+        logout,
+        isAuthenticated: !isError && !!user,
+        isLoading,
+    }
+
     return (
-        <AuthContext.Provider
-            value={{ user, login, logout, isAuthenticated: !!user, isLoading }}
-        >
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     )
