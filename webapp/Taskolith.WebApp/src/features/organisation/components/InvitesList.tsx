@@ -6,17 +6,11 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 interface InviteRowProps {
     invite: Invite
-    onRevoke: (inviteId: string) => void
+    onRevokeClick: (invite: Invite) => void
     isRevoking: boolean
 }
 
-const InviteRow: React.FC<InviteRowProps> = ({ invite, onRevoke, isRevoking }) => {
-    const handleRevoke = () => {
-        if (window.confirm(`Are you sure you want to revoke the invite for ${invite.invitedUserEmail}?`)) {
-            onRevoke(invite.id)
-        }
-    }
-
+const InviteRow: React.FC<InviteRowProps> = ({ invite, onRevokeClick, isRevoking }) => {
     return (
         <tr className="hover:bg-gray-50 transition-colors duration-150">
             <td className="px-6 py-4 whitespace-nowrap">
@@ -49,9 +43,18 @@ const InviteRow: React.FC<InviteRowProps> = ({ invite, onRevoke, isRevoking }) =
                 </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <Button variant="destructive" size="sm" onClick={handleRevoke} disabled={isRevoking}>
-                    <X size={16} className="mr-2" />
-                    {isRevoking ? 'Revoking...' : 'Revoke'}
+                <Button variant="destructive" size="sm" onClick={() => onRevokeClick(invite)} disabled={isRevoking}>
+                    {isRevoking ? (
+                        <>
+                            <LoadingSpinner size="sm" className="mr-2" />
+                            Revoking...
+                        </>
+                    ) : (
+                        <>
+                            <X size={16} className="mr-2" />
+                            Revoke
+                        </>
+                    )}
                 </Button>
             </td>
         </tr>
@@ -63,8 +66,8 @@ interface InvitesListProps {
     isError: boolean
     filteredInvites: Invite[]
     isSearchActive: boolean
-    onRevokeInvite: (inviteId: string) => void
-    isRevoking: boolean
+    onRevokeClick: (invite: Invite) => void
+    revokingInviteId: string | null
 }
 
 export const InvitesList: React.FC<InvitesListProps> = ({
@@ -72,13 +75,12 @@ export const InvitesList: React.FC<InvitesListProps> = ({
     isError,
     filteredInvites,
     isSearchActive,
-    onRevokeInvite,
-    isRevoking,
+    onRevokeClick,
+    revokingInviteId,
 }) => {
     if (isLoading) {
         return <LoadingSpinner />
     }
-
     if (isError) {
         return (
             <div className="text-center p-10 text-red-600 flex justify-center items-center gap-2">
@@ -87,7 +89,6 @@ export const InvitesList: React.FC<InvitesListProps> = ({
             </div>
         )
     }
-
     if (filteredInvites.length === 0) {
         const message = isSearchActive
             ? "No pending invites match your search."
@@ -112,8 +113,8 @@ export const InvitesList: React.FC<InvitesListProps> = ({
                             <InviteRow
                                 key={invite.id}
                                 invite={invite}
-                                onRevoke={onRevokeInvite}
-                                isRevoking={isRevoking}
+                                onRevokeClick={onRevokeClick}
+                                isRevoking={revokingInviteId === invite.id}
                             />
                         ))}
                     </tbody>

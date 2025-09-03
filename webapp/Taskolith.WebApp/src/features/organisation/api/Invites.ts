@@ -22,8 +22,12 @@ export const GetPendingInvites = async (organisationId: string): Promise<Invite[
     }
 };
 
-export const RevokeInvite = async (organisationId: string, inviteId: string): Promise<void> => {
-    console.log(`Revoking invite ${inviteId} for organisation ${organisationId}`)
-    // TODO: implement this for backend
-    return new Promise((resolve) => setTimeout(resolve, 300))
+export const RevokeInvite = async (organisationId: string, invitationId: string): Promise<void> => {
+    try {
+        await apiClient.delete(`/organisations/${organisationId}/invitations/${invitationId}`)
+    } catch (error: any) {
+        console.error('Failed to revoke invite:', error)
+        const errorMessage = error.response?.data?.message || 'An error occurred while revoking the invitation.'
+        throw new Error(errorMessage)
+    }
 }

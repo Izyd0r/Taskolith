@@ -30,14 +30,11 @@ export const useOrganisationAccess = () => {
     const permissions = useMemo(() => {
         const defaultPermissions = { canInvite: false, canKick: false, canAddRole: false, canRemoveRole: false, canManageInvites: false }
         if (!members || !currentUserId) return defaultPermissions
-
         const currentUserAsMember = members.find(m => m.userId.toLowerCase() === currentUserId)
         const currentUserPermissions =
             currentUserAsMember?.roles.reduce((acc: number, role: Role) => acc | role.permissions, 0) ?? 0
-
         const has = (p: number) => (currentUserPermissions & p) === p
         const canInvite = has(Permission.InviteMember)
-
         return {
             canInvite,
             canKick: has(Permission.KickMember),
@@ -49,22 +46,20 @@ export const useOrganisationAccess = () => {
 
     const lowerCaseQuery = query.toLowerCase()
 
-    const filteredMembers = useMemo(() => {
-        return members.filter(
-            m =>
-                m.username?.toLowerCase().includes(lowerCaseQuery) ||
-                m.email?.toLowerCase().includes(lowerCaseQuery) ||
-                m.roles?.some(r => r.name.toLowerCase().includes(lowerCaseQuery))
+    const filteredMembers = useMemo(() => (
+        members.filter(m =>
+            m.username?.toLowerCase().includes(lowerCaseQuery) ||
+            m.email?.toLowerCase().includes(lowerCaseQuery) ||
+            m.roles?.some(r => r.name.toLowerCase().includes(lowerCaseQuery))
         )
-    }, [members, lowerCaseQuery])
+    ), [members, lowerCaseQuery])
 
     const filteredInvites = useMemo(() => {
         if (!invites) return []
         if (!lowerCaseQuery) return invites
-        return invites.filter(
-            i =>
-                i.invitedUserEmail?.toLowerCase().includes(lowerCaseQuery) ||
-                i.initialRoles?.some(r => r.name.toLowerCase().includes(lowerCaseQuery))
+        return invites.filter(i =>
+            i.invitedUserEmail?.toLowerCase().includes(lowerCaseQuery) ||
+            i.initialRoles?.some(r => r.name.toLowerCase().includes(lowerCaseQuery))
         )
     }, [invites, lowerCaseQuery])
 
@@ -76,24 +71,9 @@ export const useOrganisationAccess = () => {
     }, [members, memberToEditRoles])
 
     return {
-        organisationId,
-        currentUserId,
-        view,
-        query,
-        isInviteModalOpen,
-        memberToEditRoles,
-        permissions,
-        filteredMembers,
-        filteredInvites,
-        members,
-        isLoadingMembers,
-        isErrorMembers,
-        isLoadingInvites,
-        isErrorInvites,
-        revokeInvite: revokeInviteMutation,
-        setView,
-        setQuery,
-        setInviteModalOpen,
-        setMemberToEditRoles,
+        organisationId, currentUserId, view, query, isInviteModalOpen, memberToEditRoles,
+        permissions, filteredMembers, filteredInvites, members, isLoadingMembers, isErrorMembers,
+        isLoadingInvites, isErrorInvites, revokeInvite: revokeInviteMutation,
+        setView, setQuery, setInviteModalOpen, setMemberToEditRoles,
     }
 }
