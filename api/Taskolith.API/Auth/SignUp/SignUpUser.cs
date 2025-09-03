@@ -23,7 +23,7 @@ public class SignUpUser : IEndPoint
         HttpResponse response,
         IOptions<JwtOptions> jwtOptions,
         CancellationToken ct,
-        IPasswordHasher<User> passwordHasher
+        IPasswordHasher<Data.Types.User> passwordHasher
     )
     {
         if (await db.Users.AnyAsync(u => u.Email == request.Email, ct))
@@ -32,7 +32,7 @@ public class SignUpUser : IEndPoint
         if (await db.Users.AnyAsync(u => u.Username == request.Username, ct))
             return Results.Conflict("Username is already taken.");
 
-        var user = new User
+        var user = new Data.Types.User
         {
             Id = Guid.NewGuid(),
             Username = request.Username,

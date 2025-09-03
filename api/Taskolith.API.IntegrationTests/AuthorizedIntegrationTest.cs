@@ -11,7 +11,7 @@ namespace Taskolith.API.IntegrationTests;
 
 public class AuthorizedIntegrationTest : BaseIntegrationTest
 {
-    public required User AuthorizedUser { get; init; }
+    public required Data.Types.User AuthorizedUser { get; init; }
     public required HttpClient AuthorizedHttpClient { get; init; }
 
     protected AuthorizedIntegrationTest(IntegrationTestWebAppFactory factory) : base(factory) { }
@@ -24,8 +24,8 @@ public class AuthorizedIntegrationTest : BaseIntegrationTest
             BaseAddress = new Uri("https://localhost")
         };
         var client = factory.CreateClient(clientOptions);
-        var user = GenerateFakeUser();
-        PasswordHasher<User> passwordHasher = new();
+        Data.Types.User user = GenerateFakeUser();
+        PasswordHasher<Data.Types.User> passwordHasher = new();
         string passwordRequest = user.Password;
         user.Password = passwordHasher.HashPassword(user, user.Password);
         
@@ -48,9 +48,9 @@ public class AuthorizedIntegrationTest : BaseIntegrationTest
         };
     }
 
-    private static User GenerateFakeUser()
+    private static Data.Types.User GenerateFakeUser()
     {
-        return new Faker<User>()
+        return new Faker<Data.Types.User>()
             .RuleFor(u => u.Username, f => f.Internet.UserName(f.Name.FirstName(), f.Name.LastName()))
             .RuleFor(u => u.Password, "Password123!")
             .RuleFor(u => u.Email, f => f.Internet.Email())

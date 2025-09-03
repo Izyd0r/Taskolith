@@ -24,13 +24,13 @@ public class LoginUserTests(IntegrationTestWebAppFactory factory, ITestOutputHel
     public async Task LoginUser_ThatExists_ShouldReturnSuccessAndSetAuthCookie()
     {
         var client = _factory.CreateClient(); 
-        var user = new User {
+        var user = new Data.Types.User {
             Username = "testusername",
             Email = "example@email.com",
             FirstName = "Firstname",
             LastName = "Lastname"
         };
-        PasswordHasher<User> passwordHasher = new();
+        PasswordHasher<Data.Types.User> passwordHasher = new();
         user.Password = passwordHasher.HashPassword(user, "PasswordExample123!");
         
         var loginRequest = new LoginRequest(user.Username, "PasswordExample123!");

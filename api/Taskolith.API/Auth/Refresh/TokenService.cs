@@ -6,7 +6,8 @@ namespace Taskolith.API.Auth.Refresh;
 
 public class TokenService(AppDbContext db, JwtTokenGenerator jwt) : ITokenService
 {
-    public async Task<(string AccessToken, RefreshToken RefreshToken)> GenerateTokensAsync(User user, CancellationToken ct)
+    public async Task<(string AccessToken, RefreshToken RefreshToken)> GenerateTokensAsync(Data.Types.User user,
+        CancellationToken ct)
     {
         var accessToken = jwt.GenerateToken(user);
         var refreshToken = new RefreshToken

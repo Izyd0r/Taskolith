@@ -48,12 +48,12 @@ public class GetOrganisationsMembersTests(IntegrationTestWebAppFactory factory) 
         getMembersResponse.Should().NotBeNull();
         getMembersResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var members = await getMembersResponse.Content.ReadFromJsonAsync<List<GetOrganisationMembersResponse>>();
+        var members = await getMembersResponse.Content.ReadFromJsonAsync<GetMembersApiResponse>();
         members.Should().NotBeNull();
-        members!.Count.Should().Be(2);
+        members!.Members.Count.Should().Be(2);
 
-        var memberOne = members.FirstOrDefault(m => m.Member.UserId == userOne.AuthorizedUser.Id);
-        var memberTwo = members.FirstOrDefault(m => m.Member.UserId == userTwo.AuthorizedUser.Id);
+        var memberOne = members.Members.FirstOrDefault(m => m.Member.UserId == userOne.AuthorizedUser.Id);
+        var memberTwo = members.Members.FirstOrDefault(m => m.Member.UserId == userTwo.AuthorizedUser.Id);
 
         memberOne.Should().NotBeNull();
         memberTwo.Should().NotBeNull();

@@ -18,7 +18,7 @@ public class JwtOptions
 
 public class JwtTokenGenerator(IOptions<JwtOptions> options)
 {
-   public string GenerateToken(User user)
+   public string GenerateToken(Data.Types.User user)
    {
       var tokenHandler = new JwtSecurityTokenHandler();
       SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(options.Value.Key));

@@ -57,7 +57,7 @@ public class GetAssignedTasksForMemberTest(IntegrationTestWebAppFactory factory)
         assignedTasks.Should().NotBeNull();
         assignedTasks.Should().HaveCount(2, "because the user was assigned to one task in each of the two organisations");
         
-        assignedTasks.Should().Contain(t => t.Task.TaskId == task1Content.TaskId && t.OrganisationId == org1.OrganisationId, "Task 1 from Org 1 should be present");
-        assignedTasks.Should().Contain(t => t.Task.TaskId == task3Content.TaskId && t.OrganisationId == org2.OrganisationId, "Task 3 from Org 2 should be present");
+        assignedTasks.Should().Contain(t => t.Task.TaskId == task1Content.TaskId && t.Organisation.OrganisationId == org1.OrganisationId, "Task 1 from Org 1 should be present");
+        assignedTasks.Should().Contain(t => t.Task.TaskId == task3Content.TaskId && t.Organisation.OrganisationId == org2.OrganisationId, "Task 3 from Org 2 should be present");
     }
 }

@@ -16,6 +16,7 @@ using Taskolith.API.Roles;
 using Taskolith.API.Projects;
 using Taskolith.API.Roles;
 using Taskolith.API.Tasks;
+using Taskolith.API.UserInfo;
 
 namespace Taskolith.API;
 
@@ -28,6 +29,7 @@ public static class Endpoints
 
         // Here we map groups of endpoints
         endpoints.MapAuthEndpoints();
+        endpoints.MapUserEndpoints();
         endpoints.MapOrganisationManagementEndpoints();
         endpoints.MapProjectEndpoints();
         endpoints.MapInvitationEndpoints();
@@ -49,6 +51,14 @@ public static class Endpoints
             .MapEndpoint<Refresh>();
         endpoints.MapPrivateGroup()
             .MapEndpoint<GetStatus>();
+    }
+
+    private static void MapUserEndpoints(this IEndpointRouteBuilder app)
+    {
+        var endpoints = app.MapGroup("/users")
+            .WithTags("User");
+        endpoints.MapPrivateGroup()
+            .MapEndpoint<UpdateUser>();
     }
 
     private static void MapTasksEndpoints(this IEndpointRouteBuilder app)

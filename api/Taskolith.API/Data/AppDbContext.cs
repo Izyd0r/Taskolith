@@ -5,7 +5,7 @@ namespace Taskolith.API.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<User> Users { get; set; }
+    public DbSet<Types.User> Users { get; set; }
     public DbSet<ToDoTask> ToDoTasks { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Organisation> Organisations { get; set; }
@@ -31,7 +31,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     private static void ConfigureUsersTable(ModelBuilder modelBuilder)
     {
-        var builder = modelBuilder.Entity<User>();
+        var builder = modelBuilder.Entity<Types.User>();
         
         builder.ToTable("Users");
         builder.HasKey(u => u.Id);

@@ -4,6 +4,7 @@ namespace Taskolith.API.Auth.Refresh;
 
 public interface ITokenService
 {
-    Task<(string AccessToken, RefreshToken RefreshToken)> GenerateTokensAsync(User user, CancellationToken ct);
+    Task<(string AccessToken, RefreshToken RefreshToken)> GenerateTokensAsync(Data.Types.User user,
+        CancellationToken ct);
     Task<(string? AccessToken, RefreshToken? RefreshToken)> RefreshTokensAsync(string refreshTokenValue, CancellationToken ct);
 }

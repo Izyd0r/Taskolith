@@ -23,7 +23,7 @@ public class LoginUser : IEndPoint
         HttpResponse response,
         IOptions<JwtOptions> jwtOptions,
         CancellationToken ct,
-        IPasswordHasher<User> passwordHasher)
+        IPasswordHasher<Data.Types.User> passwordHasher)
     {
         var user = await db.Users.FirstOrDefaultAsync(u => u.Username == request.Username, ct);
         if (user is null)

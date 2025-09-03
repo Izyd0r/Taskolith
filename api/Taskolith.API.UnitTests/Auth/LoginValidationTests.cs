@@ -14,7 +14,7 @@ public class LoginValidationTests
    public void TokenGenerator_ShouldReturnCorrectToken_WithCorrectClaims()
    {
       // Arrange
-      var user = new User {
+      var user = new Data.Types.User {
          Id = Guid.NewGuid(),
          Username = "testusername",
          Password = "testpassword",
@@ -51,7 +51,7 @@ public class LoginValidationTests
    public void TokenGenerator_ShouldUseHmac256Algorithm_WithCorrectClaims()
    {
       // Arrange
-      var user = new User {
+      var user = new Data.Types.User {
          Id = Guid.NewGuid(),
          Username = "testusername",
          Password = "testpassword",
