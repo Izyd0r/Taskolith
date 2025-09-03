@@ -3,7 +3,8 @@ namespace Taskolith.API.Data.Types;
 public enum InvitationStatus {
     Pending,
     Accepted,
-    Rejected
+    Rejected,
+    Revoked,
 }
 
 public class Invitation {

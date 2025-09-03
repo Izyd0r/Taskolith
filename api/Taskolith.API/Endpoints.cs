@@ -96,6 +96,7 @@ public static class Endpoints
             .MapEndpoint<GetUserOrganisations>();
         endpoints.MapPrivateGroup()
             .MapEndpoint<InviteMember>()
+            .MapEndpoint<RevokeInvitation>()
             .MapEndpoint<KickMember>();
         endpoints.MapPrivateGroup()
             .MapEndpoint<GetOrganisationMembers>();
