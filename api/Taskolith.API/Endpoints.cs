@@ -36,7 +36,6 @@ public static class Endpoints
         endpoints.MapKanbanEndpoints();
         endpoints.MapTasksEndpoints();
         endpoints.MapRolesEndpoints();
-
     }
 
     private static void MapAuthEndpoints(this IEndpointRouteBuilder app)
@@ -58,7 +57,8 @@ public static class Endpoints
         var endpoints = app.MapGroup("/users")
             .WithTags("User");
         endpoints.MapPrivateGroup()
-            .MapEndpoint<UpdateUser>();
+            .MapEndpoint<UpdateUser>()
+            .MapEndpoint<DeleteUser>();
     }
 
     private static void MapTasksEndpoints(this IEndpointRouteBuilder app)
