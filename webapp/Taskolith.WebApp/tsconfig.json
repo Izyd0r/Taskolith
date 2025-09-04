@@ -6,6 +6,9 @@
         },
         {
             "path": "./tsconfig.node.json"
+        },
+        {
+            "path": "./tsconfig.test.json"
         }
     ],
     "compilerOptions": {
@@ -17,7 +20,6 @@
         },
         "types": [
             "vite/client",
-            "vite/globals",
             "@testing-library/jest-dom"
         ]
     }
