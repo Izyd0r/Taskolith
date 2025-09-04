@@ -876,3 +876,4 @@ dist-ssr
 
 docs/
 .env
+nginx/certs
